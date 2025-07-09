@@ -1,0 +1,85 @@
+<nav>
+  <div class="h-screen bg-primary">
+    <div class="flex flex-col gap-8 px-[12px] mt-[50px]">
+      <a
+        class="flex gap-1 cursor-pointer p-2 rounded"
+        (click)="selectMenu('dashboard')"
+        [ngClass]="{
+          'bg-white text-primary': selectedItem === 'dashboard',
+          'text-white': selectedItem !== 'dashboard',
+        }"
+        [routerLink]="'/dashboard'"
+      >
+        <mat-icon
+          [ngClass]="{
+            'text-primary': selectedItem === 'dashboard',
+            'text-white': selectedItem !== 'dashboard',
+          }"
+        >
+          dashboard
+        </mat-icon>
+        <span>Dashboard</span>
+      </a>
+
+      <a
+        class="flex gap-1 cursor-pointer p-2 rounded"
+        (click)="selectMenu('contacts')"
+        [ngClass]="{
+          'bg-white text-primary': selectedItem === 'contacts',
+          'text-white': selectedItem !== 'contacts',
+        }"
+        [routerLink]="'/contacts'"
+      >
+        <mat-icon
+          [ngClass]="{
+            'text-primary': selectedItem === 'contacts',
+            'text-white': selectedItem !== 'contacts',
+          }"
+        >
+          article
+        </mat-icon>
+        <span>Contacts</span>
+      </a>
+
+      <a
+        class="flex gap-1 cursor-pointer p-2 rounded"
+        (click)="selectMenu('orders')"
+        [ngClass]="{
+          'bg-white text-primary': selectedItem === 'orders',
+          'text-white': selectedItem !== 'orders',
+        }"
+        [routerLink]="'/sales-orders'"
+      >
+        <mat-icon
+          [ngClass]="{
+            'text-primary': selectedItem === 'orders',
+            'text-white': selectedItem !== 'orders',
+          }"
+        >
+          receipt_long
+        </mat-icon>
+        <span>Sales Orders</span>
+      </a>
+
+      <a
+        class="flex gap-1 cursor-pointer p-2 rounded"
+        (click)="selectMenu('users')"
+        [ngClass]="{
+          'bg-white text-primary': selectedItem === 'users',
+          'text-white': selectedItem !== 'users',
+        }"
+        [routerLink]="'/user-management'"
+      >
+        <mat-icon
+          [ngClass]="{
+            'text-primary': selectedItem === 'users',
+            'text-white': selectedItem !== 'users',
+          }"
+        >
+          person
+        </mat-icon>
+        <span>User Management</span>
+      </a>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,12 @@
+<div
+  class="w-[336px] h-[39px] rounded-[10px] flex justify-between shadow-xl p-2 text-center"
+>
+  <input
+    type="text"
+    placeholder="Search by email/name"
+    class="placeholder-gray-400 focus:outline-none focus:border-blue-500 py-2"
+    [(ngModel)]="searchText"
+    (input)="valueChange()"
+  />
+  <mat-icon>search</mat-icon>
+</div>
