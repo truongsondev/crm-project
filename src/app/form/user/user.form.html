@@ -1,0 +1,100 @@
+<form
+  (ngSubmit)="onSubmit()"
+  [formGroup]="form"
+  class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2 bg-white rounded-md shadow w-full"
+>
+  <app-form-input
+    label="First Name"
+    formControlName="first_name"
+    placeholder="Gumayusi"
+  ></app-form-input>
+
+  <app-form-input
+    label="Last Name"
+    formControlName="last_name"
+    placeholder="T1"
+  ></app-form-input>
+
+  <app-form-input
+    label="Email"
+    formControlName="email"
+    placeholder="Ex. john@example.com"
+  ></app-form-input>
+
+  <app-form-input
+    label="Username"
+    formControlName="user_name"
+    placeholder="Ex. johndoe"
+  ></app-form-input>
+
+  <app-form-input
+    label="Password"
+    formControlName="password"
+    placeholder="Password"
+    type="password"
+  ></app-form-input>
+
+  <app-form-input
+    label="Confirm Password"
+    formControlName="confirm_password"
+    placeholder="Confirm Password"
+    type="password"
+  ></app-form-input>
+
+  <app-form-input
+    label="Address"
+    formControlName="address"
+    placeholder="123 Main St"
+    class="col-span-2"
+  ></app-form-input>
+
+  <mat-form-field class="w-full">
+    <mat-label>Salutation</mat-label>
+    <mat-select formControlName="salutation">
+      <mat-option value="none">None</mat-option>
+      <mat-option value="mr">Mr.</mat-option>
+      <mat-option value="mrs">Mrs.</mat-option>
+      <mat-option value="dr">Dr.</mat-option>
+      <mat-option value="prof">Prof.</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="w-full">
+    <mat-label>Role</mat-label>
+    <mat-select formControlName="role">
+      <mat-option value="USER_ADMIN">Admin</mat-option>
+      <mat-option value="DIR">Director</mat-option>
+      <mat-option value="SALES_MGR">Sales Manager</mat-option>
+      <mat-option value="SALES_EMP">Sales Person</mat-option>
+      <mat-option value="CONTACT_MGR">Contact Manager</mat-option>
+      <mat-option value="CONTACT_EMP">Contact Employee</mat-option>
+      <mat-option value="USER_READ_ONLY">Guest</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="w-full">
+    <mat-label>Hired Date</mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="hired_date" />
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+  <mat-slide-toggle formControlName="active">Active</mat-slide-toggle>
+
+  <app-form-input
+    label="Job Title"
+    formControlName="job_title"
+    placeholder="Ex. Developer"
+  ></app-form-input>
+
+  <mat-slide-toggle formControlName="manager">Manager</mat-slide-toggle>
+
+  <div class="col-span-2">
+    <button
+      type="submit"
+      class="w-full bg-primary text-white py-2 rounded-[15px] cursor-pointer hover:bg-white hover:text-primary transition duration-300 border border-transparent hover:border-primary"
+    >
+      Submit
+    </button>
+  </div>
+</form>

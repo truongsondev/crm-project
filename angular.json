@@ -23,7 +23,7 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/styles.css"
+              "src/app/styles/styles.css"
             ]
           },
           "configurations": {
@@ -38,6 +38,12 @@
                   "type": "anyComponentStyle",
                   "maximumWarning": "4kB",
                   "maximumError": "8kB"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/app/environments/environment.dev.ts",
+                  "with": "src/app/environments/environment.prod.ts"
                 }
               ],
               "outputHashing": "all"
