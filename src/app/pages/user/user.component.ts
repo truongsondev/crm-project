@@ -21,12 +21,14 @@ import { User } from '@app/interfaces/user.interface';
 import { HeaderColumn } from '@app/custom-types/shared.type';
 import { ModalDiaLogComponent } from '@app/shares/modal/modal.component';
 import { UserForm } from '@app/form/user/user.form';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
   standalone: true,
   selector: 'user-management',
   templateUrl: './user.component.html',
   styleUrl: './user.component.css',
+  providers: [provideNativeDateAdapter()],
   imports: [
     SearchComponent,
     MatIconModule,
@@ -46,31 +48,41 @@ export class UserManagementComponent implements AfterViewInit {
 
   displayedColumns: string[] = [
     'employee',
-    'username',
+    'user_name',
     'email',
     'salutation',
     'role',
-    'jobTitle',
+    'job_title',
     'manager',
     'action',
   ];
   columnDefs: HeaderColumn[] = [
     { column: 'employee', label: 'Employee' },
-    { column: 'username', label: 'Username' },
+    { column: 'user_name', label: 'Username' },
     { column: 'email', label: 'Email' },
     { column: 'salutation', label: 'Salutation' },
     { column: 'role', label: 'Role' },
-    { column: 'jobTitle', label: 'Job Title' },
+    { column: 'job_title', label: 'Job Title' },
     { column: 'manager', label: 'Manager' },
     { column: 'action', label: 'Action' },
   ];
+
+  displayRole = {
+    USER_ADMIN: 'Admin',
+    DIR: 'Director',
+    SALES_MGR: 'Sales Manager',
+    SALES_EMP: 'Sales Person',
+    CONTACT_MGR: 'Contact Manager',
+    CONTACT_EMP: 'Contact Employee',
+    USER_READ_ONLY: 'Guest',
+  };
+
   dataSource!: MatTableDataSource<User>;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   onSearch(event: string) {
     if (event !== '') {
-      this.userService.getListUser({ username: event }).subscribe((data) => {
-        console.log('data:::', data);
+      this.userService.getListUser({ user_name: event }).subscribe((data) => {
         this.employees = data;
         this.dataSource.data = data;
       });
@@ -114,10 +126,28 @@ export class UserManagementComponent implements AfterViewInit {
     this.dialog.open(ModalDiaLogComponent, {
       data: {
         component: UserForm,
-        title: "Add user"
+        title: 'Add user',
+        metadata: {
+          user: {},
+          action: 'create',
+        },
+      },
+    });
+  }
+  onRowClick(row: User) {
+    this.dialog.open(ModalDiaLogComponent, {
+      data: {
+        component: UserForm,
+        title: 'Edit user',
+        metadata: {
+          user: row,
+          action: 'update',
+        },
       },
     });
   }
 
-  
+  getDisplayRole(role: string): string {
+    return this.displayRole[role as keyof typeof this.displayRole] || '-';
+  }
 }

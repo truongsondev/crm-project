@@ -1,7 +1,7 @@
 <form
   (ngSubmit)="onSubmit()"
   [formGroup]="form"
-  class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2 bg-white rounded-md shadow w-full"
+  class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2 bg-white rounded-[10px] shadow w-full"
 >
   <app-form-input
     label="First Name"
@@ -78,17 +78,42 @@
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker></mat-datepicker>
   </mat-form-field>
+  <mat-form-field class="w-full">
+    <mat-label>Terminated date</mat-label>
+    <input
+      matInput
+      [matDatepicker]="picker2"
+      formControlName="terminated_date"
+      [disabled]="!isTerminate"
+    />
+    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+    <mat-datepicker #picker2></mat-datepicker>
+  </mat-form-field>
 
-  <mat-slide-toggle formControlName="active">Active</mat-slide-toggle>
-
+  <mat-form-field class="w-full">
+    <mat-label>Manager name</mat-label>
+    <mat-select formControlName="manager_name">
+      <mat-option value="none">None</mat-option>
+      <mat-option value="mr">Mr.</mat-option>
+      <mat-option value="mrs">Mrs.</mat-option>
+      <mat-option value="dr">Dr.</mat-option>
+      <mat-option value="prof">Prof.</mat-option>
+    </mat-select>
+  </mat-form-field>
   <app-form-input
     label="Job Title"
     formControlName="job_title"
     placeholder="Ex. Developer"
   ></app-form-input>
+  <mat-slide-toggle formControlName="active">Active</mat-slide-toggle>
 
   <mat-slide-toggle formControlName="manager">Manager</mat-slide-toggle>
-
+  <mat-checkbox
+    (change)="onToggleTerminated()"
+    [(ngModel)]="isTerminate"
+    formControlName="is_terminate"
+    >Mushroom</mat-checkbox
+  >
   <div class="col-span-2">
     <button
       type="submit"

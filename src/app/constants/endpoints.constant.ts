@@ -5,7 +5,8 @@ export const getEndpoints = () => {
     user: {
       v1: {
         users: `${environment.baseURL}/employees`,
-        create_user: `${environment.baseURL}/employees/create`,
+        create_user: `${environment.baseURL}/employees`,
+        update_user: `${environment.baseURL}/employees/:id`,
       },
     },
   } as const;

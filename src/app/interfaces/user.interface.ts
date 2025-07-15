@@ -1,9 +1,18 @@
 export interface User {
-  employee: string;
-  username: string;
+  id: string;
+  first_name: string;
+  last_name: string;
+  user_name: string;
   email: string;
+  address: string;
+  salutation: string;
   role: string;
-  jobTitle: string;
-  manager: string;
-  action: string;
+  job_title: string;
+  active: boolean;
+  manager: boolean;
+  manager_name: string;
+  hired_date: Date;
+  terminated_date: Date;
+  created_time: Date;
+  updated_time: Date;
 }
