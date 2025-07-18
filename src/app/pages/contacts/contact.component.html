@@ -1,1 +1,75 @@
-<h1>this is contact</h1>
+<div class="mt-6 mx-10">
+  <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-10">
+      <div class="flex gap-20 items-center">
+        <h1 class="font-medium text-4xl">Contacts</h1>
+        <div
+          (click)="openDialog()"
+          class="px-2 cursor-pointer flex items-center justify-center gap-2 h-[35px] bg-primary rounded-[10px] text-white font-medium"
+        >
+          <mat-icon class="text-white cursor-pointer" [style.color]="'white'"
+            >add</mat-icon
+          >
+          <button class="cursor-pointer">Add Contact</button>
+        </div>
+      </div>
+      <div class="flex justify-between items-center">
+        <h1 class="font-medium text-xl">List of Contacts</h1>
+        <div>
+          <search-component
+            (search)="onSearch($event)"
+            [titleSearch]="mySearch"
+          />
+        </div>
+      </div>
+      <div>
+        <div class="mat-elevation-z8">
+          <table mat-table [dataSource]="dataSource" matSort>
+            <ng-container
+              *ngFor="let col of columnDefs"
+              [matColumnDef]="col.column"
+            >
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                {{ col.label }}
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <ng-container [ngSwitch]="col.column">
+                  <span
+                    class="text-primary cursor-pointer flex gap-2"
+                    *ngSwitchCase="'action'"
+                  >
+                    <span>Edit</span>
+                    <span>Delete</span>
+                  </span>
+                  <span *ngSwitchCase="'created_on'">
+                    {{ getFormattedDate(row[col.column]) || "-" }}
+                  </span>
+                  <span *ngSwitchCase="'updated_on'">
+                    {{ getFormattedDate(row[col.column]) || "-" }}
+                  </span>
+                  <span *ngSwitchDefault>
+                    {{ row[col.column] || "-" }}
+                  </span>
+                </ng-container>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell" colspan="4">
+                No data matching the filter CONSTANT CHỖ NÀY
+              </td>
+            </tr>
+          </table>
+
+          <mat-paginator
+            [pageSizeOptions]="[10]"
+            aria-label="Select page of users"
+          ></mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

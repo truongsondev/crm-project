@@ -1,4 +1,4 @@
-<div class="mt-6 mx-10">
+<div class="mt-6 mx-10 bg-white">
   <div class="flex flex-col gap-6">
     <div class="flex flex-col gap-10">
       <div class="flex gap-20 items-center">
@@ -17,31 +17,96 @@
       <div class="flex justify-between items-center">
         <h1 class="font-medium text-xl">List of Users</h1>
         <div class="relative">
-          <select class="rounded px-4 py-2 w-40 shadow-lg">
-            <option>Filter by</option>
-            <option value="role">Role</option>
-            <option value="createdTime">Created Time</option>
-            <option value="updatedTime">Updated Time</option>
+          <select
+            class="rounded px-4 py-2 w-50 shadow-lg"
+            (change)="getUserByRole($event)"
+          >
+            <option value="">Role</option>
+            <option
+              *ngFor="let item of displayRole | keyvalue"
+              [value]="item.key"
+            >
+              {{ item.value }}
+            </option>
           </select>
         </div>
+        <div class="relative">
+          <mat-form-field>
+            <mat-label>Created time</mat-label>
+            <mat-date-range-input
+              [rangePicker]="createdPicker"
+              [formGroup]="range"
+            >
+              <input
+                formControlName="start"
+                matStartDate
+                placeholder="Start date"
+              />
+              <input
+                (dateChange)="getUserByTime()"
+                formControlName="end"
+                matEndDate
+                placeholder="End date"
+              />
+            </mat-date-range-input>
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="createdPicker"
+            ></mat-datepicker-toggle>
+            <mat-date-range-picker #createdPicker></mat-date-range-picker>
+            @if (range.controls.start.hasError("matStartDateInvalid")) {
+              <mat-error>Invalid start date</mat-error>
+            }
+            @if (range.controls.end.hasError("matEndDateInvalid")) {
+              <mat-error>Invalid end date</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="relative">
+          <mat-form-field>
+            <mat-label>Updated time</mat-label>
+            <mat-date-range-input
+              [rangePicker]="updatedPicker"
+              [formGroup]="range"
+            >
+              <input
+                matStartDate
+                placeholder="Start date"
+                formControlName="start"
+              />
+              <input
+                matEndDate
+                placeholder="End date"
+                formControlName="end"
+                (dateChange)="getUserByTime()"
+              />
+            </mat-date-range-input>
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="updatedPicker"
+            ></mat-datepicker-toggle>
+            <mat-date-range-picker #updatedPicker></mat-date-range-picker>
+            @if (range.controls.start.hasError("matStartDateInvalid")) {
+              <mat-error>Invalid start date</mat-error>
+            }
+            @if (range.controls.end.hasError("matEndDateInvalid")) {
+              <mat-error>Invalid end date</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
         <div>
-          <search-component (testFn)="onSearch($event)" />
+          <search-component
+            (search)="onSearch($event)"
+            [titleSearch]="mySearch"
+          />
         </div>
       </div>
 
       <div>
-        <mat-form-field>
-          <mat-label>Filter</mat-label>
-          <input
-            matInput
-            (keyup)="applyFilter($event)"
-            placeholder="Ex. Mia"
-            #input
-          />
-        </mat-form-field>
-
         <div class="mat-elevation-z8">
-          <table mat-table [dataSource]="dataSource" matSort>
+          <table mat-table [dataSource]="dataSource" matSort class="">
             <ng-container
               *ngFor="let col of columnDefs"
               [matColumnDef]="col.column"
@@ -51,12 +116,25 @@
               </th>
               <td mat-cell *matCellDef="let row">
                 <ng-container [ngSwitch]="col.column">
-                  <span class="text-primar" *ngSwitchCase="'action'">edit</span>
+                  <span
+                    class="text-primary cursor-pointer"
+                    *ngSwitchCase="'action'"
+                    (click)="onRowClick(row)"
+                    >Edit</span
+                  >
                   <span *ngSwitchCase="'employee'">
                     {{ row["first_name"] }} {{ row["last_name"] }}
                   </span>
                   <span *ngSwitchCase="'role'">
                     {{ getDisplayRole(row.role) }}
+                  </span>
+                  <span *ngSwitchCase="'all'">
+                    <p>
+                      <mat-checkbox></mat-checkbox>
+                    </p>
+                  </span>
+                  <span *ngSwitchCase="'manager_name'">
+                    {{ row.manager_name?.name || "-" }}
                   </span>
                   <span *ngSwitchDefault>
                     {{ row[col.column] || "-" }}
@@ -66,11 +144,7 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr
-              mat-row
-              *matRowDef="let row; columns: displayedColumns"
-              (click)="onRowClick(row)"
-            ></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
             <tr class="mat-row" *matNoDataRow>
               <td class="mat-cell" colspan="4">

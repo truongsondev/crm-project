@@ -5,12 +5,15 @@ export default {
     extend: {
       colors: {
         primary: "#0099FF",
-        secondary: "#F1F5FB"
+        secondary: "#F1F5FB",
       },
       fontFamily: {
-        roboto: ["Roboto", "sans-serif"]
-      }
-    }
+        roboto: ["Roboto", "sans-serif"],
+      },
+      boxShadow: {
+        custom: "0px 3px 8px rgba(0, 0, 0, 0.24)",
+      },
+    },
   },
-  plugins: []
+  plugins: [],
 };

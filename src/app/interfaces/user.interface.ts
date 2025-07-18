@@ -10,7 +10,10 @@ export interface User {
   job_title: string;
   active: boolean;
   manager: boolean;
-  manager_name: string;
+  manager_name: {
+    id: string;
+    name: string;
+  };
   hired_date: Date;
   terminated_date: Date;
   created_time: Date;

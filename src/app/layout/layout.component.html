@@ -1,10 +1,10 @@
-<main class="flex h-screen bg-second">
+<main class="flex bg-second">
   <nav-component class="w-[250px] bg-primary"></nav-component>
 
   <div class="flex-1 flex flex-col w-full">
-    <header-component></header-component>
+    <header-component class="sticky top-0"></header-component>
 
-    <div class="flex-1 overflow-auto bg-secondary">
+    <div class="flex-1 overflow-auto bg-white">
       <router-outlet></router-outlet>
     </div>
   </div>

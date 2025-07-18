@@ -1,0 +1,107 @@
+<form
+  action=""
+  class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2 bg-white rounded-[10px] shadow w-full"
+>
+  <mat-form-field hintLabel="">
+    <mat-label>Contact name</mat-label>
+    <input
+      matInput
+      #input
+      maxlength="10"
+      placeholder="Ex. Nougat"
+      (input)="onInput($event)"
+    />
+  </mat-form-field>
+  <mat-form-field hintLabel="">
+    <mat-label>Phone</mat-label>
+    <input
+      matInput
+      #input
+      maxlength="10"
+      placeholder="Ex. Nougat"
+      (input)="onInput($event)"
+    />
+  </mat-form-field>
+
+  <mat-form-field hintLabel="">
+    <mat-label>Email</mat-label>
+    <input
+      matInput
+      #input
+      maxlength="10"
+      placeholder="Ex. Nougat"
+      (input)="onInput($event)"
+    />
+  </mat-form-field>
+  <mat-form-field hintLabel="">
+    <mat-label>Organization</mat-label>
+    <input
+      matInput
+      #input
+      maxlength="10"
+      placeholder="Ex. Nougat"
+      (input)="onInput($event)"
+    />
+  </mat-form-field>
+
+  <mat-form-field class="w-full">
+    <mat-label>Lead source</mat-label>
+    <mat-select formControlName="lead_source">
+      <mat-option *ngFor="let item of leadSource" [value]="item"
+        >{{ item }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="w-full">
+    <mat-label>Assigned to</mat-label>
+    <mat-select formControlName="manager_name">
+      <mat-option> clgt </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="w-full">
+    <mat-label>Hired Date</mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="hired_date" />
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+  <mat-form-field hintLabel="">
+    <mat-label>Description</mat-label>
+    <input
+      matInput
+      #input
+      maxlength="10"
+      placeholder="Ex. Nougat"
+      (input)="onInput($event)"
+    />
+  </mat-form-field>
+  <mat-form-field hintLabel="">
+    <mat-label>Address</mat-label>
+    <input
+      matInput
+      #input
+      maxlength="10"
+      placeholder="Ex. Nougat"
+      (input)="onInput($event)"
+    />
+  </mat-form-field>
+
+  <mat-form-field class="w-full">
+    <mat-label>Salutation</mat-label>
+    <mat-select>
+      <mat-option *ngFor="let item of salutations" [value]="item.value">
+        {{ item.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field hintLabel="">
+    <mat-label>Description</mat-label>
+    <input
+      matInput
+      #input
+      maxlength="10"
+      placeholder="Ex. Nougat"
+      (input)="onInput($event)"
+    />
+  </mat-form-field>
+</form>

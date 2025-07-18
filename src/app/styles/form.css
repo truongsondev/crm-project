@@ -1,3 +1,12 @@
 .mat-mdc-text-field-wrapper {
   background-color: aliceblue !important;
 }
+
+.mat-mdc-select-panel {
+  background-color: white !important;
+}
+
+.mat-mdc-option:hover:not(.mdc-list-item--disabled) :hover {
+  background-color: #0099ff !important;
+  color: white !important;
+}

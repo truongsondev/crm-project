@@ -1,7 +1,8 @@
-import { Component, Inject, Injector, Type } from '@angular/core';
-import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
-import { User } from '@app/interfaces/user.interface';
+import { Inject, Injector, Type, Component } from '@angular/core';
+import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { UserFormData } from '@app/interfaces/user-form-data.interface';
+
 @Component({
   standalone: true,
   imports: [MatDialogModule, CommonModule],
@@ -15,16 +16,28 @@ export class ModalDiaLogComponent {
     public data: {
       component: Type<unknown>;
       title: string;
-      metadata: {
-        action: string;
-        user: User;
-      };
+      metadata: UserFormData;
     },
     private parentInjector: Injector,
   ) {
-    console.log('compoent:::', data.component);
     this.injector = Injector.create({
-      providers: [{ provide: 'user', useValue: this.data.metadata }],
+      providers: [
+        {
+          provide: 'user',
+          useValue: {
+            action: this.data.metadata.action,
+            selectedUser: this.data.metadata.selectedUser,
+            userList: this.data.metadata.userList,
+          },
+        },
+        {
+          provide: 'listUser',
+          useValue: {
+            action: 'create',
+            userList: this.data.metadata.userList,
+          },
+        },
+      ],
       parent: this.parentInjector,
     });
   }

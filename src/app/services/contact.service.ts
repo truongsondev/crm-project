@@ -4,10 +4,10 @@ import { getEndpoints } from '@app/constants/endpoints.constant';
 import { User } from '@app/interfaces/user.interface';
 
 @Injectable({ providedIn: 'root' })
-export class UserService {
+export class ContactService {
   constructor(private http: HttpClient) {}
-  private readonly endpoints = getEndpoints().user.v1;
-  getListUser(config: any) {
+  private readonly endpoints = getEndpoints().contact.v1;
+  getListContact(config: any) {
     let params = new HttpParams();
 
     for (const key in config) {
@@ -15,13 +15,13 @@ export class UserService {
         params = params.set(key, config[key]);
       }
     }
-    return this.http.get<any[]>(`${this.endpoints.users}`, {
+    return this.http.get<any[]>(`${this.endpoints.contacts}`, {
       params,
     });
   }
 
-  createUser(data: any) {
-    return this.http.post(this.endpoints.create_user, data, {
+  createContact(data: any) {
+    return this.http.post(this.endpoints.contacts, data, {
       headers: {
         'Content-Type': 'application/json',
         // Authorization: 'Bearer token',
@@ -29,8 +29,8 @@ export class UserService {
     });
   }
 
-  updateUser(id: string, data: User) {
-    const url = `${this.endpoints.update_user.replace(':id', id)}`;
+  updateContact(id: string, data: User) {
+    const url = `${this.endpoints.contacts.replace(':id', id)}`;
     console.log(url);
     return this.http.put(url, data, {
       headers: {

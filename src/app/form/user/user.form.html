@@ -1,74 +1,95 @@
 <form
   (ngSubmit)="onSubmit()"
-  [formGroup]="form"
+  [formGroup]="userFormGroup"
   class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2 bg-white rounded-[10px] shadow w-full"
 >
-  <app-form-input
-    label="First Name"
-    formControlName="first_name"
-    placeholder="Gumayusi"
-  ></app-form-input>
+  <mat-form-field class="w-full">
+    <mat-label>First Name</mat-label>
+    <input matInput formControlName="first_name" placeholder="Gumayusi" />
+    <mat-error *ngIf="userFormGroup.get('first_name') | errorMessage as msg">
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
 
-  <app-form-input
-    label="Last Name"
-    formControlName="last_name"
-    placeholder="T1"
-  ></app-form-input>
+  <mat-form-field class="w-full">
+    <mat-label>Last Name</mat-label>
+    <input matInput formControlName="last_name" placeholder="T1" />
+    <mat-error *ngIf="userFormGroup.get('last_name') | errorMessage as msg">
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
 
-  <app-form-input
-    label="Email"
-    formControlName="email"
-    placeholder="Ex. john@example.com"
-  ></app-form-input>
+  <mat-form-field class="w-full">
+    <mat-label>Email</mat-label>
+    <input
+      matInput
+      formControlName="email"
+      placeholder="Ex. john@example.com"
+    />
+    <mat-error *ngIf="userFormGroup.get('email') | errorMessage as msg">
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
 
-  <app-form-input
-    label="Username"
-    formControlName="user_name"
-    placeholder="Ex. johndoe"
-  ></app-form-input>
+  <mat-form-field class="w-full">
+    <mat-label>Username</mat-label>
+    <input matInput formControlName="user_name" placeholder="Ex. johndoe" />
+    <mat-error *ngIf="userFormGroup.get('user_name') | errorMessage as msg">
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
 
-  <app-form-input
-    label="Password"
-    formControlName="password"
-    placeholder="Password"
-    type="password"
-  ></app-form-input>
+  <mat-form-field class="w-full">
+    <mat-label>Password</mat-label>
+    <input
+      matInput
+      type="password"
+      formControlName="password"
+      placeholder="Password"
+    />
+    <mat-error *ngIf="userFormGroup.get('password') | errorMessage as msg">
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
 
-  <app-form-input
-    label="Confirm Password"
-    formControlName="confirm_password"
-    placeholder="Confirm Password"
-    type="password"
-  ></app-form-input>
+  <mat-form-field class="w-full">
+    <mat-label>Confirm Password</mat-label>
+    <input
+      matInput
+      type="password"
+      formControlName="confirm_password"
+      placeholder="Confirm Password"
+    />
+    <mat-error
+      *ngIf="userFormGroup.get('confirm_password') | errorMessage as msg"
+    >
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
 
-  <app-form-input
-    label="Address"
-    formControlName="address"
-    placeholder="123 Main St"
-    class="col-span-2"
-  ></app-form-input>
+  <mat-form-field class="w-full col-span-2">
+    <mat-label>Address</mat-label>
+    <input matInput formControlName="address" placeholder="123 Main St" />
+    <mat-error *ngIf="userFormGroup.get('address') | errorMessage as msg">
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
 
   <mat-form-field class="w-full">
     <mat-label>Salutation</mat-label>
     <mat-select formControlName="salutation">
-      <mat-option value="none">None</mat-option>
-      <mat-option value="mr">Mr.</mat-option>
-      <mat-option value="mrs">Mrs.</mat-option>
-      <mat-option value="dr">Dr.</mat-option>
-      <mat-option value="prof">Prof.</mat-option>
+      <mat-option *ngFor="let item of salutations" [value]="item.value">
+        {{ item.label }}
+      </mat-option>
     </mat-select>
   </mat-form-field>
 
   <mat-form-field class="w-full">
     <mat-label>Role</mat-label>
     <mat-select formControlName="role">
-      <mat-option value="USER_ADMIN">Admin</mat-option>
-      <mat-option value="DIR">Director</mat-option>
-      <mat-option value="SALES_MGR">Sales Manager</mat-option>
-      <mat-option value="SALES_EMP">Sales Person</mat-option>
-      <mat-option value="CONTACT_MGR">Contact Manager</mat-option>
-      <mat-option value="CONTACT_EMP">Contact Employee</mat-option>
-      <mat-option value="USER_READ_ONLY">Guest</mat-option>
+      <mat-option *ngFor="let role of roles" [value]="role.value">
+        {{ role.label }}
+      </mat-option>
     </mat-select>
   </mat-form-field>
 
@@ -84,7 +105,7 @@
       matInput
       [matDatepicker]="picker2"
       formControlName="terminated_date"
-      [disabled]="!isTerminate"
+      [disabled]="!isTerminated"
     />
     <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
     <mat-datepicker #picker2></mat-datepicker>
@@ -93,25 +114,31 @@
   <mat-form-field class="w-full">
     <mat-label>Manager name</mat-label>
     <mat-select formControlName="manager_name">
-      <mat-option value="none">None</mat-option>
-      <mat-option value="mr">Mr.</mat-option>
-      <mat-option value="mrs">Mrs.</mat-option>
-      <mat-option value="dr">Dr.</mat-option>
-      <mat-option value="prof">Prof.</mat-option>
+      <mat-option
+        *ngFor="let item of listManager"
+        [value]="{ id: item.id, name: item.first_name + ' ' + item.last_name }"
+      >
+        {{ item.first_name }} {{ item.last_name }}
+      </mat-option>
     </mat-select>
   </mat-form-field>
-  <app-form-input
-    label="Job Title"
-    formControlName="job_title"
-    placeholder="Ex. Developer"
-  ></app-form-input>
+  <mat-form-field class="w-full">
+    <mat-label>Job Title</mat-label>
+    <input
+      matInput
+      type="text"
+      formControlName="job_title"
+      placeholder="job title"
+    />
+    <mat-error *ngIf="userFormGroup.get('job_title') | errorMessage as msg">
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
+
   <mat-slide-toggle formControlName="active">Active</mat-slide-toggle>
 
   <mat-slide-toggle formControlName="manager">Manager</mat-slide-toggle>
-  <mat-checkbox
-    (change)="onToggleTerminated()"
-    [(ngModel)]="isTerminate"
-    formControlName="is_terminate"
+  <mat-checkbox (change)="onToggleTerminated()" formControlName="is_terminate"
     >Mushroom</mat-checkbox
   >
   <div class="col-span-2">

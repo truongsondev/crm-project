@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 @Component({
@@ -10,9 +10,9 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class SearchComponent {
   searchText: string = '';
-  @Output() testFn = new EventEmitter();
-
+  @Output() search = new EventEmitter();
+  @Input() titleSearch: string = '';
   valueChange() {
-    this.testFn.emit(this.searchText);
+    this.search.emit(this.searchText);
   }
 }

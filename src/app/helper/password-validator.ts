@@ -25,10 +25,10 @@ export function passwordValidator(
       };
 }
 
-export function confirmPasswordValidator(): ValidatorFn {
-  return (group: AbstractControl) => {
-    const password = group.get('password')?.value;
-    const confirm = group.get('confirm_password')?.value;
-    return password === confirm ? null : { passwordsMismatch: true };
-  };
+export function confirmPasswordValidator(
+  group: AbstractControl,
+): ValidationErrors | null {
+  const password = group.get('password')?.value;
+  const confirmPassword = group.get('confirm_password')?.value;
+  return password === confirmPassword ? null : { passwordMismatch: true };
 }
