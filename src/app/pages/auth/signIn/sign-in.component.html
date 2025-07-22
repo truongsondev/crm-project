@@ -1,0 +1,55 @@
+<form
+  [formGroup]="LoginFormGroup"
+  (ngSubmit)="onSubmit()"
+  class="flex flex-col gap-4"
+>
+  <div class="flex flex-col">
+    <div class="py-2 border-b-1">
+      <input
+        formControlName="user_name"
+        placeholder="Enter your username"
+        class="focus-visible:outline-none placeholder:text-gray-500"
+      />
+    </div>
+    <span
+      *ngIf="
+        LoginFormGroup.get('user_name')?.touched &&
+        LoginFormGroup.get('user_name')?.invalid
+      "
+      class="text-sm text-red-500"
+    >
+      Username is required
+    </span>
+  </div>
+  <div class="flex flex-col">
+    <div class="py-2 border-b-1">
+      <input
+        formControlName="password"
+        placeholder="Enter your password"
+        class="focus-visible:outline-none placeholder:text-gray-500"
+        type="password"
+      />
+    </div>
+    <span
+      *ngIf="
+        LoginFormGroup.get('password')?.touched &&
+        LoginFormGroup.get('password')?.errors?.['required']
+      "
+      class="text-sm text-red-500"
+    >
+      passwword is required
+    </span>
+  </div>
+  <span class="text-sm">
+    Don't you have an account?
+    <button class="hover:cursor-pointer text-primary" (click)="onNavigate()">
+      Click here
+    </button>
+  </span>
+  <button
+    type="submit"
+    class="p-2 bg-primary rounded-[10px] text-white cursor-pointer"
+  >
+    Submit
+  </button>
+</form>

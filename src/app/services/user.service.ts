@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { getEndpoints } from '@app/constants/endpoints.constant';
 import { User } from '@app/interfaces/user.interface';
-
+import { UserResponse } from '@app/interfaces/response.interface';
 @Injectable({ providedIn: 'root' })
 export class UserService {
   constructor(private http: HttpClient) {}
@@ -15,7 +15,7 @@ export class UserService {
         params = params.set(key, config[key]);
       }
     }
-    return this.http.get<any[]>(`${this.endpoints.users}`, {
+    return this.http.get<UserResponse>(`${this.endpoints.users}`, {
       params,
     });
   }

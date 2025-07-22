@@ -1,5 +1,7 @@
 <nav>
-  <div class="h-screen bg-primary">
+  <div
+    class="w-full bg-cyan-400 h-screen max-xxl:animate-wiggle flex flex-col justify-between"
+  >
     <div class="flex flex-col gap-8 px-[12px] mt-[50px]">
       <a
         class="flex gap-1 cursor-pointer p-2 rounded"
@@ -18,7 +20,7 @@
         >
           dashboard
         </mat-icon>
-        <span class="hidden lg:block">Dashboard</span>
+        <span class="hidden xxl:block">Dashboard</span>
       </a>
 
       <a
@@ -38,7 +40,7 @@
         >
           article
         </mat-icon>
-        <span class="hidden lg:block">Contacts</span>
+        <span class="hidden xxl:block">Contacts</span>
       </a>
 
       <a
@@ -58,7 +60,7 @@
         >
           receipt_long
         </mat-icon>
-        <span class="hidden lg:block">Sales Orders</span>
+        <span class="hidden xxl:block">Sales Orders</span>
       </a>
 
       <a
@@ -78,8 +80,14 @@
         >
           person
         </mat-icon>
-        <span class="hidden lg:block">User Management</span>
+        <span class="hidden xxl:block">User Management</span>
       </a>
+    </div>
+    <div class="p-4 w-full flex flex-row items-center gap-3 cursor-pointer">
+      <div class="rounded-[999999px] bg-white w-[24px] h-[24px]">
+        <img src="avt.png" alt="avt" class="object-cover rounded-[999999px]" />
+      </div>
+      <span class="text-white">{{ username }}</span>
     </div>
   </div>
 </nav>

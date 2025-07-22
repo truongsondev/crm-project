@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { User } from '@app/interfaces/user.interface';
 @Component({
   standalone: true,
   selector: 'nav-component',
@@ -10,14 +11,20 @@ import { NavigationEnd, Router, RouterModule } from '@angular/router';
 })
 export class NavComponent {
   selectedItem = 'dashboard';
-
-  selectMenu(item: string) {
-    this.selectedItem = item;
+  username = '';
+  constructor(private router: Router) {}
+  getUserName() {
+    const userJson = localStorage.getItem('user');
+    if (!userJson) return '';
+    const user = JSON.parse(userJson);
+    return user.first_name + ' ' + user.last_name;
   }
 
-  constructor(private router: Router) {}
-
   ngOnInit() {
+    this.username = this.getUserName();
+    const segments = this.router.url.split('/');
+    const last = segments.pop() || '';
+    this.selectedItem = last;
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         const segments = event.urlAfterRedirects.split('/');
@@ -25,5 +32,8 @@ export class NavComponent {
         this.selectedItem = last;
       }
     });
+  }
+  selectMenu(item: string) {
+    this.selectedItem = item;
   }
 }
