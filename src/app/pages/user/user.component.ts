@@ -35,6 +35,7 @@ import {
   DISPLAYROLES,
   ITEM_OF_PAGE,
 } from '@app/constants/value.constant';
+import { getManagerName as _getManagerName } from '@app/helper/getManagerName';
 @Component({
   standalone: true,
   selector: 'user-management',
@@ -42,7 +43,6 @@ import {
   providers: [provideNativeDateAdapter()],
   imports: [
     MatDatepickerModule,
-    MatCheckboxModule,
     FormsModule,
     ReactiveFormsModule,
     SearchComponent,
@@ -65,6 +65,7 @@ export class UserManagementComponent implements AfterViewInit {
   pageSize = ITEM_OF_PAGE;
   pageIndex = 0;
   Math = Math;
+  getManagerName = _getManagerName;
   onPageChange(event: PageEvent) {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
@@ -83,15 +84,16 @@ export class UserManagementComponent implements AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
   onSearch(event: string) {
     if (event !== '') {
-      this.userService.getListUser('').subscribe((data) => {
+      this.userService.getListUser().subscribe((data) => {
         const { users } = data;
+
         this.employees = users.filter(
-          (u) => u.user_name.includes(event) || u.email.includes(event),
+          (u) => u.username?.includes(event) || u.email.includes(event),
         );
         this.dataSource.data = this.employees;
       });
     } else {
-      this.userService.getListUser('').subscribe((data) => {
+      this.userService.getListUser().subscribe((data) => {
         const { users } = data;
         this.employees = users;
         this.dataSource.data = users;
@@ -122,12 +124,9 @@ export class UserManagementComponent implements AfterViewInit {
   }
 
   ngOnInit() {
-    this.userService.getListUser('').subscribe((data) => {
-      console.log('data:::', data);
+    this.userService.getListUser().subscribe((data) => {
       const { users }: { users: User[] } = data;
       this.employees = users;
-      console.log('employees:::', this.employees);
-
       this.dataSource.data = users;
     });
   }
@@ -152,8 +151,8 @@ export class UserManagementComponent implements AfterViewInit {
         title: 'Edit user',
         metadata: {
           action: 'update',
-          selectedUser: row,
-          userList: this.employees,
+          dataSelected: row,
+          dataList: this.employees,
         },
       },
     });

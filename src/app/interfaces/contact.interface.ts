@@ -1,9 +1,15 @@
 export interface Contact {
-  id: string;
+  _id: string;
   contact_name: string;
   salutation: string;
-  lead_source: string;
   assigned_to: string;
+  address: string;
+  phone: string;
+  email: string;
+  organization: string;
+  birthday: Date;
+  lead_source: string;
+  description: string;
   created_on: Date;
   updated_on: Date;
 }

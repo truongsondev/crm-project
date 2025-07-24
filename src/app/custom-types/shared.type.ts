@@ -1,3 +1,4 @@
+import { Contact } from '@app/interfaces/contact.interface';
 import { User } from '@app/interfaces/user.interface';
 
 export type HeaderColumn = {
@@ -7,8 +8,8 @@ export type HeaderColumn = {
 
 export type FormUser = {
   action: string;
-  selectedUser: User | null;
-  userList: User[];
+  dataSelected: User | null;
+  dataList: User[];
 };
 
 export type ListFormUser = {
@@ -19,4 +20,10 @@ export type ListFormUser = {
 export type SelectOption = {
   value: string;
   label: string;
+};
+
+export type FormContact = {
+  action: string;
+  dataSelected: Contact | null;
+  dataList: Contact[];
 };

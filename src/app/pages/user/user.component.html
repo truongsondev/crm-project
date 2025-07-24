@@ -60,13 +60,19 @@
               <span *ngSwitchCase="'role'">
                 {{ getDisplayRole(row.role) }}
               </span>
-              <span *ngSwitchCase="'all'">
-                <p>
-                  <mat-checkbox></mat-checkbox>
-                </p>
-              </span>
+
               <span *ngSwitchCase="'manager_name'">
-                {{ row.manager_name?.name || "-" }}
+                {{ getManagerName(row.manager_name, employees) || "-" }}
+              </span>
+              <span
+                *ngSwitchCase="'is_active'"
+                [ngClass]="{
+                  'px-2 rounded-[9999px] border text-sm font-medium': true,
+                  'border-green-500 text-green-500 bg-green-50': row.is_active,
+                  'border-red-500 text-red-500 bg-red-50': !row.is_active,
+                }"
+              >
+                {{ row.is_active ? "Active" : "Inactive" }}
               </span>
               <span *ngSwitchDefault>
                 {{ row[col.column] || "-" }}

@@ -13,6 +13,10 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { ModalDiaLogComponent } from '@app/shares/modal/modal.component';
 import { ContactForm } from '@app/form/contacts/contact.form';
+import { User } from '@app/interfaces/user.interface';
+import { UserService } from '@app/services/user.service';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { UserForm } from '@app/form/user/user.form';
 
 @Component({
   selector: 'contact-component',
@@ -26,17 +30,18 @@ import { ContactForm } from '@app/form/contacts/contact.form';
     MatSortModule,
     MatPaginatorModule,
     CommonModule,
+    MatCheckboxModule,
   ],
   providers: [DatePipe],
 })
 export class ContactComponent {
   contacts: Contact[] = [];
   mySearch: string = 'contact name';
-
+  users: User[] = [];
   dataSource!: MatTableDataSource<Contact>;
   displayedColumns: string[] = [
+    'all',
     'contact_name',
-    'salutation',
     'lead_source',
     'assigned_to',
     'created_on',
@@ -44,8 +49,8 @@ export class ContactComponent {
     'action',
   ];
   columnDefs: HeaderColumn[] = [
+    { column: 'all', label: 'All' },
     { column: 'contact_name', label: 'Contact Name' },
-    { column: 'salutation', label: 'Salutation' },
     { column: 'lead_source', label: 'Lead Source' },
     { column: 'assigned_to', label: 'Assigned to' },
     { column: 'created_on', label: 'Created On' },
@@ -58,16 +63,12 @@ export class ContactComponent {
 
   onSearch(event: string) {
     if (event !== '') {
-      this.contactService
-        .getListContact({ contact_name: event })
-        .subscribe((data) => {
-          this.contacts = data;
-          this.dataSource.data = data;
-        });
-    } else {
-      this.contactService.getListContact('').subscribe((data) => {
-        this.contacts = data;
-        this.dataSource.data = data;
+      this.contactService.getListContact().subscribe((data) => {
+        const { code, contacts } = data;
+        if (code === 20000) {
+          this.contacts = contacts;
+          this.dataSource.data = contacts;
+        }
       });
     }
   }
@@ -76,13 +77,26 @@ export class ContactComponent {
     private contactService: ContactService,
     private datePipe: DatePipe,
     private dialog: MatDialog,
+    private userService: UserService,
   ) {}
   ngOnInit() {
-    this.contactService.getListContact('').subscribe((res) => {
-      this.contacts = res;
-      this.dataSource = new MatTableDataSource(res);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
+    this.contactService.getListContact().subscribe((res) => {
+      const { code, contacts } = res;
+
+      if (code === 200000) {
+        this.contacts = contacts;
+        this.dataSource = new MatTableDataSource(contacts);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      }
+    });
+
+    this.userService.getListUser().subscribe((res) => {
+      const { code, users } = res;
+
+      if (code === 200000) {
+        this.users = users;
+      }
     });
   }
 
@@ -99,6 +113,14 @@ export class ContactComponent {
     return this.datePipe.transform(date, 'dd/MM/yyyy') || '';
   }
 
+  getNameUser(id: string): string {
+    const name = this.users.find((item) => item._id === id);
+    if (!name) {
+      return '-';
+    }
+    return name?.first_name + ' ' + name?.last_name;
+  }
+
   openDialog() {
     this.dialog.open(ModalDiaLogComponent, {
       data: {
@@ -107,6 +129,20 @@ export class ContactComponent {
         metadata: {
           user: this.contacts,
           action: 'create',
+        },
+      },
+    });
+  }
+
+  onRowClick(row: Contact) {
+    this.dialog.open(ModalDiaLogComponent, {
+      data: {
+        component: ContactForm,
+        title: 'Edit contact',
+        metadata: {
+          action: 'update',
+          dataSelected: row,
+          contactList: this.contacts,
         },
       },
     });

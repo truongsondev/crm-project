@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { User } from '@app/interfaces/user.interface';
 import { UserService } from '@app/services/user.service';
@@ -9,6 +9,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'filter-component',
@@ -20,6 +21,9 @@ import { MatDialogRef } from '@angular/material/dialog';
     MatCheckboxModule,
     MatDatepickerModule,
     ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,6 +49,12 @@ export class FilterComponent {
     CONTACT_EMP: 'Contact Employee',
     USER_READ_ONLY: 'Guest',
   };
+  protected readonly value = signal('');
+
+  protected onInput(event: Event) {
+    const { value } = event.target as HTMLInputElement;
+    this.value.set(value);
+  }
   constructor(
     private userService: UserService,
     private dialogRef: MatDialogRef<FilterComponent>,
@@ -53,7 +63,7 @@ export class FilterComponent {
   selectedRole = '';
 
   onSubmit() {
-    this.userService.getListUser('').subscribe((res) => {
+    this.userService.getListUser().subscribe((res) => {
       const { users } = res;
       const filtered = users.filter((user) => {
         let match = true;
@@ -91,15 +101,14 @@ export class FilterComponent {
   }
 
   onCancel() {
-    this.userService.getListUser('').subscribe((users) => {
+    this.userService.getListUser().subscribe((users) => {
       this.dialogRef.close({
         employees: users,
       });
     });
   }
 
-  getUserByRole(role: Event) {
-    const value = (role.target as HTMLSelectElement).value;
-    this.selectedRole = value;
+  getUserByRole(role: string) {
+    this.selectedRole = role;
   }
 }

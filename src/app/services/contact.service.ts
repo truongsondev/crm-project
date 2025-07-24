@@ -1,27 +1,23 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { getEndpoints } from '@app/constants/endpoints.constant';
+import { Contact } from '@app/interfaces/contact.interface';
+import {
+  ContactReponse,
+  ContactsReponse,
+} from '@app/interfaces/response.interface';
 import { User } from '@app/interfaces/user.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ContactService {
   constructor(private http: HttpClient) {}
   private readonly endpoints = getEndpoints().contact.v1;
-  getListContact(config: any) {
-    let params = new HttpParams();
-
-    for (const key in config) {
-      if (config[key] !== undefined && config[key] !== null) {
-        params = params.set(key, config[key]);
-      }
-    }
-    return this.http.get<any[]>(`${this.endpoints.contacts}`, {
-      params,
-    });
+  getListContact() {
+    return this.http.get<ContactsReponse>(`${this.endpoints.contacts}`);
   }
 
   createContact(data: any) {
-    return this.http.post(this.endpoints.contacts, data, {
+    return this.http.post<ContactReponse>(this.endpoints.contacts, data, {
       headers: {
         'Content-Type': 'application/json',
         // Authorization: 'Bearer token',
@@ -29,10 +25,9 @@ export class ContactService {
     });
   }
 
-  updateContact(id: string, data: User) {
-    const url = `${this.endpoints.contacts.replace(':id', id)}`;
-    console.log(url);
-    return this.http.put(url, data, {
+  updateContact(id: string, data: Contact) {
+    const url = `${this.endpoints.update_contact.replace(':id', id)}`;
+    return this.http.put<ContactReponse>(url, data, {
       headers: {
         'Content-Type': 'application/json',
         // Authorization: 'Bearer token',

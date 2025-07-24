@@ -23,18 +23,18 @@ export class ModalDiaLogComponent {
     this.injector = Injector.create({
       providers: [
         {
-          provide: 'user',
+          provide: 'data',
           useValue: {
             action: this.data.metadata.action,
-            selectedUser: this.data.metadata.selectedUser,
-            userList: this.data.metadata.userList,
+            dataSelected: this.data.metadata.dataSelected,
+            dataList: this.data.metadata.dataList,
           },
         },
         {
-          provide: 'listUser',
+          provide: 'listData',
           useValue: {
             action: 'create',
-            userList: this.data.metadata.userList,
+            dataList: this.data.metadata.dataList,
           },
         },
       ],

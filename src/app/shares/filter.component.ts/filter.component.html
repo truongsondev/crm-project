@@ -1,14 +1,15 @@
 <div class="flex flex-col gap-6">
   <div class="relative">
-    <select
-      class="rounded px-4 py-2 w-full shadow-lg"
-      (change)="getUserByRole($event)"
-    >
-      <option value="">Role</option>
-      <option *ngFor="let item of displayRole | keyvalue" [value]="item.key">
-        {{ item.value }}
-      </option>
-    </select>
+    <mat-form-field class="w-full">
+      <mat-label>Role</mat-label>
+      <mat-select (selectionChange)="getUserByRole($event.value)">
+        <mat-option
+          *ngFor="let role of displayRole | keyvalue"
+          [value]="role.key"
+          >{{ role.value }}</mat-option
+        >
+      </mat-select>
+    </mat-form-field>
   </div>
 
   <div class="relative">

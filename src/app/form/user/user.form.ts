@@ -35,6 +35,11 @@ import { CommonModule } from '@angular/common';
 import { ErrorMessagePipe } from '@app/helper/error-message-form';
 import { User } from '@app/interfaces/user.interface';
 import { terminatedAfterHiredValidator } from '@app/helper/date-validator';
+import { MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { PizzaPartyAnnotatedComponent } from '@app/shares/toast/toast.component';
+import { SALUTATION } from '@app/constants/value.constant';
+
 @Component({
   standalone: true,
   selector: 'user-form',
@@ -54,19 +59,18 @@ import { terminatedAfterHiredValidator } from '@app/helper/date-validator';
     MatCheckboxModule,
     CommonModule,
     ErrorMessagePipe,
+    MatFormFieldModule,
+    FormsModule,
+    MatInputModule,
+    MatButtonModule,
+    MatSnackBarModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserForm {
   userFormGroup!: FormGroup;
   isTerminated = false;
-  salutations: SelectOption[] = [
-    { value: 'none', label: 'None' },
-    { value: 'mr', label: 'Mr.' },
-    { value: 'mrs', label: 'Mrs.' },
-    { value: 'dr', label: 'Dr.' },
-    { value: 'prof', label: 'Prof.' },
-  ];
+  salutations: SelectOption[] = SALUTATION;
 
   roles: SelectOption[] = [
     { value: 'USER_ADMIN', label: 'Admin' },
@@ -81,9 +85,19 @@ export class UserForm {
 
   isCheckedDate = true;
 
+  private _snackBar = inject(MatSnackBar);
+
+  durationInSeconds = 2;
+
+  openSnackBar(message: string) {
+    this._snackBar.openFromComponent(PizzaPartyAnnotatedComponent, {
+      duration: this.durationInSeconds * 1000,
+      data: message,
+    });
+  }
   listManager: User[] = [];
   protected readonly value = signal('');
-  private readonly _formBuilder = inject(FormBuilder);
+  // private readonly _formBuilder = inject(FormBuilder);
 
   protected onInput(event: Event) {
     const { value } = event.target as HTMLInputElement;
@@ -92,65 +106,49 @@ export class UserForm {
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    @Inject('user') public user: FormUser,
-    @Inject('listUser') public listUser: ListFormUser,
+    @Inject('data') public user: FormUser,
+    @Inject('listData') public listUser: ListFormUser,
+    private dialogRef: MatDialogRef<UserForm>,
   ) {}
 
   alertFormValues(formGroup: FormGroup) {
     console.log(JSON.stringify(formGroup.value, null, 2));
   }
 
-  handleSalutation(label: string | undefined | null): string | null {
-    if (!label) {
-      return null;
-    }
-    let labelLowCase = label.toLowerCase();
-    if (labelLowCase.includes('.')) {
-      labelLowCase = labelLowCase.slice(0, -1);
-    }
-    return labelLowCase;
-  }
-
   initForm = () => {
     this.userFormGroup = this.fb.group(
       {
-        id: [this.user.selectedUser?.id || ''],
+        _id: [this.user.dataSelected?._id || ''],
         first_name: [
-          this.user.selectedUser?.first_name || '',
+          this.user.dataSelected?.first_name || '',
           Validators.required,
         ],
         last_name: [
-          this.user.selectedUser?.last_name || '',
+          this.user.dataSelected?.last_name || '',
           Validators.required,
         ],
-        user_name: [
-          this.user.selectedUser?.user_name || '',
-          Validators.required,
-        ],
+        username: [this.user.dataSelected?.username || '', Validators.required],
         email: [
-          this.user.selectedUser?.email || '',
+          this.user.dataSelected?.email || '',
           [Validators.required, Validators.email],
         ],
         password: ['', [Validators.required, passwordValidator]],
         confirm_password: ['', [Validators.required]],
-        address: [this.user.selectedUser?.address || ''],
+        address: [this.user.dataSelected?.address || ''],
         salutation: [
-          this.handleSalutation(this.user.selectedUser?.salutation) || 'none',
+          this.user.dataSelected?.salutation || 'None',
           Validators.required,
         ],
-        role: [this.user.selectedUser?.role || '', Validators.required],
-        hired_date: [this.user.selectedUser?.hired_date || null],
-        job_title: [this.user.selectedUser?.job_title || ''],
-        active: [this.user.selectedUser?.active ?? true],
-        manager: [this.user.selectedUser?.manager ?? false],
-        manager_name: [
-          this.user.selectedUser?.manager_name || '',
-          Validators.required,
-        ],
+        role: [this.user.dataSelected?.role || '', Validators.required],
+        hired_date: [this.user.dataSelected?.hired_date || null],
+        job_title: [this.user.dataSelected?.job_title || ''],
+        is_active: [this.user.dataSelected?.is_active ?? true],
+        is_manager: [this.user.dataSelected?.is_manager ?? false],
+        manager_name: [this.user.dataSelected?._id || '', Validators.required],
         is_terminate: [false],
         terminated_date: [
           {
-            value: this.user.selectedUser?.terminated_date || null,
+            value: this.user.dataSelected?.terminated_date || null,
             disabled: true,
           },
         ],
@@ -163,7 +161,7 @@ export class UserForm {
 
   ngOnInit() {
     this.listManager =
-      this.listUser.userList?.filter((item) => item.manager) || [];
+      this.listUser.userList?.filter((item) => item.is_manager) || [];
     this.initForm();
   }
 
@@ -187,24 +185,39 @@ export class UserForm {
     try {
       const dataReq = { ...this.userFormGroup.value };
       delete dataReq.is_terminate;
+      delete dataReq.confirm_password;
 
       if (this.user.action === 'create') {
-        if (!dataReq.id) {
-          delete dataReq.id;
-        }
-        const data = { ...dataReq, created_time: new Date().toISOString() };
-        this.userService.createUser(data).subscribe((res) => {
-          console.log('Response:::', res);
+        delete dataReq._id;
+
+        this.userService.updateUser(dataReq._id, dataReq).subscribe({
+          next: (res) => {
+            console.log(res);
+            const { code } = res;
+            if (code === 200000) {
+              this.openSnackBar('Create user success');
+              this.dialogRef.close();
+            }
+          },
+          error: (err) => {
+            alert('Update user fail');
+            console.error(err);
+          },
         });
       } else if (this.user.action === 'update') {
-        const data = {
-          ...dataReq,
-          created_time: this.user.selectedUser?.created_time,
-          updated_time: new Date().toISOString(),
-        };
-
-        this.userService.updateUser(data.id, data).subscribe((res) => {
-          console.log('Response:::', res);
+        this.userService.updateUser(dataReq._id, dataReq).subscribe({
+          next: (res) => {
+            console.log(res);
+            const { code } = res;
+            if (code === 200000) {
+              this.openSnackBar('update user success');
+              this.dialogRef.close();
+            }
+          },
+          error: (err) => {
+            alert('Update user fail');
+            console.error(err);
+          },
         });
       }
     } catch (e) {

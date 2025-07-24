@@ -3,7 +3,6 @@ import { HeaderColumn } from '@app/custom-types/shared.type';
 export const ITEM_OF_PAGE = 10;
 
 export const COLUMNDEFS: HeaderColumn[] = [
-  { column: 'all', label: 'All' },
   { column: 'employee', label: 'Employee' },
   { column: 'username', label: 'Username' },
   { column: 'email', label: 'Email' },
@@ -11,6 +10,7 @@ export const COLUMNDEFS: HeaderColumn[] = [
   { column: 'role', label: 'Role' },
   { column: 'job_title', label: 'Job Title' },
   { column: 'manager_name', label: 'Manager' },
+  { column: 'is_active', label: 'Active' },
   { column: 'action', label: 'Action' },
 ];
 
@@ -25,7 +25,6 @@ export const DISPLAYROLES = {
 };
 
 export const DISPLAYCOLUMNROLE = [
-  'all',
   'employee',
   'username',
   'email',
@@ -33,5 +32,24 @@ export const DISPLAYCOLUMNROLE = [
   'role',
   'job_title',
   'manager_name',
+  'is_active',
   'action',
+];
+
+export const LEADSOURCE = [
+  'Existing Customer',
+  'Partner',
+  'Conference',
+  'Website',
+  'Word of mouth',
+  'Other',
+];
+
+export const SALUTATION = [
+  { value: 'None', label: 'None' },
+  { value: 'Mr.', label: 'Mr.' },
+  { value: 'Mrs.', label: 'Mrs.' },
+  { value: 'Dr.', label: 'Dr.' },
+  { value: 'Prof.', label: 'Prof.' },
+  { value: 'Ms.', label: 'Ms.' },
 ];

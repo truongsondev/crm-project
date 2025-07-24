@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
-import { User } from '@app/interfaces/user.interface';
 @Component({
   standalone: true,
   selector: 'nav-component',
@@ -12,12 +11,21 @@ import { User } from '@app/interfaces/user.interface';
 export class NavComponent {
   selectedItem = 'dashboard';
   username = '';
+  roleOfUser: string = this.getRoleUser();
   constructor(private router: Router) {}
   getUserName() {
     const userJson = localStorage.getItem('user');
     if (!userJson) return '';
     const user = JSON.parse(userJson);
     return user.first_name + ' ' + user.last_name;
+  }
+
+  getRoleUser(): string {
+    const userJson = localStorage.getItem('user');
+
+    if (!userJson) return '';
+    const user = JSON.parse(userJson);
+    return user.role;
   }
 
   ngOnInit() {
