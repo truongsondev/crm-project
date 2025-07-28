@@ -2,7 +2,6 @@ import {
   Component,
   ChangeDetectionStrategy,
   signal,
-  inject,
   Inject,
 } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,17 +19,16 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { SALUTATION } from '@app/constants/value.constant';
+import { SALUTATION } from '@app/constants/shared.constant';
 import { ContactService } from '@app/services/contact.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { PizzaPartyAnnotatedComponent } from '@app/shares/toast/toast.component';
+
 import { MatDialogRef } from '@angular/material/dialog';
 import { UserForm } from '../user/user.form';
+import { SnackbarService } from '@app/services/snackbar.service';
 
 @Component({
   selector: 'contact-form',
   templateUrl: './contact.form.html',
-  styleUrl: 'contact.form.css',
   imports: [
     MatFormFieldModule,
     MatInputModule,
@@ -45,15 +43,7 @@ import { UserForm } from '../user/user.form';
 })
 export class ContactForm {
   protected readonly value = signal('');
-  private _snackBar = inject(MatSnackBar);
-  durationInSeconds = 2;
 
-  openSnackBar(message: string) {
-    this._snackBar.openFromComponent(PizzaPartyAnnotatedComponent, {
-      duration: this.durationInSeconds * 1000,
-      data: message,
-    });
-  }
   contactFormGroup!: FormGroup;
   salutations: SelectOption[] = SALUTATION;
   leadSource: string[] = [
@@ -70,6 +60,7 @@ export class ContactForm {
     private fb: FormBuilder,
     private contactService: ContactService,
     private dialogRef: MatDialogRef<UserForm>,
+    private snackbarService: SnackbarService,
     @Inject('data') public contact: FormContact,
   ) {
     this.getListUser();
@@ -103,17 +94,15 @@ export class ContactForm {
     const role = this.getRole();
     if (!role) return;
     this.userService.getListUser().subscribe((data) => {
-      const { code, users } = data;
-      if (code === 200000) {
-        if (role === 'USER_ADMIN' || role === 'CONTACT_MGR') {
-          this.listAssign = users.filter((item) =>
-            ['CONTACT_MGR', 'CONTACT_EMP'].includes(item.role),
-          );
-        } else if (role === 'CONTACT_EMP') {
-          this.listAssign = users.filter((item) =>
-            ['CONTACT_EMP '].includes(item.role),
-          );
-        }
+      const { users } = data;
+      if (role === 'USER_ADMIN' || role === 'CONTACT_MGR') {
+        this.listAssign = users.filter((item) =>
+          ['CONTACT_MGR', 'CONTACT_EMP'].includes(item.role),
+        );
+      } else if (role === 'CONTACT_EMP') {
+        this.listAssign = users.filter((item) =>
+          ['CONTACT_EMP '].includes(item.role),
+        );
       }
     });
   }
@@ -123,48 +112,25 @@ export class ContactForm {
   }
 
   onSubmit() {
+    if (this.contactFormGroup.invalid) {
+      this.contactFormGroup.markAllAsTouched();
+      console.warn('Form is invalid', this.contactFormGroup.value);
+      this.snackbarService.openSnackBar('Form invalid!');
+      return;
+    }
     if (this.contact.action === 'create') {
-      if (this.contactFormGroup.invalid) {
-        this.contactFormGroup.markAllAsTouched();
-        console.warn('Form is invalid', this.contactFormGroup.value);
-        return;
-      }
-
-      const data = this.contactFormGroup.value;
-      delete data._id;
+      const { _id, ...data } = this.contactFormGroup.value;
       this.contactService.createContact(data).subscribe((res) => {
-        const { code } = res;
-        if (code === 200000) {
-          this.openSnackBar('Create contact success');
-          this.dialogRef.close();
-        } else {
-          this.openSnackBar('Create contact fail');
-        }
+        this.snackbarService.openSnackBar('Create contact success');
+        this.dialogRef.close();
       });
     } else if (this.contact.action === 'update') {
-      if (this.contactFormGroup.invalid) {
-        this.contactFormGroup.markAllAsTouched();
-        console.warn('Form is invalid', this.contactFormGroup.value);
-        return;
-      }
       const data = this.contactFormGroup.value;
-
       const _id = data._id;
       this.contactService.updateContact(_id, data).subscribe({
         next: (res) => {
-          console.log(res);
-          const { code } = res;
-          console.log(res);
-          if (code === 200000) {
-            this.openSnackBar('Update contact success');
-            this.dialogRef.close();
-          } else {
-            this.openSnackBar('Update contact fail');
-          }
-        },
-        error: (err) => {
-          this.openSnackBar('Update contact fail');
-          console.error('err:::', err);
+          this.snackbarService.openSnackBar('Update contact success');
+          this.dialogRef.close();
         },
       });
     }

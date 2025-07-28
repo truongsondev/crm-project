@@ -1,0 +1,38 @@
+import mongoose from "mongoose";
+
+const orderSchema = new mongoose.Schema({
+  order_number: { type: String, required: true, unique: true },
+  subject: { type: String, required: true },
+
+  contact_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Contact",
+    required: true,
+  },
+
+  status: {
+    type: String,
+    enum: ["Created", "Approved", "Delivered", "Canceled"],
+    default: "Created",
+  },
+
+  total: { type: Number, required: true },
+
+  assigned_to: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+
+  creator_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+
+  description: { type: String },
+
+  purchase_on: { type: Date, default: Date.now },
+  updated_on: { type: Date, default: Date.now },
+});
+
+orderSchema.pre("save", function (next) {
+  this.updated_on = new Date();
+  next();
+});
+
+const Order = mongoose.model("Order", orderSchema);
+
+export default Order;

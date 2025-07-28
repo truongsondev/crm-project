@@ -12,6 +12,7 @@ export interface User {
   is_manager: boolean;
   manager_name: any;
   hired_date: Date;
+  password: string;
   terminated_date: Date;
   created_time: Date;
   updated_time: Date;

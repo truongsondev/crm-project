@@ -6,32 +6,30 @@ import {
   ContactReponse,
   ContactsReponse,
 } from '@app/interfaces/response.interface';
-import { User } from '@app/interfaces/user.interface';
+import { EndpointService } from './endpoint.service';
 
 @Injectable({ providedIn: 'root' })
 export class ContactService {
-  constructor(private http: HttpClient) {}
+  constructor(private endpointService: EndpointService) {}
   private readonly endpoints = getEndpoints().contact.v1;
   getListContact() {
-    return this.http.get<ContactsReponse>(`${this.endpoints.contacts}`);
+    const endpoint = this.endpoints.contacts;
+    return this.endpointService.fetchEndpoint<ContactsReponse>(endpoint);
   }
 
   createContact(data: any) {
-    return this.http.post<ContactReponse>(this.endpoints.contacts, data, {
-      headers: {
-        'Content-Type': 'application/json',
-        // Authorization: 'Bearer token',
-      },
-    });
+    const endpoint = this.endpoints.contacts;
+
+    return this.endpointService.postEndpoint<ContactReponse>(endpoint, data);
   }
 
   updateContact(id: string, data: Contact) {
     const url = `${this.endpoints.update_contact.replace(':id', id)}`;
-    return this.http.put<ContactReponse>(url, data, {
-      headers: {
-        'Content-Type': 'application/json',
-        // Authorization: 'Bearer token',
-      },
-    });
+    return this.endpointService.putEndpoint<ContactReponse>(url, data);
+  }
+
+  deleteContact(id: string) {
+    const url = `${this.endpoints.delete_contact.replace(':id', id)}`;
+    return this.endpointService.deleteEndpoint<ContactReponse>(url);
   }
 }

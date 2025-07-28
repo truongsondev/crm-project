@@ -14,6 +14,7 @@ export const getEndpoints = () => {
         contacts: `${environment.baseURL}/contacts`,
         create_contact: `${environment.baseURL}/contacts`,
         update_contact: `${environment.baseURL}/contacts/:id`,
+        delete_contact: `${environment.baseURL}/contacts/delete/:id`,
       },
     },
     auth: {

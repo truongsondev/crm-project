@@ -16,13 +16,31 @@
       </div>
       <div class="flex justify-between items-center">
         <h1 class="font-medium text-xl">List of Contacts</h1>
-        <div>
-          <search-component
-            (search)="onSearch($event)"
-            [titleSearch]="mySearch"
-          />
-        </div>
       </div>
+      <div class="flex flex-row items-center justify-between">
+        <search-component
+          (search)="onSearch($event)"
+          [titleSearch]="mySearch"
+        />
+        <button
+          (click)="openFilter()"
+          class="flex items-center gap-2 bg-emerald-400 text-white px-4 py-2 rounded-[10px]"
+        >
+          <mat-icon>filter_list</mat-icon>
+          <span>Filter by</span>
+        </button>
+      </div>
+      <!-- <div>
+        <h1 class="opacity-90 text-2xl md:text-sm">
+          Showing
+          {{ pageIndex * pageSize + 1 }}
+          -
+          {{ Math.min((pageIndex + 1) * pageSize, dataSource.data.length) }}
+          of
+          {{ dataSource.data.length }}
+          records
+        </h1>
+      </div> -->
       <div>
         <div class="mat-elevation-z8">
           <table mat-table [dataSource]="dataSource" matSort>
@@ -45,6 +63,7 @@
                       >Edit</span
                     >
                     <span
+                      (click)="onDelete(row)"
                       class="px-2 rounded-[9999px] border text-sm font-medium border-indigo-500 text-indigo-500 bg-indigo-50"
                       >Delete</span
                     >
@@ -80,6 +99,7 @@
 
           <mat-paginator
             [pageSizeOptions]="[10]"
+            showFirstLastButtons
             aria-label="Select page of users"
           ></mat-paginator>
         </div>

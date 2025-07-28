@@ -6,31 +6,24 @@ import {
   UserResponse,
   UsersResponse,
 } from '@app/interfaces/response.interface';
+import { EndpointService } from './endpoint.service';
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  constructor(private http: HttpClient) {}
+  constructor(private endpointService: EndpointService) {}
   private readonly endpoints = getEndpoints().user.v1;
   getListUser() {
-    return this.http.get<UsersResponse>(`${this.endpoints.users}`);
+    const endpoint = getEndpoints().user.v1.users;
+    return this.endpointService.fetchEndpoint<UsersResponse>(endpoint);
   }
 
   createUser(data: any) {
-    return this.http.post<UserResponse>(this.endpoints.create_user, data, {
-      headers: {
-        'Content-Type': 'application/json',
-        // Authorization: 'Bearer token',
-      },
-    });
+    const endpoint = getEndpoints().user.v1.create_user;
+    return this.endpointService.postEndpoint<UserResponse>(endpoint, data);
   }
 
   updateUser(id: string, data: User) {
     const url = `${this.endpoints.update_user.replace(':id', id)}`;
     console.log(url);
-    return this.http.put<UserResponse>(url, data, {
-      headers: {
-        'Content-Type': 'application/json',
-        // Authorization: 'Bearer token',
-      },
-    });
+    return this.endpointService.putEndpoint<UserResponse>(url, data);
   }
 }

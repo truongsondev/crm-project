@@ -1,59 +1,50 @@
-# CrmUi
+# CRM
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.5.
+Customer Relationship Manager application during an intership at a tech company a web base app enables businesses to manage customer data, track sales and activities.
 
-## Development server
+## Prerequisite
 
-To start a local development server, run:
+- Operating System - Window 10 or 11
+- Angular version - v20.x.x
+- NodeJS version -v22.x.x
 
-```bash
-ng serve
-```
+## installation
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Describe step to install this project. Example
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+1. Clone the repository
 
 ```bash
-ng generate component component-name
+git clone https://github.com/truongsondev/crm-project.git
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+2. Navigate to the project directory
 
 ```bash
-ng generate --help
+cd crm-ui
 ```
 
-## Building
-
-To build the project run:
+3. Install dependencies:
 
 ```bash
-ng build
+npm install
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Usage
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Run the application with the following command
 
 ```bash
-ng test
+npm start
 ```
 
-## Running end-to-end tests
+## Features
 
-For end-to-end (e2e) testing, run:
+1. User Manager
+   As an admin user, you can create, update, and manage all system users.
 
-```bash
-ng e2e
-```
+- Watching detail information users
+- Actice and deactivate user account
+- Assign role for user account
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+2. Contact

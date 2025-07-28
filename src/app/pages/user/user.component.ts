@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { SearchComponent } from '@app/shares/search/search.component';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import {
   MatPaginator,
   MatPaginatorModule,
@@ -26,16 +26,17 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { FilterComponent } from '@app/shares/filter.component.ts/filter.component';
 import {
   COLUMNDEFS,
-  DISPLAYCOLUMNROLE,
-  DISPLAYROLES,
+  DISPLAY_COLUMN_ROLE,
+  DISPLAY_ROLES,
   ITEM_OF_PAGE,
-} from '@app/constants/value.constant';
-import { getManagerName as _getManagerName } from '@app/helper/getManagerName';
+} from '@app/constants/shared.constant';
+import { getManagerName as _getManagerName } from '@app/helper/get-manager-name';
+import { SnackbarService } from '@app/services/snackbar.service';
+import { ModalService } from '@app/services/modal.service';
+import { FilterComponent } from '@app/shares/filter.component.ts/filter.component';
 @Component({
   standalone: true,
   selector: 'user-management',
@@ -75,34 +76,38 @@ export class UserManagementComponent implements AfterViewInit {
     start: new FormControl<Date | null>(null),
     end: new FormControl<Date | null>(null),
   });
-  displayedColumns: string[] = DISPLAYCOLUMNROLE;
+  displayedColumns: string[] = DISPLAY_COLUMN_ROLE;
   columnDefs: HeaderColumn[] = COLUMNDEFS;
-  displayRole = DISPLAYROLES;
+  displayRole = DISPLAY_ROLES;
 
   dataSource!: MatTableDataSource<User>;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  onSearch(event: string) {
-    if (event !== '') {
-      this.userService.getListUser().subscribe((data) => {
+  onSearch(searchKeyword: string) {
+    this.userService.getListUser().subscribe({
+      next: (data) => {
         const { users } = data;
 
-        this.employees = users.filter(
-          (u) => u.username?.includes(event) || u.email.includes(event),
-        );
+        if (searchKeyword !== '') {
+          this.employees = users.filter(
+            (u) =>
+              u.username?.includes(searchKeyword) ||
+              u.email.includes(searchKeyword),
+          );
+        } else {
+          this.employees = users;
+        }
         this.dataSource.data = this.employees;
-      });
-    } else {
-      this.userService.getListUser().subscribe((data) => {
-        const { users } = data;
-        this.employees = users;
-        this.dataSource.data = users;
-      });
-    }
+      },
+      error: (err) => {
+        this.snackbarservice.openSnackBar('Search failed: ' + err.message);
+      },
+    });
   }
   constructor(
     private userService: UserService,
-    private dialog: MatDialog,
+    private snackbarservice: SnackbarService,
+    private modalService: ModalService,
   ) {
     this.dataSource = new MatTableDataSource(this.employees);
   }
@@ -125,57 +130,40 @@ export class UserManagementComponent implements AfterViewInit {
 
   ngOnInit() {
     this.userService.getListUser().subscribe((data) => {
-      const { users }: { users: User[] } = data;
+      const { users } = data;
       this.employees = users;
       this.dataSource.data = users;
     });
   }
 
   openDialog() {
-    this.dialog.open(ModalDiaLogComponent, {
-      data: {
-        component: UserForm,
-        title: 'Add user',
-        metadata: {
-          action: 'create',
-          user: null,
-          userList: this.employees,
-        },
-      },
+    this.modalService.openFilter(ModalDiaLogComponent, UserForm, 'Add user', {
+      action: 'create',
+      dataSelected: null,
+      dataList: this.employees,
     });
   }
   onRowClick(row: User) {
-    this.dialog.open(ModalDiaLogComponent, {
-      data: {
-        component: UserForm,
-        title: 'Edit user',
-        metadata: {
-          action: 'update',
-          dataSelected: row,
-          dataList: this.employees,
-        },
-      },
+    this.modalService.openFilter(ModalDiaLogComponent, UserForm, 'Edit user', {
+      action: 'update',
+      dataSelected: row,
+      dataList: this.employees,
     });
   }
 
   openFilter() {
-    const dialogRef = this.dialog.open(ModalDiaLogComponent, {
-      data: {
-        component: FilterComponent,
-        title: 'Filter by',
-        metadata: {
-          action: '#',
-          user: null,
-          userList: null,
-        },
-      },
-    });
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.employees = result.employees;
-        this.dataSource.data = result.employees;
-      }
-    });
+    this.modalService
+      .openFilter(ModalDiaLogComponent, FilterComponent, 'Filter by', {
+        action: '#',
+        dataSelected: null,
+        dataList: [],
+      })
+      .subscribe((result) => {
+        if (result) {
+          this.employees = result.employees;
+          this.dataSource.data = result.employees;
+        }
+      });
   }
 
   getDisplayRole(role: string): string {

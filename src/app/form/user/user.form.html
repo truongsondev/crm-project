@@ -41,12 +41,18 @@
 
   <mat-form-field class="w-full">
     <mat-label>Password</mat-label>
-    <input
-      matInput
-      type="password"
-      formControlName="password"
-      placeholder="Password"
-    />
+    <div class="flex flex-row items-center justify-between pr-2">
+      <input
+        matInput
+        [type]="isPasswordHidden ? 'password' : 'text'"
+        formControlName="password"
+        placeholder="Password"
+      />
+      <mat-icon class="cursor-pointer" (click)="handleHiddenPassword()"
+        >remove_red_eye</mat-icon
+      >
+    </div>
+
     <mat-error *ngIf="userFormGroup.get('password') | errorMessage as msg">
       {{ msg }}
     </mat-error>
@@ -54,12 +60,17 @@
 
   <mat-form-field class="w-full">
     <mat-label>Confirm Password</mat-label>
-    <input
-      matInput
-      type="password"
-      formControlName="confirm_password"
-      placeholder="Confirm Password"
-    />
+    <div class="flex flex-row items-center justify-between pr-2">
+      <input
+        matInput
+        [type]="isPasswordHidden ? 'password' : 'text'"
+        formControlName="confirm_password"
+        placeholder="Confirm Password"
+      />
+      <mat-icon class="cursor-pointer" (click)="handleHiddenPassword()"
+        >remove_red_eye</mat-icon
+      >
+    </div>
     <mat-error
       *ngIf="userFormGroup.get('confirm_password') | errorMessage as msg"
     >

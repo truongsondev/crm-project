@@ -10,6 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
+import { ROLES } from '@app/constants/shared.constant';
 
 @Component({
   selector: 'filter-component',
@@ -40,15 +41,7 @@ export class FilterComponent {
     end: new FormControl<Date | null>(null),
   });
 
-  displayRole = {
-    USER_ADMIN: 'Admin',
-    DIR: 'Director',
-    SALES_MGR: 'Sales Manager',
-    SALES_EMP: 'Sales Person',
-    CONTACT_MGR: 'Contact Manager',
-    CONTACT_EMP: 'Contact Employee',
-    USER_READ_ONLY: 'Guest',
-  };
+  displayRole = ROLES;
   protected readonly value = signal('');
 
   protected onInput(event: Event) {
@@ -67,11 +60,9 @@ export class FilterComponent {
       const { users } = res;
       const filtered = users.filter((user) => {
         let match = true;
-
         if (this.selectedRole) {
           match = match && user.role === this.selectedRole;
         }
-
         const createdStart = this.range.get('start')?.value;
         const createdEnd = this.range.get('end')?.value;
         if (createdStart && createdEnd) {
@@ -79,7 +70,6 @@ export class FilterComponent {
           match =
             match && createdTime >= createdStart && createdTime <= createdEnd;
         }
-
         const updatedStart = this.updateTime.get('start')?.value;
         const updatedEnd = this.updateTime.get('end')?.value;
         if (updatedStart && updatedEnd) {
@@ -87,10 +77,8 @@ export class FilterComponent {
           match =
             match && updatedTime >= updatedStart && updatedTime <= updatedEnd;
         }
-
         return match;
       });
-
       this.dialogRef.close({
         role: this.selectedRole,
         createdRange: this.range.value,
@@ -106,6 +94,8 @@ export class FilterComponent {
         employees: users,
       });
     });
+
+    this.userService.getListUser();
   }
 
   getUserByRole(role: string) {

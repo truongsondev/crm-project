@@ -25,16 +25,9 @@ export class ModalDiaLogComponent {
         {
           provide: 'data',
           useValue: {
-            action: this.data.metadata.action,
-            dataSelected: this.data.metadata.dataSelected,
-            dataList: this.data.metadata.dataList,
-          },
-        },
-        {
-          provide: 'listData',
-          useValue: {
-            action: 'create',
-            dataList: this.data.metadata.dataList,
+            action: this.data.metadata?.action,
+            dataSelected: this.data.metadata?.dataSelected,
+            dataList: this.data.metadata?.dataList,
           },
         },
       ],

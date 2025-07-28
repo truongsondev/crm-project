@@ -16,7 +16,11 @@ import { ContactForm } from '@app/form/contacts/contact.form';
 import { User } from '@app/interfaces/user.interface';
 import { UserService } from '@app/services/user.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { UserForm } from '@app/form/user/user.form';
+import { ConfirmActionComponent } from '@app/shares/confirm-action.component/confirm-action.component';
+import { FilterComponent } from '@app/shares/filter.component.ts/filter.component';
+import { ModalService } from '@app/services/modal.service';
+import { ITEM_OF_PAGE } from '@app/constants/shared.constant';
+import { SnackbarService } from '@app/services/snackbar.service';
 
 @Component({
   selector: 'contact-component',
@@ -38,6 +42,9 @@ export class ContactComponent {
   contacts: Contact[] = [];
   mySearch: string = 'contact name';
   users: User[] = [];
+  pageSize = ITEM_OF_PAGE;
+  pageIndex = 0;
+  Math = Math;
   dataSource!: MatTableDataSource<Contact>;
   displayedColumns: string[] = [
     'all',
@@ -61,16 +68,24 @@ export class ContactComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  onSearch(event: string) {
-    if (event !== '') {
-      this.contactService.getListContact().subscribe((data) => {
-        const { code, contacts } = data;
-        if (code === 20000) {
+  onSearch(searchKeyword: string) {
+    this.contactService.getListContact().subscribe({
+      next: (data) => {
+        const { contacts } = data;
+
+        if (searchKeyword !== '') {
+          this.contacts = contacts.filter((u) =>
+            u.contact_name?.includes(searchKeyword),
+          );
+        } else {
           this.contacts = contacts;
-          this.dataSource.data = contacts;
         }
-      });
-    }
+        this.dataSource.data = this.contacts;
+      },
+      error: (err) => {
+        this.snackbarservice.openSnackBar('Search failed: ' + err.message);
+      },
+    });
   }
 
   constructor(
@@ -78,25 +93,22 @@ export class ContactComponent {
     private datePipe: DatePipe,
     private dialog: MatDialog,
     private userService: UserService,
+    private modalService: ModalService,
+    private snackbarservice: SnackbarService,
   ) {}
   ngOnInit() {
     this.contactService.getListContact().subscribe((res) => {
-      const { code, contacts } = res;
+      const { contacts } = res;
 
-      if (code === 200000) {
-        this.contacts = contacts;
-        this.dataSource = new MatTableDataSource(contacts);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      }
+      this.contacts = contacts;
+      this.dataSource = new MatTableDataSource(contacts);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
     });
 
     this.userService.getListUser().subscribe((res) => {
-      const { code, users } = res;
-
-      if (code === 200000) {
-        this.users = users;
-      }
+      const { users } = res;
+      this.users = users;
     });
   }
 
@@ -120,31 +132,57 @@ export class ContactComponent {
     }
     return name?.first_name + ' ' + name?.last_name;
   }
-
+  openFilter() {
+    this.modalService
+      .openFilter(ModalDiaLogComponent, FilterComponent, 'Filter by', {
+        action: '#',
+        dataSelected: null,
+        dataList: [],
+      })
+      .subscribe((res) => {
+        // if (!res) {
+        //   return;
+        // }
+        this.contacts = res;
+        this.dataSource.data = this.contacts;
+      });
+  }
   openDialog() {
-    this.dialog.open(ModalDiaLogComponent, {
-      data: {
-        component: ContactForm,
-        title: 'Add contact',
-        metadata: {
-          user: this.contacts,
-          action: 'create',
-        },
+    this.modalService.openFilter(
+      ModalDiaLogComponent,
+      ContactForm,
+      'Add contact',
+      {
+        action: '#',
+        dataSelected: null,
+        dataList: this.contacts,
       },
-    });
+    );
   }
 
   onRowClick(row: Contact) {
-    this.dialog.open(ModalDiaLogComponent, {
-      data: {
-        component: ContactForm,
-        title: 'Edit contact',
-        metadata: {
-          action: 'update',
-          dataSelected: row,
-          contactList: this.contacts,
-        },
+    this.modalService.openFilter(
+      ModalDiaLogComponent,
+      ContactForm,
+      'Edit contact',
+      {
+        action: 'update',
+        dataSelected: row,
+        dataList: this.contacts,
       },
-    });
+    );
+  }
+
+  onDelete(row: Contact) {
+    this.modalService.openFilter(
+      ModalDiaLogComponent,
+      ConfirmActionComponent,
+      'Edit contact',
+      {
+        action: 'Confirm delete',
+        dataSelected: row,
+        dataList: this.contacts,
+      },
+    );
   }
 }
