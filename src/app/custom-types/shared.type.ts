@@ -27,3 +27,11 @@ export type FormContact = {
   dataSelected: Contact | null;
   dataList: Contact[];
 };
+
+export type Error = {
+  message: string;
+};
+
+export type From = {
+  from: string;
+};

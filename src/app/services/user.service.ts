@@ -23,7 +23,6 @@ export class UserService {
 
   updateUser(id: string, data: User) {
     const url = `${this.endpoints.update_user.replace(':id', id)}`;
-    console.log(url);
     return this.endpointService.putEndpoint<UserResponse>(url, data);
   }
 }

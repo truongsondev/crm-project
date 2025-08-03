@@ -28,7 +28,7 @@ import {
 } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
-  COLUMNDEFS,
+  COLUMN_DEFS,
   DISPLAY_COLUMN_ROLE,
   DISPLAY_ROLES,
   ITEM_OF_PAGE,
@@ -36,7 +36,7 @@ import {
 import { getManagerName as _getManagerName } from '@app/helper/get-manager-name';
 import { SnackbarService } from '@app/services/snackbar.service';
 import { ModalService } from '@app/services/modal.service';
-import { FilterComponent } from '@app/shares/filter.component.ts/filter.component';
+import { FilterComponent } from '@app/shares/filter/filter.component';
 @Component({
   standalone: true,
   selector: 'user-management',
@@ -77,7 +77,7 @@ export class UserManagementComponent implements AfterViewInit {
     end: new FormControl<Date | null>(null),
   });
   displayedColumns: string[] = DISPLAY_COLUMN_ROLE;
-  columnDefs: HeaderColumn[] = COLUMNDEFS;
+  columnDefs: HeaderColumn[] = COLUMN_DEFS;
   displayRole = DISPLAY_ROLES;
 
   dataSource!: MatTableDataSource<User>;
@@ -87,7 +87,6 @@ export class UserManagementComponent implements AfterViewInit {
     this.userService.getListUser().subscribe({
       next: (data) => {
         const { users } = data;
-
         if (searchKeyword !== '') {
           this.employees = users.filter(
             (u) =>
@@ -141,6 +140,8 @@ export class UserManagementComponent implements AfterViewInit {
       action: 'create',
       dataSelected: null,
       dataList: this.employees,
+      message: '',
+      from: 'user-management',
     });
   }
   onRowClick(row: User) {
@@ -148,6 +149,8 @@ export class UserManagementComponent implements AfterViewInit {
       action: 'update',
       dataSelected: row,
       dataList: this.employees,
+      message: '',
+      from: 'user-management',
     });
   }
 
@@ -157,6 +160,8 @@ export class UserManagementComponent implements AfterViewInit {
         action: '#',
         dataSelected: null,
         dataList: [],
+        message: '',
+        from: 'user-management',
       })
       .subscribe((result) => {
         if (result) {

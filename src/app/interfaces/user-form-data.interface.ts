@@ -4,4 +4,6 @@ export interface UserFormData {
   action: 'create' | 'update';
   dataSelected: any | null;
   dataList: any[];
+  message: string;
+  from: string;
 }

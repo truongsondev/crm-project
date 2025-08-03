@@ -9,6 +9,7 @@ import {
 import { Router } from '@angular/router';
 import { passwordValidator } from '@app/helper/password-validator';
 import { AuthService } from '@app/services/auth.service';
+import { SnackbarService } from '@app/services/snackbar.service';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -31,6 +32,7 @@ export class SignInComponent {
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
+    private snackbarService: SnackbarService,
   ) {
     this.initLoginForm();
   }
@@ -42,24 +44,19 @@ export class SignInComponent {
       const { user_name, password } = this.LoginFormGroup.value;
       this.authService.signIn({ user_name, password }).subscribe({
         next: (res) => {
-          if (res.code === 20000) {
-            this.cookieService.set('at', res.metadata.token.accessToken, {
-              expires: 2,
-              path: '/',
-            });
-            this.cookieService.set('rt', res.metadata.token.accessToken, {
-              expires: 7,
-              path: '/',
-            });
-            localStorage.setItem('user', JSON.stringify(res.metadata.user));
-            this.router.navigate(['/dashboard']);
-          } else {
-            alert('login fail');
-          }
+          this.cookieService.set('at', res.metadata.token.accessToken, {
+            expires: 2,
+            path: '/',
+          });
+          this.cookieService.set('rt', res.metadata.token.accessToken, {
+            expires: 7,
+            path: '/',
+          });
+          localStorage.setItem('user', JSON.stringify(res.metadata.user));
+          this.router.navigate(['/dashboard']);
         },
         error: (err) => {
-          console.error('HTTP Error:', err);
-          alert('Server error!');
+          this.snackbarService.openSnackBar(err.message);
         },
       });
     } else {

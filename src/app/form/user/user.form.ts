@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   signal,
-  inject,
   Inject,
 } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -26,11 +25,7 @@ import {
 } from '@app/helper/password-validator';
 import { UserService } from '@app/services/user.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import {
-  FormUser,
-  ListFormUser,
-  SelectOption,
-} from '@app/custom-types/shared.type';
+import { FormUser, SelectOption } from '@app/custom-types/shared.type';
 import { CommonModule } from '@angular/common';
 import { ErrorMessagePipe } from '@app/helper/error-message-form';
 import { User } from '@app/interfaces/user.interface';
@@ -90,12 +85,9 @@ export class UserForm {
     private dialogRef: MatDialogRef<UserForm>,
   ) {}
 
-  alertFormValues(formGroup: FormGroup) {
-    console.log(JSON.stringify(formGroup.value, null, 2));
-  }
-
   initForm = () => {
     const userSelected = this.user.dataSelected;
+    console.log('userSelected:::', userSelected);
     this.userFormGroup = this.fb.group(
       {
         _id: [userSelected?._id || ''],
@@ -110,7 +102,7 @@ export class UserForm {
           userSelected?.password || '',
           [Validators.required, passwordValidator],
         ],
-        confirm_password: [userSelected?.password, [Validators.required]],
+        confirm_password: [userSelected?.password || '', [Validators.required]],
         address: [userSelected?.address || ''],
         salutation: [userSelected?.salutation || 'None', Validators.required],
         role: [userSelected?.role || '', Validators.required],
@@ -118,7 +110,7 @@ export class UserForm {
         job_title: [userSelected?.job_title || ''],
         is_active: [userSelected?.is_active ?? true],
         is_manager: [userSelected?.is_manager ?? false],
-        manager_name: [userSelected?._id || '', Validators.required],
+        manager_name: [userSelected?.manager_name || '', Validators.required],
         is_terminate: [false],
         terminated_date: [
           {
@@ -136,7 +128,6 @@ export class UserForm {
   ngOnInit() {
     this.listManager =
       this.user.dataList?.filter((item) => item.is_manager) || [];
-
     this.initForm();
   }
 

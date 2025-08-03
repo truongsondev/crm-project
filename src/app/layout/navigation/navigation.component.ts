@@ -15,7 +15,9 @@ export class NavComponent {
   constructor(private router: Router) {}
   getUserName() {
     const userJson = localStorage.getItem('user');
-    if (!userJson) return '';
+    if (!userJson) {
+      return '';
+    }
     const user = JSON.parse(userJson);
     return user.first_name + ' ' + user.last_name;
   }
@@ -23,7 +25,9 @@ export class NavComponent {
   getRoleUser(): string {
     const userJson = localStorage.getItem('user');
 
-    if (!userJson) return '';
+    if (!userJson) {
+      return '';
+    }
     const user = JSON.parse(userJson);
     return user.role;
   }

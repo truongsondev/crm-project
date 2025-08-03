@@ -16,7 +16,7 @@ export class ModalDiaLogComponent {
     public data: {
       component: Type<unknown>;
       title: string;
-      metadata: UserFormData;
+      data: UserFormData;
     },
     private parentInjector: Injector,
   ) {
@@ -25,9 +25,11 @@ export class ModalDiaLogComponent {
         {
           provide: 'data',
           useValue: {
-            action: this.data.metadata?.action,
-            dataSelected: this.data.metadata?.dataSelected,
-            dataList: this.data.metadata?.dataList,
+            action: this.data.data?.action,
+            dataSelected: this.data.data?.dataSelected,
+            dataList: this.data.data?.dataList,
+            message: this.data.data?.message,
+            from: this.data.data?.from,
           },
         },
       ],

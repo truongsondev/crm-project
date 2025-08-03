@@ -80,7 +80,7 @@
                     </p>
                   </span>
                   <span *ngSwitchCase="'assigned_to'">
-                    {{ getNameUser(row[col.column]) || "-" }}
+                    {{ row[col.column] || "-" }}
                   </span>
                   <span *ngSwitchDefault>
                     {{ row[col.column] || "-" }}

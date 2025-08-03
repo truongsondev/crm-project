@@ -19,12 +19,22 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { SALUTATION } from '@app/constants/shared.constant';
+import { LEAD_SOURCE, SALUTATION } from '@app/constants/shared.constant';
 import { ContactService } from '@app/services/contact.service';
 
 import { MatDialogRef } from '@angular/material/dialog';
 import { UserForm } from '../user/user.form';
 import { SnackbarService } from '@app/services/snackbar.service';
+
+enum ROLE_TYPE {
+  USER_ADMIN,
+  DIR,
+  SALES_MGR,
+  SALES_EMP,
+  CONTACT_MGR,
+  CONTACT_EMP,
+  USER_READ_ONLY,
+}
 
 @Component({
   selector: 'contact-form',
@@ -46,14 +56,7 @@ export class ContactForm {
 
   contactFormGroup!: FormGroup;
   salutations: SelectOption[] = SALUTATION;
-  leadSource: string[] = [
-    'Existing Customer',
-    'Partner',
-    'Conference',
-    'Website',
-    'Word of mouth',
-    'Other',
-  ];
+  leadSource: string[] = LEAD_SOURCE;
   listAssign: User[] = [];
   constructor(
     private userService: UserService,
@@ -68,7 +71,6 @@ export class ContactForm {
 
   ngOnInit() {
     const contactForm = this.contact.dataSelected;
-    console.log(contactForm);
     this.contactFormGroup = this.fb.group({
       _id: [contactForm?._id || ''],
       contact_name: [contactForm?.contact_name || '', Validators.required],
@@ -85,7 +87,9 @@ export class ContactForm {
   }
   getRole() {
     const userJson = localStorage.getItem('user');
-    if (!userJson) return '';
+    if (!userJson) {
+      return '';
+    }
     const user = JSON.parse(userJson);
     return user.role;
   }
@@ -95,13 +99,16 @@ export class ContactForm {
     if (!role) return;
     this.userService.getListUser().subscribe((data) => {
       const { users } = data;
-      if (role === 'USER_ADMIN' || role === 'CONTACT_MGR') {
+      if (role === ROLE_TYPE.USER_ADMIN || role === ROLE_TYPE.CONTACT_MGR) {
         this.listAssign = users.filter((item) =>
-          ['CONTACT_MGR', 'CONTACT_EMP'].includes(item.role),
+          [
+            ROLE_TYPE.CONTACT_MGR.toString(),
+            ROLE_TYPE.CONTACT_EMP.toString(),
+          ].includes(item.role),
         );
-      } else if (role === 'CONTACT_EMP') {
+      } else if (role === ROLE_TYPE.CONTACT_EMP) {
         this.listAssign = users.filter((item) =>
-          ['CONTACT_EMP '].includes(item.role),
+          [ROLE_TYPE.CONTACT_EMP.toString()].includes(item.role),
         );
       }
     });

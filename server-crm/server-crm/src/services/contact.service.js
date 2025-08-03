@@ -1,4 +1,5 @@
 import { ContactRepo } from "../repositories/contact.repo.js";
+import UserRepo from "../repositories/user.repo.js";
 
 const mockContacts = [
   {
@@ -156,13 +157,28 @@ export class ContactService {
 
   static getListContacts = async () => {
     try {
-      const contacts = await ContactRepo.getListContacts();
+      const rawContacts = await ContactRepo.getListContacts();
+      const contacts = await Promise.all(
+        rawContacts.map(async (contact) => {
+          const assignedToUser = await UserRepo.findUserbyId(
+            contact.assigned_to
+          );
+
+          return {
+            ...(contact.toObject?.() || contact),
+            assigned_to: assignedToUser
+              ? `${assignedToUser.first_name} ${assignedToUser.last_name}`
+              : null,
+          };
+        })
+      );
+
       return {
         code: 200000,
         contacts,
       };
     } catch (e) {
-      console.log(e);
+      next(e);
     }
   };
 

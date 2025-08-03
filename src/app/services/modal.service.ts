@@ -15,13 +15,15 @@ export class ModalService {
       action: string;
       dataSelected: any | null;
       dataList: any[];
+      message: string;
+      from: string;
     },
   ) {
     const dialogRef = this.dialog.open(ModalDialogComponent, {
       data: {
         component: innerComponent,
         title: title,
-        metadata: options,
+        data: options,
       },
     });
 

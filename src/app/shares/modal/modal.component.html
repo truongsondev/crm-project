@@ -1,8 +1,11 @@
 <mat-dialog-content class="bg-white w-full">
-  <h2 mat-dialog-title>{{ data.title }}</h2>
+  <div class="bg-slate-100 px-4 py-2">
+    <h2 mat-dialog-title class="text-sm">{{ data.title }}</h2>
+  </div>
 
-  <ng-container
-    *ngComponentOutlet="data.component; injector: injector"
-  ></ng-container>
+  <div class="px-4 py-2">
+    <ng-container
+      *ngComponentOutlet="data.component; injector: injector"
+    ></ng-container>
+  </div>
 </mat-dialog-content>
-<mat-dialog-actions align="end"> </mat-dialog-actions>

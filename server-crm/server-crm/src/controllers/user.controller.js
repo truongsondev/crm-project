@@ -3,11 +3,15 @@ import UserSerivice from "../services/user.service.js";
 
 class UserController {
   static getListUser = async (req, res, next) => {
-    const users = await UserSerivice.getListUser();
-    res.status(200).json({
-      code: 200000,
-      users: users,
-    });
+    try {
+      const users = await UserSerivice.getListUser();
+      res.status(200).json({
+        code: 200000,
+        users: users,
+      });
+    } catch (err) {
+      next(err);
+    }
   };
 
   static createUser = async (req, res, next) => {

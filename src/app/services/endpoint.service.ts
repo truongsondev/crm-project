@@ -1,10 +1,17 @@
 import { HttpClient, HttpErrorResponse, HttpEvent } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ErrorComponent } from '@app/shares/error/error.component';
+import { ModalDiaLogComponent } from '@app/shares/modal/modal.component';
 import { catchError, of, throwError } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
+import { ModalService } from './modal.service';
+import { ERROR_MESSAGES } from '@app/constants/shared.constant';
 @Injectable({ providedIn: 'root' })
 export class EndpointService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private modalService: ModalService,
+  ) {}
   fetchEndpoint<T = any>(endpoint: string, options?: any): Observable<T> {
     return this.http
       .get<T>(endpoint, {
@@ -13,7 +20,7 @@ export class EndpointService {
       } as {
         observe: 'body';
       })
-      .pipe(catchError((err: HttpErrorResponse) => this.handleEror<T>(err)));
+      .pipe(catchError((err: HttpErrorResponse) => this.handleError<T>(err)));
   }
 
   postEndpoint<T = any>(
@@ -28,7 +35,7 @@ export class EndpointService {
       } as {
         observe: 'body';
       })
-      .pipe(catchError((err: HttpErrorResponse) => this.handleEror<T>(err)));
+      .pipe(catchError((err: HttpErrorResponse) => this.handleError<T>(err)));
   }
 
   putEndpoint<T = any>(
@@ -43,7 +50,7 @@ export class EndpointService {
       } as {
         observe: 'body';
       })
-      .pipe(catchError((err) => this.handleEror<T>(err)));
+      .pipe(catchError((err) => this.handleError<T>(err)));
   }
 
   deleteEndpoint<T = any>(endpoint: string, options?: any): Observable<T> {
@@ -54,10 +61,29 @@ export class EndpointService {
       } as {
         observe: 'body';
       })
-      .pipe(catchError((err) => this.handleEror<T>(err)));
+      .pipe(catchError((err) => this.handleError<T>(err)));
   }
 
-  handleEror<T>(error: HttpErrorResponse): Observable<T> {
-    return throwError(() => new Error('API failed'));
+  showError(title: string, message: string) {
+    return this.modalService.openFilter(
+      ModalDiaLogComponent,
+      ErrorComponent,
+      title,
+      {
+        action: '',
+        dataList: [],
+        dataSelected: null,
+        message: message,
+        from: '',
+      },
+    );
+  }
+
+  handleError<T>(error: HttpErrorResponse): Observable<T> {
+    const httpStatus = error.status;
+    return this.showError(
+      ERROR_MESSAGES[httpStatus].title || 'Invalid Error',
+      ERROR_MESSAGES[httpStatus].message || 'An unknown error occurred',
+    );
   }
 }

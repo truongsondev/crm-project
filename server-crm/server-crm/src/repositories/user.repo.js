@@ -7,6 +7,11 @@ class UserRepo {
     });
   }
 
+  static async findUserbyId(_id) {
+    return await User.findOne({
+      _id: _id,
+    });
+  }
   static async findUsers({ user_name }) {
     return await User.find({
       username: user_name,

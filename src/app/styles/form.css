@@ -34,4 +34,19 @@
   .mdc-switch__track::after {
     background-color: var(--color-green-300);
   }
+  .mat-mdc-dialog-title {
+    padding: 0;
+  }
+  .mat-mdc-dialog-container .mat-mdc-dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0px;
+  }
+  .mat-mdc-dialog-surface {
+    border-radius: 0px;
+  }
+  .mat-mdc-dialog-title::before {
+    height: 10px;
+  }
 }

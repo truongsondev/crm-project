@@ -5,6 +5,8 @@ export function getManagerName(
   employees: User[] | null,
 ) {
   const manager = employees?.find((u) => u._id == id);
-  if (!manager) return null;
+  if (!manager) {
+    return null;
+  }
   return manager.first_name + ' ' + manager?.last_name;
 }

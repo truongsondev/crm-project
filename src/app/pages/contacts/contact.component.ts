@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { HeaderColumn } from '@app/custom-types/shared.type';
@@ -10,14 +10,13 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule, DatePipe } from '@angular/common';
-import { MatDialog } from '@angular/material/dialog';
 import { ModalDiaLogComponent } from '@app/shares/modal/modal.component';
 import { ContactForm } from '@app/form/contacts/contact.form';
 import { User } from '@app/interfaces/user.interface';
 import { UserService } from '@app/services/user.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ConfirmActionComponent } from '@app/shares/confirm-action.component/confirm-action.component';
-import { FilterComponent } from '@app/shares/filter.component.ts/filter.component';
+import { ConfirmActionComponent } from '@app/shares/confirm-action/confirm-action.component';
+import { FilterComponent } from '@app/shares/filter/filter.component';
 import { ModalService } from '@app/services/modal.service';
 import { ITEM_OF_PAGE } from '@app/constants/shared.constant';
 import { SnackbarService } from '@app/services/snackbar.service';
@@ -91,7 +90,6 @@ export class ContactComponent {
   constructor(
     private contactService: ContactService,
     private datePipe: DatePipe,
-    private dialog: MatDialog,
     private userService: UserService,
     private modalService: ModalService,
     private snackbarservice: SnackbarService,
@@ -99,7 +97,6 @@ export class ContactComponent {
   ngOnInit() {
     this.contactService.getListContact().subscribe((res) => {
       const { contacts } = res;
-
       this.contacts = contacts;
       this.dataSource = new MatTableDataSource(contacts);
       this.dataSource.paginator = this.paginator;
@@ -138,12 +135,11 @@ export class ContactComponent {
         action: '#',
         dataSelected: null,
         dataList: [],
+        message: '',
+        from: 'contact',
       })
       .subscribe((res) => {
-        // if (!res) {
-        //   return;
-        // }
-        this.contacts = res;
+        this.contacts = res.contacts;
         this.dataSource.data = this.contacts;
       });
   }
@@ -156,6 +152,8 @@ export class ContactComponent {
         action: '#',
         dataSelected: null,
         dataList: this.contacts,
+        message: '',
+        from: 'contact',
       },
     );
   }
@@ -169,6 +167,8 @@ export class ContactComponent {
         action: 'update',
         dataSelected: row,
         dataList: this.contacts,
+        message: '',
+        from: 'contact',
       },
     );
   }
@@ -182,6 +182,8 @@ export class ContactComponent {
         action: 'Confirm delete',
         dataSelected: row,
         dataList: this.contacts,
+        message: '',
+        from: 'contact',
       },
     );
   }
