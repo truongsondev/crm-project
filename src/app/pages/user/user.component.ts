@@ -37,6 +37,9 @@ import { getManagerName as _getManagerName } from '@app/helper/get-manager-name'
 import { SnackbarService } from '@app/services/snackbar.service';
 import { ModalService } from '@app/services/modal.service';
 import { FilterComponent } from '@app/shares/filter/filter.component';
+import { FileService } from '@app/services/fileService.service';
+import { SelectOptioncomponent } from '@app/shares/select-option/select-option.component';
+import { getEndpoints } from '@app/constants/endpoints.constant';
 @Component({
   standalone: true,
   selector: 'user-management',
@@ -107,6 +110,7 @@ export class UserManagementComponent implements AfterViewInit {
     private userService: UserService,
     private snackbarservice: SnackbarService,
     private modalService: ModalService,
+    private fileService: FileService,
   ) {
     this.dataSource = new MatTableDataSource(this.employees);
   }
@@ -136,13 +140,18 @@ export class UserManagementComponent implements AfterViewInit {
   }
 
   openDialog() {
-    this.modalService.openFilter(ModalDiaLogComponent, UserForm, 'Add user', {
-      action: 'create',
-      dataSelected: null,
-      dataList: this.employees,
-      message: '',
-      from: 'user-management',
-    });
+    this.modalService.openFilter(
+      ModalDiaLogComponent,
+      SelectOptioncomponent,
+      'Select option',
+      {
+        action: 'select',
+        dataSelected: null,
+        dataList: this.employees,
+        message: '',
+        from: 'user-management',
+      },
+    );
   }
   onRowClick(row: User) {
     this.modalService.openFilter(ModalDiaLogComponent, UserForm, 'Edit user', {
@@ -174,5 +183,17 @@ export class UserManagementComponent implements AfterViewInit {
   getDisplayRole(role: string): string {
     const rolekey = role as keyof typeof this.displayRole;
     return this.displayRole[rolekey] || '-';
+  }
+
+  exportToFileCSV() {
+    const endpoint = getEndpoints().user.v1.download_user;
+    this.fileService.downloadFile(endpoint).subscribe((res) => {
+      const url = window.URL.createObjectURL(res);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'user_management.csv';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
   }
 }

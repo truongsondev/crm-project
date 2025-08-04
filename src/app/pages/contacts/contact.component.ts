@@ -20,6 +20,9 @@ import { FilterComponent } from '@app/shares/filter/filter.component';
 import { ModalService } from '@app/services/modal.service';
 import { ITEM_OF_PAGE } from '@app/constants/shared.constant';
 import { SnackbarService } from '@app/services/snackbar.service';
+import { FileService } from '@app/services/fileService.service';
+import { getEndpoints } from '@app/constants/endpoints.constant';
+import { SelectOptioncomponent } from '@app/shares/select-option/select-option.component';
 
 @Component({
   selector: 'contact-component',
@@ -93,6 +96,7 @@ export class ContactComponent {
     private userService: UserService,
     private modalService: ModalService,
     private snackbarservice: SnackbarService,
+    private fileService: FileService,
   ) {}
   ngOnInit() {
     this.contactService.getListContact().subscribe((res) => {
@@ -146,10 +150,10 @@ export class ContactComponent {
   openDialog() {
     this.modalService.openFilter(
       ModalDiaLogComponent,
-      ContactForm,
-      'Add contact',
+      SelectOptioncomponent,
+      'Select option',
       {
-        action: '#',
+        action: 'select',
         dataSelected: null,
         dataList: this.contacts,
         message: '',
@@ -186,5 +190,16 @@ export class ContactComponent {
         from: 'contact',
       },
     );
+  }
+  exportToFileCSV() {
+    const endpoint = getEndpoints().contact.v1.download_contact;
+    this.fileService.downloadFile(endpoint).subscribe((res) => {
+      const url = window.URL.createObjectURL(res);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'contact.csv';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
   }
 }

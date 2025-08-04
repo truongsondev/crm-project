@@ -22,7 +22,14 @@ class UserRepo {
     return await User.insertOne(user);
   }
   static async createUsers(users) {
-    return await User.insertMany(users);
+    console.log("users:::", users);
+    const normalizedUsers = users.map((u) => ({
+      ...u,
+      is_active: u.is_active === "true",
+      is_manager: u.is_manager === "true",
+    }));
+
+    return await User.insertMany(normalizedUsers);
   }
   static async getListUser() {
     return await User.find();

@@ -1,4 +1,5 @@
 import { ContactService } from "../services/contact.service.js";
+import fs from "fs";
 
 export class ContactController {
   static getListContacts = async (req, res, next) => {
@@ -12,6 +13,7 @@ export class ContactController {
     console.log(responseData);
     res.status(200).json(responseData);
   };
+
   static deleteContact = async (req, res, next) => {
     const id = req.params.id;
     const data = await ContactService.deleteContact(id);
@@ -28,5 +30,23 @@ export class ContactController {
       code: 200000,
       contact: response,
     });
+  };
+
+  static exportToFileCSV = async (req, res, next) => {
+    try {
+      const { filePath, fileName } = await ContactService.exportToFileCSV();
+
+      res.download(filePath, fileName, (err) => {
+        if (err) {
+          next(err);
+        }
+
+        fs.unlink(filePath, (unlinkErr) => {
+          if (unlinkErr) console.error("Error deleting temp file:", unlinkErr);
+        });
+      });
+    } catch (e) {
+      next(e);
+    }
   };
 }

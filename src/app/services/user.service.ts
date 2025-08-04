@@ -20,6 +20,12 @@ export class UserService {
     const endpoint = getEndpoints().user.v1.create_user;
     return this.endpointService.postEndpoint<UserResponse>(endpoint, data);
   }
+  createUsers(data: any) {
+    const endpoint = getEndpoints().user.v1.create_users;
+    return this.endpointService.postEndpoint<UsersResponse>(endpoint, data, {
+      
+    });
+  }
 
   updateUser(id: string, data: User) {
     const url = `${this.endpoints.update_user.replace(':id', id)}`;

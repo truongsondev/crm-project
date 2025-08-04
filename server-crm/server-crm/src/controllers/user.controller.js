@@ -1,6 +1,6 @@
 import AuthService from "../services/auth.service.js";
 import UserSerivice from "../services/user.service.js";
-
+import fs from "fs";
 class UserController {
   static getListUser = async (req, res, next) => {
     try {
@@ -28,6 +28,21 @@ class UserController {
     }
   };
 
+  static createUsers = async (req, res, next) => {
+    try {
+      const users = req.body;
+      const usersRes = await UserSerivice.createUsers(users);
+      res.status(200).json({
+        code: 200000,
+        users: usersRes,
+      });
+    } catch (e) {
+      console.log(e);
+
+      next(e);
+    }
+  };
+
   static updateUser = async (req, res, next) => {
     try {
       const id = req.params.id;
@@ -46,6 +61,24 @@ class UserController {
     const { user_name, password } = req.body;
     const response = await AuthService.signIn({ user_name, password });
     res.status(200).json(response);
+  };
+
+  static exportToFileCSV = async (req, res, next) => {
+    try {
+      const { filePath, fileName } = await UserSerivice.exportToFileCSV();
+
+      res.download(filePath, fileName, (err) => {
+        if (err) {
+          next(err);
+        }
+
+        fs.unlink(filePath, (unlinkErr) => {
+          if (unlinkErr) console.error("Error deleting temp file:", unlinkErr);
+        });
+      });
+    } catch (e) {
+      next(e);
+    }
   };
 }
 

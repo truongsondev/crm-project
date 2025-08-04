@@ -1,0 +1,15 @@
+<div class="flex flex-row w-full justify-between items-center">
+  <button
+    (click)="addSingleItem()"
+    class="cursor-pointer py-2 px-4 border-1 border-teal-500 bg-teal-50 text-teal-500 text-sm font-medium"
+  >
+    Add one
+  </button>
+  <button
+    (click)="fileInput.click()"
+    class="cursor-pointer py-2 px-4 border-1 border-sky-500 bg-sky-50 text-sky-500 text-sm font-medium"
+  >
+    Add multiple
+  </button>
+  <input type="file" #fileInput hidden (change)="onFileSelected($event)" />
+</div>
