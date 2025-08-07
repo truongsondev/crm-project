@@ -68,14 +68,29 @@ export class ContactForm {
   ) {
     this.getListUser();
   }
+  getErrorMsg(controlName: string): string | null {
+    const control = this.contactFormGroup.get(controlName);
+    if (!control || !control.errors || !control.touched) return null;
+    if (control.errors['required']) {
+      return 'This field is required';
+    }
+    if (control.errors['email']) {
+      return 'Email must be in form abc@gmail.com';
+    }
 
+    return 'Invalid input';
+  }
   ngOnInit() {
     const contactForm = this.contact.dataSelected;
     this.contactFormGroup = this.fb.group({
       _id: [contactForm?._id || ''],
       contact_name: [contactForm?.contact_name || '', Validators.required],
       salutation: [contactForm?.salutation || 'None', Validators.required],
-      phone: [contactForm?.phone, Validators.required],
+      phone: [
+        contactForm?.phone,
+        Validators.required,
+        Validators.pattern(/^[0-9]{9,15}$/),
+      ],
       email: [contactForm?.email, Validators.email],
       organization: [contactForm?.organization],
       birthday: [contactForm?.birthday || null],
@@ -117,11 +132,12 @@ export class ContactForm {
     const { value } = event.target as HTMLInputElement;
     this.value.set(value);
   }
-
+  closeForm() {
+    this.dialogRef.close();
+  }
   onSubmit() {
     if (this.contactFormGroup.invalid) {
       this.contactFormGroup.markAllAsTouched();
-      console.warn('Form is invalid', this.contactFormGroup.value);
       this.snackbarService.openSnackBar('Form invalid!');
       return;
     }

@@ -5,6 +5,7 @@ import { Contact } from '@app/interfaces/contact.interface';
 import {
   ContactReponse,
   ContactsReponse,
+  DataResponse,
 } from '@app/interfaces/response.interface';
 import { EndpointService } from './endpoint.service';
 
@@ -21,6 +22,12 @@ export class ContactService {
     const endpoint = this.endpoints.contacts;
 
     return this.endpointService.postEndpoint<ContactReponse>(endpoint, data);
+  }
+
+  createContacts(data: any) {
+    const endpoint = this.endpoints.create_contacts;
+
+    return this.endpointService.postEndpoint<DataResponse>(endpoint, data);
   }
 
   updateContact(id: string, data: Contact) {

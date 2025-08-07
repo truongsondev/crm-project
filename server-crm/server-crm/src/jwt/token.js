@@ -12,4 +12,13 @@ const createTokenPair = (payload, publicKey, privateKey) => {
   return { accessToken, refreshToken };
 };
 
-export default createTokenPair;
+const verifyToken = (accessToken, publicKey) => {
+  try {
+    const decoded = jwt.verify(accessToken, publicKey);
+    return decoded;
+  } catch (err) {
+    console.log("err:::", err);
+    return null;
+  }
+};
+export { verifyToken, createTokenPair };

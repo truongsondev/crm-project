@@ -6,7 +6,7 @@
   <mat-form-field class="w-full">
     <mat-label>First Name</mat-label>
     <input matInput formControlName="first_name" placeholder="Gumayusi" />
-    <mat-error *ngIf="userFormGroup.get('first_name') | errorMessage as msg">
+    <mat-error *ngIf="getErrorMsg('first_name') as msg">
       {{ msg }}
     </mat-error>
   </mat-form-field>
@@ -14,7 +14,7 @@
   <mat-form-field class="w-full">
     <mat-label>Last Name</mat-label>
     <input matInput formControlName="last_name" placeholder="T1" />
-    <mat-error *ngIf="userFormGroup.get('last_name') | errorMessage as msg">
+    <mat-error *ngIf="getErrorMsg('last_name') as msg">
       {{ msg }}
     </mat-error>
   </mat-form-field>
@@ -26,7 +26,7 @@
       formControlName="email"
       placeholder="Ex. john@example.com"
     />
-    <mat-error *ngIf="userFormGroup.get('email') | errorMessage as msg">
+    <mat-error *ngIf="getErrorMsg('email') as msg">
       {{ msg }}
     </mat-error>
   </mat-form-field>
@@ -34,7 +34,7 @@
   <mat-form-field class="w-full">
     <mat-label>Username</mat-label>
     <input matInput formControlName="username" placeholder="Ex. johndoe" />
-    <mat-error *ngIf="userFormGroup.get('username') | errorMessage as msg">
+    <mat-error *ngIf="getErrorMsg('username') as msg">
       {{ msg }}
     </mat-error>
   </mat-form-field>
@@ -52,8 +52,7 @@
         >remove_red_eye</mat-icon
       >
     </div>
-
-    <mat-error *ngIf="userFormGroup.get('password') | errorMessage as msg">
+    <mat-error *ngIf="getErrorMsg('password') as msg">
       {{ msg }}
     </mat-error>
   </mat-form-field>
@@ -71,9 +70,7 @@
         >remove_red_eye</mat-icon
       >
     </div>
-    <mat-error
-      *ngIf="userFormGroup.get('confirm_password') | errorMessage as msg"
-    >
+    <mat-error *ngIf="getErrorMsg('confirm_password') as msg">
       {{ msg }}
     </mat-error>
   </mat-form-field>
@@ -81,7 +78,8 @@
   <mat-form-field class="w-full col-span-2">
     <mat-label>Address</mat-label>
     <input matInput formControlName="address" placeholder="123 Main St" />
-    <mat-error *ngIf="userFormGroup.get('address') | errorMessage as msg">
+
+    <mat-error *ngIf="getErrorMsg('address') as msg">
       {{ msg }}
     </mat-error>
   </mat-form-field>
@@ -138,7 +136,7 @@
       formControlName="job_title"
       placeholder="job title"
     />
-    <mat-error *ngIf="userFormGroup.get('job_title') | errorMessage as msg">
+    <mat-error *ngIf="userFormGroup.get('job_title') as msg">
       {{ msg }}
     </mat-error>
   </mat-form-field>
@@ -150,11 +148,20 @@
       >Terminate</mat-checkbox
     >
   </div>
-  <div class="col-span-2">
+  <div class="col-span-2 flex flex-row gap-2 justify-end">
     <button
       aria-label="Show an example snack-bar"
+      (click)="closeForm()"
+      class="bg-teal-50 text-teal-500 py-2 px-6 rounded-[8px] cursor-pointer hover:bg-white hover:text-primary transition duration-300 border border-teal-500 hover:border-primary"
+    >
+      Close
+    </button>
+
+    <button
+      [disabled]="userFormGroup.invalid"
+      aria-label="Show an example snack-bar"
       type="submit"
-      class="w-full bg-primary text-white py-2 rounded-[15px] cursor-pointer hover:bg-white hover:text-primary transition duration-300 border border-transparent hover:border-primary"
+      class="bg-cyan-50 text-cyan-500 py-2 px-6 rounded-[8px] cursor-pointer hover:bg-white hover:text-primary transition duration-300 border border-cyan-500 hover:border-primary"
     >
       Submit
     </button>

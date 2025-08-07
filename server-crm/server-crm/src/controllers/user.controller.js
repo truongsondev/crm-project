@@ -1,6 +1,7 @@
 import AuthService from "../services/auth.service.js";
 import UserSerivice from "../services/user.service.js";
 import fs from "fs";
+import { OKE, SuccessResponse } from "../http/success.http.js";
 class UserController {
   static getListUser = async (req, res, next) => {
     try {
@@ -32,10 +33,7 @@ class UserController {
     try {
       const users = req.body;
       const usersRes = await UserSerivice.createUsers(users);
-      res.status(200).json({
-        code: 200000,
-        users: usersRes,
-      });
+      res.status(200).json(usersRes);
     } catch (e) {
       console.log(e);
 
@@ -58,9 +56,13 @@ class UserController {
   };
 
   static signIn = async (req, res, next) => {
-    const { user_name, password } = req.body;
-    const response = await AuthService.signIn({ user_name, password });
-    res.status(200).json(response);
+    try {
+      const { user_name, password } = req.body;
+      const response = await AuthService.signIn({ user_name, password });
+      return new OKE({ data: response }).send(res);
+    } catch (e) {
+      next(e);
+    }
   };
 
   static exportToFileCSV = async (req, res, next) => {
@@ -77,6 +79,7 @@ class UserController {
         });
       });
     } catch (e) {
+      console.log(e);
       next(e);
     }
   };

@@ -8,18 +8,26 @@
     <input
       formControlName="contact_name"
       matInput
-      placeholder="Ex. Nougat"
+      placeholder="enter your conact"
       (input)="onInput($event)"
     />
+    <mat-error *ngIf="getErrorMsg('contact_name') as msg">
+      {{ msg }}
+    </mat-error>
   </mat-form-field>
   <mat-form-field hintLabel="">
     <mat-label>Phone</mat-label>
     <input
       formControlName="phone"
       matInput
-      placeholder="Ex. Nougat"
+      pattern="[0-9]*"
+      maxlength="11"
+      placeholder="Enter phone number"
       (input)="onInput($event)"
     />
+    <mat-error *ngIf="getErrorMsg('phone') as msg">
+      {{ msg }}
+    </mat-error>
   </mat-form-field>
 
   <mat-form-field hintLabel="">
@@ -27,18 +35,24 @@
     <input
       formControlName="email"
       matInput
-      placeholder="Ex. Nougat"
+      placeholder="enter your email"
       (input)="onInput($event)"
     />
+    <mat-error *ngIf="getErrorMsg('email') as msg">
+      {{ msg }}
+    </mat-error>
   </mat-form-field>
   <mat-form-field hintLabel="">
     <mat-label>Organization</mat-label>
     <input
       formControlName="organization"
       matInput
-      placeholder="Ex. Nougat"
+      placeholder="enter your organization"
       (input)="onInput($event)"
     />
+    <mat-error *ngIf="getErrorMsg('organization') as msg">
+      {{ msg }}
+    </mat-error>
   </mat-form-field>
 
   <mat-form-field class="w-full">
@@ -89,11 +103,25 @@
       placeholder="Ex. Nougat"
       (input)="onInput($event)"
     />
+    <mat-error *ngIf="getErrorMsg('address') as msg">
+      {{ msg }}
+    </mat-error>
   </mat-form-field>
-  <button
-    type="submit"
-    class="w-full col-span-2 bg-primary text-white py-2 rounded-[15px] cursor-pointer hover:bg-white hover:text-primary transition duration-300 border border-transparent hover:border-primary"
-  >
-    Submit
-  </button>
+  <div class="col-span-2 flex flex-row gap-2 justify-end">
+    <button
+      (click)="closeForm()"
+      class="bg-teal-50 text-teal-500 py-2 px-6 rounded-[8px] cursor-pointer hover:bg-white hover:text-primary transition duration-300 border border-teal-500 hover:border-primary"
+    >
+      Close
+    </button>
+
+    <button
+      [disabled]="contactFormGroup.invalid"
+      aria-label="Show an example snack-bar"
+      type="submit"
+      class="bg-cyan-50 text-cyan-500 py-2 px-6 rounded-[8px] cursor-pointer hover:bg-white hover:text-primary transition duration-300 border border-cyan-500 hover:border-primary"
+    >
+      Submit
+    </button>
+  </div>
 </form>

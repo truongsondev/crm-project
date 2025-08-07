@@ -7,10 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { passwordValidator } from '@app/helper/password-validator';
 import { AuthService } from '@app/services/auth.service';
-import { SnackbarService } from '@app/services/snackbar.service';
-import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'sign-in-component',
@@ -23,40 +20,41 @@ export class SignInComponent {
   initLoginForm() {
     this.LoginFormGroup = this.fb.group({
       user_name: ['', Validators.required],
-      password: ['', [Validators.required, passwordValidator]],
+      password: ['', [Validators.required]],
     });
   }
-  private cookieService = inject(CookieService);
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
-    private snackbarService: SnackbarService,
   ) {
     this.initLoginForm();
   }
   onNavigate() {
     this.router.navigate(['/auth/sign-up']);
   }
+
+  ngOnInit() {
+    const accessToken = localStorage.getItem('at');
+    if (accessToken) {
+      this.router.navigate(['/']);
+    }
+  }
+
   onSubmit() {
     if (this.LoginFormGroup.valid) {
+      localStorage.clear();
       const { user_name, password } = this.LoginFormGroup.value;
       this.authService.signIn({ user_name, password }).subscribe({
         next: (res) => {
-          this.cookieService.set('at', res.metadata.token.accessToken, {
-            expires: 2,
-            path: '/',
-          });
-          this.cookieService.set('rt', res.metadata.token.accessToken, {
-            expires: 7,
-            path: '/',
-          });
-          localStorage.setItem('user', JSON.stringify(res.metadata.user));
-          this.router.navigate(['/dashboard']);
-        },
-        error: (err) => {
-          this.snackbarService.openSnackBar(err.message);
+          console.log(res);
+          const at = res.data.token.accessToken;
+          const rt = res.data.token.refreshToken;
+          localStorage.setItem('user', JSON.stringify(res.data.user));
+          localStorage.setItem('at', at);
+          localStorage.setItem('rt', rt);
+          this.router.navigate(['/']);
         },
       });
     } else {

@@ -35,11 +35,12 @@ class UserRepo {
     return await User.find();
   }
 
-  static async updateUser({ _id, accessToken, refreshToken }) {
+  static async updateUser({ _id, accessToken, refreshToken, publicKeyString }) {
     const user = await User.findById(_id);
     if (user) {
       user.access_token = accessToken;
       user.refresh_token = refreshToken;
+      user.public_key = publicKeyString;
       await user.save();
       return user;
     }
@@ -47,6 +48,10 @@ class UserRepo {
 
   static async updateFilterUser(id, data) {
     return await User.findByIdAndUpdate(id, data);
+  }
+
+  static async getUserById(_id) {
+    return await User.findById(_id);
   }
 }
 

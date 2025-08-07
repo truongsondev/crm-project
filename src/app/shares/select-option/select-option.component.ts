@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { ContactForm } from '@app/form/contacts/contact.form';
 import { UserForm } from '@app/form/user/user.form';
+import { ContactService } from '@app/services/contact.service';
 import { ModalService } from '@app/services/modal.service';
 import { SnackbarService } from '@app/services/snackbar.service';
 import { UserService } from '@app/services/user.service';
@@ -20,6 +21,7 @@ export class SelectOptioncomponent {
     private dialogRef: MatDialogRef<SelectOptioncomponent>,
     private userService: UserService,
     private snackbarService: SnackbarService,
+    private contactService: ContactService,
   ) {}
   addSingleItem() {
     if (this.item.from === 'user-management') {
@@ -48,6 +50,35 @@ export class SelectOptioncomponent {
     this.dialogRef.close();
   }
 
+  private downloadInvalidData(
+    invalidData: any[],
+    fileName = 'invalid_data.csv',
+  ): void {
+    if (!invalidData.length) return;
+
+    const keys = Object.keys(invalidData[0]);
+    const csvContent =
+      keys.join(',') +
+      '\n' +
+      invalidData
+        .map((row) =>
+          keys
+            .map((k) => `"${(row[k] ?? '').toString().replace(/"/g, '""')}"`)
+            .join(','),
+        )
+        .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (!file) return;
@@ -61,19 +92,37 @@ export class SelectOptioncomponent {
       const { validData, invalidData } = this.validateCSV(data);
 
       if (invalidData.length > 0) {
-        this.snackbarService.openSnackBar('Create users fail!');
+        this.snackbarService.openSnackBar(
+          `There are ${invalidData.length} invalid entries. Please check again.`,
+        );
+        this.downloadInvalidData(invalidData, 'record failed');
       }
 
       if (validData.length > 0) {
-        console.log('validData::::', validData);
-        this.userService.createUsers(validData).subscribe({
-          next: () => {
-            this.snackbarService.openSnackBar('Create users success');
-          },
-          error: () => {
-            this.snackbarService.openSnackBar('Create users fail!');
-          },
-        });
+        if (this.item.from === 'user-management') {
+          console.log('validData::::', validData);
+          this.userService.createUsers(validData).subscribe({
+            next: (res) => {
+              const failed = res.failed;
+              this.downloadInvalidData(failed, 'conflicted_users.csv');
+              this.snackbarService.openSnackBar('Create users success');
+            },
+            error: () => {
+              this.snackbarService.openSnackBar('Create users fail!');
+            },
+          });
+        } else if (this.item.from === 'contact') {
+          this.contactService.createContacts(validData).subscribe({
+            next: (res) => {
+              const failed = res.failed;
+              this.downloadInvalidData(failed, 'conflicted_users.csv');
+              this.snackbarService.openSnackBar('Create contact success');
+            },
+            error: () => {
+              this.snackbarService.openSnackBar('Create contact fail!');
+            },
+          });
+        }
         this.dialogRef.close();
       }
     };

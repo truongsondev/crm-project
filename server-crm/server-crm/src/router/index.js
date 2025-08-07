@@ -1,6 +1,9 @@
 import express from "express";
 import { ContactController } from "../controllers/contact.controller.js";
+import { TokenController } from "../controllers/token.controller.js";
 import UserController from "../controllers/user.controller.js";
+import { checkRole } from "../middleware/user.js";
+import { checkToken } from "../middleware/verify-token.js";
 
 const router = express.Router();
 
@@ -8,7 +11,7 @@ router.get("/auth/sign-in", (req, res) => {
   res.send("Hello World");
 });
 
-router.get("/users", UserController.getListUser);
+router.get("/users", checkToken, checkRole, UserController.getListUser);
 router.post("/users", UserController.createUser);
 router.post("/multiple-user", UserController.createUsers);
 router.put("/users/:id", UserController.updateUser);
@@ -21,5 +24,7 @@ router.post("/contacts", ContactController.createContact);
 router.put("/contacts/:id", ContactController.updateContact);
 router.delete("/contacts/delete/:id", ContactController.deleteContact);
 router.get("/contacts/download", ContactController.exportToFileCSV);
+
+router.post("/reset-token", TokenController.resetToken);
 
 export default router;

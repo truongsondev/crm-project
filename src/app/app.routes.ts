@@ -29,10 +29,6 @@ export const routes: Routes = [
         path: 'dashboard',
         component: DashboardComponet,
       },
-      {
-        path: 'login',
-        component: LayoutAuthComponent,
-      },
     ],
   },
   {

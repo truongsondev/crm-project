@@ -2,8 +2,8 @@ import { Contact } from './contact.interface';
 import { User } from './user.interface';
 
 export interface DataLoginResponse {
-  code: number;
-  metadata: {
+  message: string;
+  data: {
     user: User;
     token: {
       accessToken: string;
@@ -15,6 +15,11 @@ export interface DataLoginResponse {
 export interface UsersResponse {
   code: number;
   users: User[];
+}
+
+export interface DataResponse {
+  failed: any[];
+  success: any[];
 }
 
 export interface UserResponse {

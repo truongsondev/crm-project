@@ -1,6 +1,7 @@
 import UserRepo from "../repositories/user.repo.js";
 import { generateKeyPairSync } from "crypto";
-import createTokenPair from "../jwt/token.js";
+import { createTokenPair } from "../jwt/token.js";
+import { AuthorizedError, NotFoundError } from "../http/error.http.js";
 
 // const mockUsers = [
 //   {
@@ -133,68 +134,46 @@ import createTokenPair from "../jwt/token.js";
 
 class AuthService {
   static async signIn({ user_name, password }) {
-    try {
-      const user = await UserRepo.findUser({ user_name });
-      console.log(user);
-      if (!user) {
-        return {
-          code: 40003,
-          data: {
-            user: null,
-            token: null,
-          },
-        };
-      }
-      const matchPassword = password === user.password;
-      if (!matchPassword) {
-        return {
-          code: 40003,
-          data: {
-            user: null,
-            token: null,
-          },
-        };
-      }
+    const user = await UserRepo.findUser({ user_name });
+    console.log(user);
+    if (!user) {
+      throw new NotFoundError((message = "User not found"));
+    }
+    const matchPassword = password === user.password;
 
-      const { publicKey, privateKey } = generateKeyPairSync("rsa", {
-        modulusLength: 2048,
-      });
+    if (!matchPassword) {
+      throw new AuthorizedError({ message: "Incorrect password" });
+    }
 
-      const { accessToken, refreshToken } = createTokenPair(
-        {
-          _id: user.id,
-          role: user.role,
-        },
-        publicKey,
-        privateKey
-      );
-      const saveUser = await UserRepo.updateUser({
+    const { publicKey, privateKey } = generateKeyPairSync("rsa", {
+      modulusLength: 2048,
+    });
+    const publicKeyString = publicKey
+      .export({ type: "pkcs1", format: "pem" })
+      .toString();
+    const { accessToken, refreshToken } = createTokenPair(
+      {
         _id: user._id,
+      },
+      publicKeyString,
+      privateKey
+    );
+    const saveUser = await UserRepo.updateUser({
+      _id: user._id,
+      accessToken,
+      refreshToken,
+      publicKeyString,
+    });
+    if (!saveUser) {
+      throw new Error("Internal Server Error");
+    }
+    return {
+      user: user,
+      token: {
         accessToken,
         refreshToken,
-      });
-      if (!saveUser) {
-        return {
-          code: 40003,
-          data: {
-            user: null,
-            token: null,
-          },
-        };
-      }
-      return {
-        code: 20000,
-        data: {
-          user: user,
-          token: {
-            accessToken,
-            refreshToken,
-          },
-        },
-      };
-    } catch (e) {
-      console.log(e);
-    }
+      },
+    };
   }
   static async signUp(user_name = "user", password = "Lson123456@") {
     // const users = await UserRepo.createUsers(mockUsers);

@@ -81,9 +81,13 @@ export class EndpointService {
 
   handleError<T>(error: HttpErrorResponse): Observable<T> {
     const httpStatus = error.status;
+    const message = error.error.message;
+    console.log(error);
     return this.showError(
       ERROR_MESSAGES[httpStatus].title || 'Invalid Error',
-      ERROR_MESSAGES[httpStatus].message || 'An unknown error occurred',
+      message ||
+        ERROR_MESSAGES[httpStatus].message ||
+        'An unknown error occurred',
     );
   }
 }

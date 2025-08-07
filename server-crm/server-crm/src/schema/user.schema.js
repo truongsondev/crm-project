@@ -33,13 +33,17 @@ const userSchema = new mongoose.Schema({
   is_active: { type: Boolean, default: true },
   is_manager: { type: Boolean, default: false },
 
-  manager_name: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  manager_name: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
+  },
 
   hired_date: { type: Date },
   terminated_date: { type: Date },
   access_token: { type: String },
   refresh_token: { type: String },
-
+  public_key: { type: String },
   created_on: { type: Date, default: Date.now },
   updated_on: { type: Date, default: Date.now },
 });

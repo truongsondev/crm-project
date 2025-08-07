@@ -18,13 +18,14 @@ export const getEndpoints = () => {
         update_contact: `${environment.baseURL}/contacts/:id`,
         delete_contact: `${environment.baseURL}/contacts/delete/:id`,
         download_contact: `${environment.baseURL}/contacts/download`,
+        create_contacts: `${environment.baseURL}/multiple-contact`,
       },
     },
     auth: {
       v1: {
         signIn: `${environment.baseURL}/auth/sign-in`,
-        create_contact: `${environment.baseURL}/contacts`,
-        update_contact: `${environment.baseURL}/contacts/:id`,
+
+        resetToken: `${environment.baseURL}/reset-token`,
       },
     },
   } as const;

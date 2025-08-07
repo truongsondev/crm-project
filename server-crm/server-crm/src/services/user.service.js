@@ -3,12 +3,15 @@ import path from "path";
 import { Parser } from "@json2csv/plainjs";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import { NotFoundError } from "../http/error.http.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 class UserSerivice {
   static async getListUser() {
     const users = await UserRepo.getListUser();
-
+    if (!users) {
+      throw new NotFoundError("No data found");
+    }
     const newlists = [];
 
     for (const user of users) {
@@ -30,17 +33,45 @@ class UserSerivice {
     return await UserRepo.createUser(user);
   };
 
-  static createUsers = async (users) => {
-    return await UserRepo.createUsers(users);
-  };
+  static async createUsers(users) {
+    const success = [];
+    const failed = [];
+
+    for (const user of users) {
+      try {
+        await UserModel.create(user);
+        success.push(user);
+      } catch (err) {
+        if (err.code === 11000) {
+          failed.push({
+            ...user,
+            reason: "Duplicate " + Object.keys(err.keyValue).join(", "),
+          });
+        } else {
+          failed.push({ ...user, reason: "Unknown error" });
+        }
+      }
+    }
+    return {
+      success,
+      failed,
+    };
+  }
+
+  static async getUserById(_id) {
+    return await UserRepo.findUserbyId(_id);
+  }
 
   static updateUser = async (id, data) => {
     return await UserRepo.updateFilterUser(id, data);
   };
 
   static exportToFileCSV = async () => {
-    const data = await this.getListUser();
-
+    // const data = await this.getListUser();
+    const data = null;
+    if (!data) {
+      throw new NotFoundError("No data found");
+    }
     const opts = {};
     const parser = new Parser(opts);
     const csv = parser.parse(data);

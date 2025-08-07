@@ -27,7 +27,6 @@ import { UserService } from '@app/services/user.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormUser, SelectOption } from '@app/custom-types/shared.type';
 import { CommonModule } from '@angular/common';
-import { ErrorMessagePipe } from '@app/helper/error-message-form';
 import { User } from '@app/interfaces/user.interface';
 import { terminatedAfterHiredValidator } from '@app/helper/date-validator';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -51,7 +50,6 @@ import { SnackbarService } from '@app/services/snackbar.service';
     MatNativeDateModule,
     MatCheckboxModule,
     CommonModule,
-    ErrorMessagePipe,
     MatFormFieldModule,
     FormsModule,
     MatInputModule,
@@ -87,7 +85,6 @@ export class UserForm {
 
   initForm = () => {
     const userSelected = this.user.dataSelected;
-    console.log('userSelected:::', userSelected);
     this.userFormGroup = this.fb.group(
       {
         _id: [userSelected?._id || ''],
@@ -110,7 +107,7 @@ export class UserForm {
         job_title: [userSelected?.job_title || ''],
         is_active: [userSelected?.is_active ?? true],
         is_manager: [userSelected?.is_manager ?? false],
-        manager_name: [userSelected?.manager_name || '', Validators.required],
+        manager_name: [userSelected?.manager_name || ''],
         is_terminate: [false],
         terminated_date: [
           {
@@ -131,6 +128,9 @@ export class UserForm {
     this.initForm();
   }
 
+  closeForm() {
+    this.dialogRef.close();
+  }
   handleHiddenPassword() {
     this.isPasswordHidden = !this.isPasswordHidden;
   }
@@ -145,11 +145,29 @@ export class UserForm {
       dateControl?.reset();
     }
   }
+  getErrorMsg(controlName: string): string | null {
+    const control = this.userFormGroup.get(controlName);
+    if (!control || !control.errors || !control.touched) return null;
+    if (control.errors['required']) {
+      return 'This field is required';
+    }
+    if (control.errors['email']) {
+      return 'Email must be in form abc@gmail.com';
+    }
+    if (control.errors['passwordStrength']) {
+      return 'Password must include A-Z, a-z, 1- 9, and (.!@#)';
+    }
+
+    if (control.errors['notMatching']) {
+      return 'Passwords do not match';
+    }
+
+    return 'Invalid input';
+  }
 
   onSubmit() {
     if (this.userFormGroup.invalid) {
       this.userFormGroup.markAllAsTouched();
-      console.warn('Form is invalid', this.userFormGroup.value);
       return;
     }
     try {

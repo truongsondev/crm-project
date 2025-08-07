@@ -3,33 +3,49 @@ import fs from "fs";
 
 export class ContactController {
   static getListContacts = async (req, res, next) => {
-    const responseData = await ContactService.getListContacts();
-    res.status(200).json(responseData);
+    try {
+      const responseData = await ContactService.getListContacts();
+      res.status(200).json(responseData);
+    } catch (e) {
+      next(e);
+    }
   };
 
   static createContact = async (req, res, next) => {
-    const contact = req.body;
-    const responseData = await ContactService.createContact(contact);
-    console.log(responseData);
-    res.status(200).json(responseData);
+    try {
+      const contact = req.body;
+      const responseData = await ContactService.createContact(contact);
+      console.log(responseData);
+      res.status(200).json(responseData);
+    } catch (e) {
+      next(e);
+    }
   };
 
   static deleteContact = async (req, res, next) => {
-    const id = req.params.id;
-    const data = await ContactService.deleteContact(id);
-    res.status(200).json({
-      code: 200000,
-      data,
-    });
+    try {
+      const id = req.params.id;
+      const data = await ContactService.deleteContact(id);
+      res.status(200).json({
+        code: 200000,
+        data,
+      });
+    } catch (e) {
+      next(e);
+    }
   };
   static updateContact = async (req, res, next) => {
-    const id = req.params.id;
-    const data = req.body;
-    const response = await ContactService.updateContact(id, data);
-    res.status(200).json({
-      code: 200000,
-      contact: response,
-    });
+    try {
+      const id = req.params.id;
+      const data = req.body;
+      const response = await ContactService.updateContact(id, data);
+      res.status(200).json({
+        code: 200000,
+        contact: response,
+      });
+    } catch (e) {
+      next(e);
+    }
   };
 
   static exportToFileCSV = async (req, res, next) => {
