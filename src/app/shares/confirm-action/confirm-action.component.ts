@@ -30,6 +30,7 @@ export class ConfirmActionComponent {
         this.snackbarService.openSnackBar('Delete fail!');
       },
     });
+    this.dialogRef.close();
   }
   onCancel() {
     this.dialogRef.close();

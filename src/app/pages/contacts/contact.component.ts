@@ -23,6 +23,7 @@ import { SnackbarService } from '@app/services/snackbar.service';
 import { FileService } from '@app/services/fileService.service';
 import { getEndpoints } from '@app/constants/endpoints.constant';
 import { SelectOptioncomponent } from '@app/shares/select-option/select-option.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'contact-component',
@@ -37,6 +38,7 @@ import { SelectOptioncomponent } from '@app/shares/select-option/select-option.c
     MatPaginatorModule,
     CommonModule,
     MatCheckboxModule,
+    FormsModule,
   ],
   providers: [DatePipe],
 })
@@ -47,6 +49,8 @@ export class ContactComponent {
   pageSize = ITEM_OF_PAGE;
   pageIndex = 0;
   Math = Math;
+  listDelete: string[] = [];
+  allSelected = false;
   dataSource!: MatTableDataSource<Contact>;
   displayedColumns: string[] = [
     'all',
@@ -99,17 +103,25 @@ export class ContactComponent {
     private fileService: FileService,
   ) {}
   ngOnInit() {
-    this.contactService.getListContact().subscribe((res) => {
-      const { contacts } = res;
-      this.contacts = contacts;
-      this.dataSource = new MatTableDataSource(contacts);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-    });
-
+    this.getListContact();
     this.userService.getListUser().subscribe((res) => {
       const { users } = res;
       this.users = users;
+    });
+  }
+
+  getListContact() {
+    this.contactService.getListContact().subscribe((res) => {
+      const contactsRes = res.contacts;
+      this.contacts = contactsRes.map((contact) => {
+        return {
+          ...contact,
+          isChecked: false,
+        };
+      });
+      this.dataSource = new MatTableDataSource(this.contacts);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
     });
   }
 
@@ -122,8 +134,43 @@ export class ContactComponent {
     }
   }
 
-  getFormattedDate(date: string): string {
-    return this.datePipe.transform(date, 'dd/MM/yyyy') || '';
+  insertListDelete(contact: Contact) {
+    if (contact.isChecked) {
+      if (!this.listDelete.includes(contact._id)) {
+        this.listDelete.push(contact._id);
+      }
+    } else {
+      this.listDelete = this.listDelete.filter((id) => id !== contact._id);
+    }
+    console.log(this.listDelete);
+  }
+
+  onRowChange() {
+    this.allSelected = this.contacts.every((c) => c.isChecked);
+    this.listDelete = this.contacts
+      .filter((c) => c.isChecked)
+      .map((c) => c._id);
+  }
+  selectAllContacts(checked: boolean) {
+    this.contacts.forEach((contact) => (contact.isChecked = checked));
+
+    if (checked) {
+      this.listDelete = this.contacts.map((contact) => contact._id);
+    } else {
+      this.listDelete = [];
+    }
+    console.log(this.listDelete);
+  }
+  deleteMany() {
+    if (this.listDelete.length > 0) {
+      this.contactService.deleteContacts(this.listDelete).subscribe(() => {
+        this.snackbarservice.openSnackBar('Delete success');
+        this.getListContact();
+        this.allSelected = false;
+      });
+    } else {
+      this.snackbarservice.openSnackBar('You not select contact');
+    }
   }
 
   getNameUser(id: string): string {
@@ -148,48 +195,55 @@ export class ContactComponent {
       });
   }
   openDialog() {
-    this.modalService.openFilter(
-      ModalDiaLogComponent,
-      SelectOptioncomponent,
-      'Select option',
-      {
-        action: 'select',
-        dataSelected: null,
-        dataList: this.contacts,
-        message: '',
-        from: 'contact',
-      },
-    );
+    this.modalService
+      .openFilter(
+        ModalDiaLogComponent,
+        SelectOptioncomponent,
+        'Select option',
+        {
+          action: 'select',
+          dataSelected: null,
+          dataList: this.contacts,
+          message: '',
+          from: 'contact',
+        },
+      )
+      .subscribe(() => {
+        this.ngOnInit();
+      });
   }
 
   onRowClick(row: Contact) {
-    this.modalService.openFilter(
-      ModalDiaLogComponent,
-      ContactForm,
-      'Edit contact',
-      {
+    this.modalService
+      .openFilter(ModalDiaLogComponent, ContactForm, 'Edit contact', {
         action: 'update',
         dataSelected: row,
         dataList: this.contacts,
         message: '',
         from: 'contact',
-      },
-    );
+      })
+      .subscribe(() => {
+        this.ngOnInit();
+      });
   }
 
   onDelete(row: Contact) {
-    this.modalService.openFilter(
-      ModalDiaLogComponent,
-      ConfirmActionComponent,
-      'Edit contact',
-      {
-        action: 'Confirm delete',
-        dataSelected: row,
-        dataList: this.contacts,
-        message: '',
-        from: 'contact',
-      },
-    );
+    this.modalService
+      .openFilter(
+        ModalDiaLogComponent,
+        ConfirmActionComponent,
+        'Edit contact',
+        {
+          action: 'Confirm delete',
+          dataSelected: row,
+          dataList: this.contacts,
+          message: '',
+          from: 'contact',
+        },
+      )
+      .subscribe(() => {
+        this.ngOnInit();
+      });
   }
   exportToFileCSV() {
     const endpoint = getEndpoints().contact.v1.download_contact;

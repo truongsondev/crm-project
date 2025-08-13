@@ -22,18 +22,15 @@ export class UserService {
 
   getListUser() {
     const endpoint = getEndpoints().user.v1.users;
-    const at = this.commonService.getAccessToken();
-    const rt = this.commonService.getRefreshToken();
-    if (at === '' && rt === '') {
-      this.router.navigate(['/auth/sign-up']);
-      return EMPTY;
-    }
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${at}`,
-    });
-    return this.endpointService.fetchEndpoint<UsersResponse>(endpoint, {
-      headers,
-    });
+    // const at = this.commonService.handleToken();
+    // console.log('at in get list::::', at);
+    // if (at === '') {
+    //   return EMPTY;
+    // }
+    // const headers = new HttpHeaders({
+    //   Authorization: `Bearer ${at}`,
+    // });
+    return this.endpointService.fetchEndpoint<UsersResponse>(endpoint);
   }
 
   createUser(data: any) {

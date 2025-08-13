@@ -154,13 +154,17 @@ export class UserManagementComponent implements AfterViewInit {
     );
   }
   onRowClick(row: User) {
-    this.modalService.openFilter(ModalDiaLogComponent, UserForm, 'Edit user', {
-      action: 'update',
-      dataSelected: row,
-      dataList: this.employees,
-      message: '',
-      from: 'user-management',
-    });
+    this.modalService
+      .openFilter(ModalDiaLogComponent, UserForm, 'Edit user', {
+        action: 'update',
+        dataSelected: row,
+        dataList: this.employees,
+        message: '',
+        from: 'user-management',
+      })
+      .subscribe(() => {
+        this.ngOnInit();
+      });
   }
 
   openFilter() {

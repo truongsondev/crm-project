@@ -35,3 +35,8 @@ export interface ContactReponse {
   code: number;
   contact: Contact;
 }
+
+export interface TokenResponse {
+  refreshToken: string;
+  accessToken: string;
+}

@@ -31,12 +31,16 @@ export class ContactService {
   }
 
   updateContact(id: string, data: Contact) {
-    const url = `${this.endpoints.update_contact.replace(':id', id)}`;
-    return this.endpointService.putEndpoint<ContactReponse>(url, data);
+    const endpoint = `${this.endpoints.update_contact.replace(':id', id)}`;
+    return this.endpointService.putEndpoint<ContactReponse>(endpoint, data);
   }
 
   deleteContact(id: string) {
-    const url = `${this.endpoints.delete_contact.replace(':id', id)}`;
-    return this.endpointService.deleteEndpoint<ContactReponse>(url);
+    const endpoint = `${this.endpoints.delete_contact.replace(':id', id)}`;
+    return this.endpointService.deleteEndpoint<ContactReponse>(endpoint);
+  }
+  deleteContacts(id: string[]) {
+    const endpoint = this.endpoints.delete_contacts;
+    return this.endpointService.postEndpoint<ContactReponse>(endpoint, id);
   }
 }

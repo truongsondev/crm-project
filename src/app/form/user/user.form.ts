@@ -3,6 +3,8 @@ import {
   Component,
   signal,
   Inject,
+  EventEmitter,
+  Output,
 } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -65,6 +67,7 @@ export class UserForm {
   isPasswordHidden = true;
   roles: SelectOption[] = ROLES;
   isChecked = true;
+  @Output() formSubmit = new EventEmitter<any>();
 
   isCheckedDate = true;
 
@@ -107,7 +110,7 @@ export class UserForm {
         job_title: [userSelected?.job_title || ''],
         is_active: [userSelected?.is_active ?? true],
         is_manager: [userSelected?.is_manager ?? false],
-        manager_name: [userSelected?.manager_name || ''],
+        manager_name: [userSelected?.manager_name?._id || ''],
         is_terminate: [false],
         terminated_date: [
           {
@@ -125,6 +128,7 @@ export class UserForm {
   ngOnInit() {
     this.listManager =
       this.user.dataList?.filter((item) => item.is_manager) || [];
+    console.log(this.listManager);
     this.initForm();
   }
 

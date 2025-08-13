@@ -22,6 +22,32 @@ export class ContactController {
     }
   };
 
+  static createContacts = async (req, res, next) => {
+    try {
+      const contacts = req.body;
+      const contactRes = await ContactService.createContacts(contacts);
+      res.status(200).json(contactRes);
+    } catch (e) {
+      console.log(e);
+
+      next(e);
+    }
+  };
+
+  static deleteContacts = async (req, res, next) => {
+    try {
+      const listId = req.body;
+      await ContactService.deleteManyContacts(listId);
+      res.status(200).json({
+        message: "Delete success",
+      });
+    } catch (e) {
+      console.log(e);
+
+      next(e);
+    }
+  };
+
   static deleteContact = async (req, res, next) => {
     try {
       const id = req.params.id;

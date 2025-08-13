@@ -115,7 +115,7 @@ export class SelectOptioncomponent {
           this.contactService.createContacts(validData).subscribe({
             next: (res) => {
               const failed = res.failed;
-              this.downloadInvalidData(failed, 'conflicted_users.csv');
+              this.downloadInvalidData(failed, 'conflicted_contact.csv');
               this.snackbarService.openSnackBar('Create contact success');
             },
             error: () => {
@@ -138,6 +138,7 @@ export class SelectOptioncomponent {
       key.forEach((header, i) => {
         obj[header] = values[i] ?? '';
       });
+      console.log('obj:::', obj);
       return obj;
     });
 
@@ -149,7 +150,6 @@ export class SelectOptioncomponent {
 
     for (const row of data) {
       let isValid = false;
-      console.log('row:::', row);
       if (this.item.from === 'user-management') {
         isValid =
           row.first_name?.trim().length > 0 &&
@@ -170,8 +170,7 @@ export class SelectOptioncomponent {
           ) &&
           /^\+?[0-9]{8,15}$/.test(row.phone || '') &&
           (!row.email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.email)) &&
-          row.lead_source?.trim().length > 0 &&
-          row.assigned_to?.trim().length > 0;
+          row.lead_source?.trim().length > 0;
       }
 
       if (isValid) {

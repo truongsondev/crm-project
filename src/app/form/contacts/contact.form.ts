@@ -27,13 +27,13 @@ import { UserForm } from '../user/user.form';
 import { SnackbarService } from '@app/services/snackbar.service';
 
 enum ROLE_TYPE {
-  USER_ADMIN,
-  DIR,
-  SALES_MGR,
-  SALES_EMP,
-  CONTACT_MGR,
-  CONTACT_EMP,
-  USER_READ_ONLY,
+  USER_ADMIN = 'USER_ADMIN',
+  DIR = 'DIR',
+  SALES_MGR = 'SALES_MGR',
+  SALES_EMP = 'SALES_EMP',
+  CONTACT_MGR = 'CONTACT_MGR',
+  CONTACT_EMP = 'CONTACT_EMP',
+  USER_READ_ONLY = 'USER_READ_ONLY',
 }
 
 @Component({
@@ -80,22 +80,23 @@ export class ContactForm {
 
     return 'Invalid input';
   }
+
   ngOnInit() {
     const contactForm = this.contact.dataSelected;
+    console.log(contactForm);
     this.contactFormGroup = this.fb.group({
       _id: [contactForm?._id || ''],
       contact_name: [contactForm?.contact_name || '', Validators.required],
       salutation: [contactForm?.salutation || 'None', Validators.required],
       phone: [
         contactForm?.phone,
-        Validators.required,
-        Validators.pattern(/^[0-9]{9,15}$/),
+        [Validators.required, Validators.pattern(/^[0-9]{9,15}$/)],
       ],
       email: [contactForm?.email, Validators.email],
       organization: [contactForm?.organization],
       birthday: [contactForm?.birthday || null],
       lead_source: [contactForm?.lead_source || '', Validators.required],
-      assigned_to: [contactForm?.assigned_to || '', Validators.required],
+      assigned_to: [contactForm?.assigned_to?._id || '', Validators.required],
       address: [contactForm?.address || ''],
       description: [contactForm?.description || ''],
     });

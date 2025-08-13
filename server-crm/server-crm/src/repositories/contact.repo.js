@@ -13,14 +13,15 @@ export class ContactRepo {
     return await Contact.insertOne(contact);
   };
 
+  static createContacts = async (contact) => {
+    return await Contact.insertMany(contact);
+  };
+
   static async updateFilterContact(id, data) {
-    console.log("id:::", id);
-    console.log("data:::", data);
     const user = await Contact.findByIdAndUpdate(id, data, {
       new: true,
       runValidators: true,
     });
-    console.log("contact in contact repo::::", user);
 
     return user;
   }

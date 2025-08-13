@@ -77,7 +77,7 @@
               </span>
 
               <span *ngSwitchCase="'manager_name'">
-                {{ row["manager_name"] || "-" }}
+                {{ row["manager_name"]?.name || "-" }}
               </span>
               <span
                 *ngSwitchCase="'is_active'"

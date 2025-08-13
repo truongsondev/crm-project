@@ -8,9 +8,12 @@ class UserRepo {
   }
 
   static async findUserbyId(_id) {
-    return await User.findOne({
-      _id: _id,
-    });
+    try {
+      return await User.findOne({ _id });
+    } catch (err) {
+      console.error("Invalid ObjectId:", err.message);
+      return null;
+    }
   }
   static async findUsers({ user_name }) {
     return await User.find({

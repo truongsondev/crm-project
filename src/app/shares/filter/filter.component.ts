@@ -77,7 +77,7 @@ export class FilterComponent {
     this.openedFrom = this.fromData.from;
     if (this.openedFrom === OpenedFromEnum.CONTACT) {
       this.contactService.getListContact().subscribe((res) => {
-        const names = res.contacts.map((item) => item.assigned_to);
+        const names = res.contacts.map((item) => item.assigned_to.name);
         this.assignedTo = [...new Set(names)];
       });
     }
@@ -97,8 +97,7 @@ export class FilterComponent {
           match = match && item.lead_source === this.selectedLeadSource;
         }
         if (this.selectedAssignTo) {
-          match = match && item.assigned_to === this.selectedAssignTo;
-          console.log(item.assignd_to);
+          match = match && item.assigned_to.name === this.selectedAssignTo;
         }
       }
 

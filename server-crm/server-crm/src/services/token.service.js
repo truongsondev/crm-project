@@ -4,6 +4,7 @@ import UserRepo from "../repositories/user.repo.js";
 import { verifyToken } from "../jwt/token.js";
 import { AuthorizedError } from "../http/error.http.js";
 import { jwtDecode } from "jwt-decode";
+import UserSerivice from "./user.service.js";
 
 export class TokenService {
   static async resetToken(refreshToken) {

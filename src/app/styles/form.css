@@ -49,4 +49,7 @@
   .mat-mdc-dialog-title::before {
     height: 10px;
   }
+  .mat-mdc-dialog-actions {
+    padding: 0;
+  }
 }

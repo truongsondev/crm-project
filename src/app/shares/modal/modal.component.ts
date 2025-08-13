@@ -1,7 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Inject, Injector, Type, Component } from '@angular/core';
+import {
+  Inject,
+  Injector,
+  Type,
+  Component,
+  ViewChild,
+  ViewContainerRef,
+} from '@angular/core';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { UserFormData } from '@app/interfaces/user-form-data.interface';
+import { FormData } from '@app/interfaces/user-form-data.interface';
+import { ConfirmActionComponent } from '../confirm-action/confirm-action.component';
+import { ErrorComponent } from '../error/error.component';
+import { FilterComponent } from '../filter/filter.component';
+import { SelectOptioncomponent } from '../select-option/select-option.component';
 
 @Component({
   standalone: true,
@@ -10,13 +21,19 @@ import { UserFormData } from '@app/interfaces/user-form-data.interface';
   templateUrl: './modal.component.html',
 })
 export class ModalDiaLogComponent {
+  @ViewChild('dynamicComponentHost', { read: ViewContainerRef, static: true })
+  container!: ViewContainerRef;
+
+  childInstance: any;
   injector: Injector;
+  isHidden: Boolean = false;
+
   constructor(
     @Inject(MAT_DIALOG_DATA)
     public data: {
       component: Type<unknown>;
       title: string;
-      data: UserFormData;
+      data: FormData;
     },
     private parentInjector: Injector,
   ) {
@@ -35,5 +52,31 @@ export class ModalDiaLogComponent {
       ],
       parent: this.parentInjector,
     });
+  }
+  private isHiddenComponent(comp: any): boolean {
+    const hiddenComponents = [
+      SelectOptioncomponent,
+      ErrorComponent,
+      FilterComponent,
+      ConfirmActionComponent,
+    ];
+    return hiddenComponents.some((c) => comp instanceof c);
+  }
+
+  ngOnInit() {
+    const compRef = this.container.createComponent(this.data.component, {
+      injector: this.injector,
+    });
+    this.childInstance = compRef.instance;
+    this.isHidden = this.isHiddenComponent(this.childInstance);
+  }
+
+  handleClickSubmit() {
+    if (
+      this.childInstance &&
+      typeof this.childInstance.onSubmit === 'function'
+    ) {
+      this.childInstance.onSubmit();
+    }
   }
 }

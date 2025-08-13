@@ -11,7 +11,7 @@ router.get("/auth/sign-in", (req, res) => {
   res.send("Hello World");
 });
 
-router.get("/users", checkToken, checkRole, UserController.getListUser);
+router.get("/users", /* checkToken, checkRole,*/ UserController.getListUser);
 router.post("/users", UserController.createUser);
 router.post("/multiple-user", UserController.createUsers);
 router.put("/users/:id", UserController.updateUser);
@@ -24,6 +24,8 @@ router.post("/contacts", ContactController.createContact);
 router.put("/contacts/:id", ContactController.updateContact);
 router.delete("/contacts/delete/:id", ContactController.deleteContact);
 router.get("/contacts/download", ContactController.exportToFileCSV);
+router.post("/multiple-contact", ContactController.createContacts);
+router.post("/delete/multiple-contact", ContactController.deleteContacts);
 
 router.post("/reset-token", TokenController.resetToken);
 

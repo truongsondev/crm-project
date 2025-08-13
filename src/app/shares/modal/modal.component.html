@@ -4,8 +4,27 @@
   </div>
 
   <div class="px-4 py-2">
-    <ng-container
-      *ngComponentOutlet="data.component; injector: injector"
-    ></ng-container>
+    <ng-container #dynamicComponentHost></ng-container>
+
+    <div class="flex flex-row items-center justify-end gap-2" *ngIf="!isHidden">
+      <mat-dialog-actions>
+        <button
+          class="bg-teal-50 text-teal-500 py-2 px-6 rounded-[8px] cursor-pointer hover:bg-white hover:text-primary transition duration-300 border border-teal-500 hover:border-primary"
+          matButton
+          mat-dialog-close
+        >
+          Close
+        </button>
+      </mat-dialog-actions>
+      <mat-dialog-actions>
+        <button
+          (click)="handleClickSubmit()"
+          class="bg-cyan-50 text-cyan-500 py-2 px-6 rounded-[8px] cursor-pointer hover:bg-white hover:text-primary transition duration-300 border border-cyan-500 hover:border-primary"
+          matButton
+        >
+          Submit
+        </button>
+      </mat-dialog-actions>
+    </div>
   </div>
 </mat-dialog-content>
