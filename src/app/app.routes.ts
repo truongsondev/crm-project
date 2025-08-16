@@ -6,7 +6,7 @@ import { SignInComponent } from './pages/auth/signIn/sign-in.component';
 import { SignUpComponent } from './pages/auth/signUp/sign-up.component';
 import { ContactComponent } from './pages/contacts/contact.component';
 import { DashboardComponet } from './pages/dashboard/dashboard.component';
-import { OrderComponet } from './pages/salesOrders/order.componet';
+import { SaleOrderComponet } from './pages/salesOrders/sales-order.componet';
 
 export const routes: Routes = [
   {
@@ -23,7 +23,7 @@ export const routes: Routes = [
       },
       {
         path: 'sales-orders',
-        component: OrderComponet,
+        component: SaleOrderComponet,
       },
       {
         path: 'dashboard',

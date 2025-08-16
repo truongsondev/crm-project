@@ -1,30 +1,29 @@
+<div class="bg-slate-100 px-4 py-2 sticky top-0 z-10">
+  <h2 mat-dialog-title class="text-sm">{{ data.title }}</h2>
+</div>
 <mat-dialog-content class="bg-white w-full">
-  <div class="bg-slate-100 px-4 py-2">
-    <h2 mat-dialog-title class="text-sm">{{ data.title }}</h2>
-  </div>
-
   <div class="px-4 py-2">
     <ng-container #dynamicComponentHost></ng-container>
-
-    <div class="flex flex-row items-center justify-end gap-2" *ngIf="!isHidden">
-      <mat-dialog-actions>
-        <button
-          class="bg-teal-50 text-teal-500 py-2 px-6 rounded-[8px] cursor-pointer hover:bg-white hover:text-primary transition duration-300 border border-teal-500 hover:border-primary"
-          matButton
-          mat-dialog-close
-        >
-          Close
-        </button>
-      </mat-dialog-actions>
-      <mat-dialog-actions>
-        <button
-          (click)="handleClickSubmit()"
-          class="bg-cyan-50 text-cyan-500 py-2 px-6 rounded-[8px] cursor-pointer hover:bg-white hover:text-primary transition duration-300 border border-cyan-500 hover:border-primary"
-          matButton
-        >
-          Submit
-        </button>
-      </mat-dialog-actions>
-    </div>
   </div>
 </mat-dialog-content>
+<div
+  class="sticky bottom-0 z-10 flex flex-row items-center justify-end gap-2 mr-4"
+  *ngIf="!isHidden"
+>
+  <mat-dialog-actions>
+    <button-component
+      (click)="onClose()"
+      [textBt]="'Cancel'"
+      [textIcon]="''"
+      [className]="'bg-teal-400 text-white'"
+    />
+  </mat-dialog-actions>
+  <mat-dialog-actions>
+    <button-component
+      [textBt]="'Submit'"
+      [textIcon]="''"
+      [className]="'bg-teal-400 text-white'"
+      (click)="handleClickSubmit()"
+    />
+  </mat-dialog-actions>
+</div>

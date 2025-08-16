@@ -7,7 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 export class ModalService {
   constructor(private dialog: MatDialog) {}
 
-  openFilter(
+  openModal(
     ModalDialogComponent: any,
     innerComponent: any,
     title: string,

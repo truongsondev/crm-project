@@ -1,0 +1,7 @@
+:root {
+  --mat-button-text-label-text-color: white;
+  .mat-mdc-button {
+    border-radius: 6px;
+    background-color: #0099ff;
+  }
+}

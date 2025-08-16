@@ -7,8 +7,13 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import {
+  MatDialogModule,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from '@angular/material/dialog';
 import { FormData } from '@app/interfaces/user-form-data.interface';
+import { ButtonComponent } from '../button/button.component';
 import { ConfirmActionComponent } from '../confirm-action/confirm-action.component';
 import { ErrorComponent } from '../error/error.component';
 import { FilterComponent } from '../filter/filter.component';
@@ -16,7 +21,7 @@ import { SelectOptioncomponent } from '../select-option/select-option.component'
 
 @Component({
   standalone: true,
-  imports: [MatDialogModule, CommonModule],
+  imports: [MatDialogModule, CommonModule, ButtonComponent],
   selector: 'app-modal-dialog',
   templateUrl: './modal.component.html',
 })
@@ -29,6 +34,8 @@ export class ModalDiaLogComponent {
   isHidden: Boolean = false;
 
   constructor(
+    private dialogRef: MatDialogRef<ModalDiaLogComponent>,
+
     @Inject(MAT_DIALOG_DATA)
     public data: {
       component: Type<unknown>;
@@ -78,5 +85,11 @@ export class ModalDiaLogComponent {
     ) {
       this.childInstance.onSubmit();
     }
+  }
+
+  onClose() {
+    this.dialogRef.close({
+      isSubmit: false,
+    });
   }
 }

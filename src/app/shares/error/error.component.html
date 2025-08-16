@@ -1,11 +1,10 @@
 <div class="flex flex-col gap-6 bg-white">
   <span class="text-black">{{ message }}</span>
   <div class="w-full flex flex-row justify-end gap-4">
-    <button
+    <button-component
+      [textBt]="'Submit'"
+      [className]="'bg-teal-400 text-white'"
       (click)="onclose()"
-      class="px-4 py-2 border-1 border-emerald-500 text-emerald-500 bg-emerald-100 rounded-sm cursor-pointer"
-    >
-      submit
-    </button>
+    />
   </div>
 </div>

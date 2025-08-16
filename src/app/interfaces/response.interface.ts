@@ -1,4 +1,5 @@
 import { Contact } from './contact.interface';
+import { SalesOrder } from './sales-order.interface';
 import { User } from './user.interface';
 
 export interface DataLoginResponse {
@@ -39,4 +40,12 @@ export interface ContactReponse {
 export interface TokenResponse {
   refreshToken: string;
   accessToken: string;
+}
+
+export interface SalesOrderResponse {
+  salesOrder: SalesOrder[];
+}
+
+export interface SaleOrderResponse {
+  salesOrder: SalesOrder;
 }

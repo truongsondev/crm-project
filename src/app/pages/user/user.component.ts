@@ -1,6 +1,5 @@
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { SearchComponent } from '@app/shares/search/search.component';
@@ -40,6 +39,8 @@ import { FilterComponent } from '@app/shares/filter/filter.component';
 import { FileService } from '@app/services/fileService.service';
 import { SelectOptioncomponent } from '@app/shares/select-option/select-option.component';
 import { getEndpoints } from '@app/constants/endpoints.constant';
+import { ButtonComponent } from '@app/shares/button/button.component';
+import { ACTION } from '@app/constants/shared.constant';
 @Component({
   standalone: true,
   selector: 'user-management',
@@ -50,7 +51,7 @@ import { getEndpoints } from '@app/constants/endpoints.constant';
     FormsModule,
     ReactiveFormsModule,
     SearchComponent,
-    MatIconModule,
+
     MatMenuModule,
     MatButtonModule,
     MatDialogModule,
@@ -60,12 +61,12 @@ import { getEndpoints } from '@app/constants/endpoints.constant';
     MatSortModule,
     MatPaginatorModule,
     CommonModule,
+    ButtonComponent,
   ],
 })
 export class UserManagementComponent implements AfterViewInit {
   employees: User[] = [];
   mySearch: string = 'user/email';
-  length = 0;
   pageSize = ITEM_OF_PAGE;
   pageIndex = 0;
   Math = Math;
@@ -118,7 +119,6 @@ export class UserManagementComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    this.length = this.dataSource.data.length;
   }
 
   applyFilter(event: Event) {
@@ -132,6 +132,10 @@ export class UserManagementComponent implements AfterViewInit {
   }
 
   ngOnInit() {
+    this.getListUser();
+  }
+
+  getListUser() {
     this.userService.getListUser().subscribe((data) => {
       const { users } = data;
       this.employees = users;
@@ -140,12 +144,12 @@ export class UserManagementComponent implements AfterViewInit {
   }
 
   openDialog() {
-    this.modalService.openFilter(
+    this.modalService.openModal(
       ModalDiaLogComponent,
       SelectOptioncomponent,
       'Select option',
       {
-        action: 'select',
+        action: ACTION.SELECT,
         dataSelected: null,
         dataList: this.employees,
         message: '',
@@ -155,22 +159,25 @@ export class UserManagementComponent implements AfterViewInit {
   }
   onRowClick(row: User) {
     this.modalService
-      .openFilter(ModalDiaLogComponent, UserForm, 'Edit user', {
-        action: 'update',
+      .openModal(ModalDiaLogComponent, UserForm, 'Edit user', {
+        action: ACTION.UPDATE,
         dataSelected: row,
         dataList: this.employees,
         message: '',
         from: 'user-management',
       })
-      .subscribe(() => {
-        this.ngOnInit();
+      .subscribe((res) => {
+        console.log(res.isSubmit);
+        if (res.isSubmit === true) {
+          this.getListUser();
+        }
       });
   }
 
   openFilter() {
     this.modalService
-      .openFilter(ModalDiaLogComponent, FilterComponent, 'Filter by', {
-        action: '#',
+      .openModal(ModalDiaLogComponent, FilterComponent, 'Filter by', {
+        action: ACTION.NON,
         dataSelected: null,
         dataList: [],
         message: '',

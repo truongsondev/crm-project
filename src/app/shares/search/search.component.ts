@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   selector: 'search-component',
   templateUrl: './search.component.html',
-  imports: [MatIconModule, FormsModule],
+  imports: [FormsModule],
 })
 export class SearchComponent {
   searchText: string = '';

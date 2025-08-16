@@ -44,7 +44,7 @@
     padding: 0px;
   }
   .mat-mdc-dialog-surface {
-    border-radius: 0px;
+    border-radius: 6px;
   }
   .mat-mdc-dialog-title::before {
     height: 10px;

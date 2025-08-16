@@ -5,7 +5,11 @@ import { HeaderColumn } from '@app/custom-types/shared.type';
 import { Contact } from '@app/interfaces/contact.interface';
 import { ContactService } from '@app/services/contact.service';
 import { SearchComponent } from '@app/shares/search/search.component';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import {
+  MatPaginator,
+  MatPaginatorModule,
+  PageEvent,
+} from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,6 +28,7 @@ import { FileService } from '@app/services/fileService.service';
 import { getEndpoints } from '@app/constants/endpoints.constant';
 import { SelectOptioncomponent } from '@app/shares/select-option/select-option.component';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent } from '@app/shares/button/button.component';
 
 @Component({
   selector: 'contact-component',
@@ -39,6 +44,7 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     MatCheckboxModule,
     FormsModule,
+    ButtonComponent,
   ],
   providers: [DatePipe],
 })
@@ -48,6 +54,7 @@ export class ContactComponent {
   users: User[] = [];
   pageSize = ITEM_OF_PAGE;
   pageIndex = 0;
+  lengthDatasource = 0;
   Math = Math;
   listDelete: string[] = [];
   allSelected = false;
@@ -96,7 +103,6 @@ export class ContactComponent {
 
   constructor(
     private contactService: ContactService,
-    private datePipe: DatePipe,
     private userService: UserService,
     private modalService: ModalService,
     private snackbarservice: SnackbarService,
@@ -122,6 +128,7 @@ export class ContactComponent {
       this.dataSource = new MatTableDataSource(this.contacts);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
+      this.lengthDatasource = this.dataSource?.data?.length ?? 0;
     });
   }
 
@@ -172,7 +179,10 @@ export class ContactComponent {
       this.snackbarservice.openSnackBar('You not select contact');
     }
   }
-
+  onPageChange(event: PageEvent) {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+  }
   getNameUser(id: string): string {
     const name = this.users.find((item) => item._id === id);
     if (!name) {
@@ -182,7 +192,7 @@ export class ContactComponent {
   }
   openFilter() {
     this.modalService
-      .openFilter(ModalDiaLogComponent, FilterComponent, 'Filter by', {
+      .openModal(ModalDiaLogComponent, FilterComponent, 'Filter by', {
         action: '#',
         dataSelected: null,
         dataList: [],
@@ -196,26 +206,23 @@ export class ContactComponent {
   }
   openDialog() {
     this.modalService
-      .openFilter(
-        ModalDiaLogComponent,
-        SelectOptioncomponent,
-        'Select option',
-        {
-          action: 'select',
-          dataSelected: null,
-          dataList: this.contacts,
-          message: '',
-          from: 'contact',
-        },
-      )
-      .subscribe(() => {
-        this.ngOnInit();
+      .openModal(ModalDiaLogComponent, SelectOptioncomponent, 'Select option', {
+        action: 'select',
+        dataSelected: null,
+        dataList: this.contacts,
+        message: '',
+        from: 'contact',
+      })
+      .subscribe((res) => {
+        if (res.isSubmit === true) {
+          this.getListContact();
+        }
       });
   }
 
   onRowClick(row: Contact) {
     this.modalService
-      .openFilter(ModalDiaLogComponent, ContactForm, 'Edit contact', {
+      .openModal(ModalDiaLogComponent, ContactForm, 'Edit contact', {
         action: 'update',
         dataSelected: row,
         dataList: this.contacts,
@@ -229,18 +236,13 @@ export class ContactComponent {
 
   onDelete(row: Contact) {
     this.modalService
-      .openFilter(
-        ModalDiaLogComponent,
-        ConfirmActionComponent,
-        'Edit contact',
-        {
-          action: 'Confirm delete',
-          dataSelected: row,
-          dataList: this.contacts,
-          message: '',
-          from: 'contact',
-        },
-      )
+      .openModal(ModalDiaLogComponent, ConfirmActionComponent, 'Edit contact', {
+        action: 'Confirm delete',
+        dataSelected: row,
+        dataList: this.contacts,
+        message: '',
+        from: 'contact',
+      })
       .subscribe(() => {
         this.ngOnInit();
       });

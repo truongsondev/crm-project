@@ -3,6 +3,7 @@
 @config "../../../tailwind.config.js";
 @import "./form.css";
 @import "./table.css";
+@import "./button.css";
 
 body {
   font-family: "Roboto", sans-serif;

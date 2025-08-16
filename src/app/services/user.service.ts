@@ -8,14 +8,14 @@ import {
   UsersResponse,
 } from '@app/interfaces/response.interface';
 import { EndpointService } from './endpoint.service';
-import { CommomService } from './common.service';
+import { CommonService } from './common.service';
 import { Router } from '@angular/router';
 import { EMPTY } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class UserService {
   constructor(
     private endpointService: EndpointService,
-    private commonService: CommomService,
+    private commonService: CommonService,
     private router: Router,
   ) {}
   private readonly endpoints = getEndpoints().user.v1;

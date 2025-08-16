@@ -18,6 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { LEAD_SOURCE, ROLES } from '@app/constants/shared.constant';
 import { From } from '@app/custom-types/shared.type';
 import { ContactService } from '@app/services/contact.service';
+import { ButtonComponent } from '../button/button.component';
 
 enum OpenedFromEnum {
   USER_MANAGEMENT = 'user-management',
@@ -38,6 +39,7 @@ enum OpenedFromEnum {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    ButtonComponent,
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -151,13 +153,7 @@ export class FilterComponent {
   }
 
   onCancel() {
-    this.userService.getListUser().subscribe((users) => {
-      this.dialogRef.close({
-        employees: users,
-      });
-    });
-
-    this.userService.getListUser();
+    this.dialogRef.close();
   }
 
   getUserByRole(role: string) {

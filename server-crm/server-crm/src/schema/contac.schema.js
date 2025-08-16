@@ -29,7 +29,7 @@ const contactSchema = new mongoose.Schema(
     },
 
     assigned_to: { type: String, default: "" },
-    creator_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    creator_id: { type: String, default: "" },
 
     address: { type: String },
     description: { type: String },

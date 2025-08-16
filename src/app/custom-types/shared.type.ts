@@ -1,4 +1,5 @@
 import { Contact } from '@app/interfaces/contact.interface';
+import { SalesOrder } from '@app/interfaces/sales-order.interface';
 import { User } from '@app/interfaces/user.interface';
 
 export type HeaderColumn = {
@@ -34,4 +35,10 @@ export type Error = {
 
 export type From = {
   from: string;
+};
+
+export type FormSalesOrder = {
+  action: string;
+  dataSelected: SalesOrder | null;
+  dataList: SalesOrder[];
 };

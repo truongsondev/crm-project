@@ -1,10 +1,12 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Error } from '@app/custom-types/shared.type';
+import { ButtonComponent } from '../button/button.component';
 @Component({
   selector: 'error-component',
   templateUrl: 'error.component.html',
   standalone: true,
+  imports: [ButtonComponent],
 })
 export class ErrorComponent {
   message!: string;

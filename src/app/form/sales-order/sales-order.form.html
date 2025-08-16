@@ -1,0 +1,77 @@
+<form
+  [formGroup]="salesOrderFormGroup"
+  class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2 bg-white rounded-[10px] shadow w-full"
+>
+  <mat-form-field hintLabel="">
+    <mat-label>No order</mat-label>
+    <input formControlName="order_number" matInput (input)="onInput($event)" />
+    <mat-error *ngIf="getErrorMsg('contact_name') as msg">
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field hintLabel="">
+    <mat-label>Subject</mat-label>
+    <input
+      formControlName="subject"
+      matInput
+      placeholder="Enter subject"
+      (input)="onInput($event)"
+    />
+    <mat-error *ngIf="getErrorMsg('subject') as msg">
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field class="w-full">
+    <mat-label>status </mat-label>
+    <mat-select formControlName="status">
+      <mat-option *ngFor="let item of statusOption" [value]="item"
+        >{{ item }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field hintLabel="">
+    <mat-label>total</mat-label>
+    <input
+      formControlName="total"
+      matInput
+      placeholder="Enter subject"
+      (input)="onInput($event)"
+    />
+    <mat-error *ngIf="getErrorMsg('total') as msg">
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field class="w-full">
+    <mat-label>Assigned to</mat-label>
+    <mat-select formControlName="assigned_to">
+      <mat-option *ngFor="let item of listAssign" [value]="item._id"
+        >{{ item.first_name }} {{ item.last_name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="w-full">
+    <mat-label>Contact</mat-label>
+    <mat-select formControlName="contact_id">
+      <mat-option *ngFor="let item of listContact" [value]="item._id"
+        >{{ item?.contact_name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field hintLabel="" class="w-full col-span-2">
+    <mat-label>description</mat-label>
+    <input
+      formControlName="description"
+      matInput
+      placeholder="Enter description"
+      (input)="onInput($event)"
+    />
+    <mat-error *ngIf="getErrorMsg('') as msg">
+      {{ msg }}
+    </mat-error>
+  </mat-form-field>
+</form>

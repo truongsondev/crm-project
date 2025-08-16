@@ -64,6 +64,13 @@ export const ROLES = [
   { value: 'USER_READ_ONLY', label: 'Guest' },
 ];
 
+export const ACTION = {
+  SELECT: 'select',
+  UPDATE: 'update',
+  CREAT: 'creat',
+  NON: '#',
+};
+
 export const ERROR_MESSAGES: Record<
   number,
   { title: string; message: string }

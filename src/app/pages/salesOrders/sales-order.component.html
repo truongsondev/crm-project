@@ -1,8 +1,8 @@
 <div class="mt-4 mx-2 md:mx-6 lg:mx-10 bg-white p-4 md:p-6 rounded-lg shadow">
   <div class="flex flex-col gap-4 md:flex-row md:items-center">
-    <h1 class="font-medium text-2xl sm:text-3xl">Contacts</h1>
+    <h1 class="font-medium text-2xl sm:text-3xl">Sales Order</h1>
     <button-component
-      [textBt]="'Add Contact'"
+      [textBt]="'Add sale order'"
       [textIcon]="'add'"
       [className]="'bg-primary text-white '"
       (click)="openDialog()"
@@ -12,7 +12,7 @@
   <div
     class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
   >
-    <h1 class="font-medium text-lg sm:text-xl">List of Contacts</h1>
+    <h1 class="font-medium text-lg sm:text-xl">List of Sales Order</h1>
   </div>
 
   <div
@@ -52,16 +52,6 @@
     </div>
   </div>
 
-  <h1 *ngIf="contacts.length > 0" class="mt-4 opacity-90 text-lg sm:text-sm">
-    Showing
-    {{ pageIndex * pageSize + 1 }}
-    -
-    {{ Math.min((pageIndex + 1) * pageSize, lengthDatasource) }}
-    of
-    {{ lengthDatasource }}
-    records
-  </h1>
-
   <div class="mat-elevation-z8 overflow-x-auto mt-4">
     <table mat-table [dataSource]="dataSource" matSort class="min-w-full">
       <ng-container *ngFor="let col of columnDefs" [matColumnDef]="col.column">
@@ -73,7 +63,7 @@
           <ng-template #showCheckbox>
             <mat-checkbox
               [(ngModel)]="allSelected"
-              (change)="selectAllContacts($event.checked)"
+              (change)="selectAllSalesOrder()"
             ></mat-checkbox>
           </ng-template>
         </th>

@@ -6,9 +6,8 @@ const orderSchema = new mongoose.Schema(
     subject: { type: String, required: true },
 
     contact_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Contact",
-      required: true,
+      type: String,
+      default: "",
     },
 
     status: {

@@ -1,5 +1,6 @@
 import express from "express";
 import { ContactController } from "../controllers/contact.controller.js";
+import { SalesOrderController } from "../controllers/sales-order.controller.js";
 import { TokenController } from "../controllers/token.controller.js";
 import UserController from "../controllers/user.controller.js";
 import { checkRole } from "../middleware/user.js";
@@ -26,6 +27,8 @@ router.delete("/contacts/delete/:id", ContactController.deleteContact);
 router.get("/contacts/download", ContactController.exportToFileCSV);
 router.post("/multiple-contact", ContactController.createContacts);
 router.post("/delete/multiple-contact", ContactController.deleteContacts);
+
+router.get("/sales-order", SalesOrderController.getListSalesOrder);
 
 router.post("/reset-token", TokenController.resetToken);
 

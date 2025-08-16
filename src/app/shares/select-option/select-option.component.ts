@@ -1,18 +1,20 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
 import { ContactForm } from '@app/form/contacts/contact.form';
+import { SalesOrderForm } from '@app/form/sales-order/sales-order.form';
 import { UserForm } from '@app/form/user/user.form';
 import { ContactService } from '@app/services/contact.service';
 import { ModalService } from '@app/services/modal.service';
 import { SnackbarService } from '@app/services/snackbar.service';
 import { UserService } from '@app/services/user.service';
+import { ButtonComponent } from '../button/button.component';
 import { ModalDiaLogComponent } from '../modal/modal.component';
-
+import { ACTION } from '@app/constants/shared.constant';
 @Component({
   selector: 'select-component',
   templateUrl: './select-option.component.html',
   standalone: true,
+  imports: [ButtonComponent],
 })
 export class SelectOptioncomponent {
   constructor(
@@ -25,29 +27,48 @@ export class SelectOptioncomponent {
   ) {}
   addSingleItem() {
     if (this.item.from === 'user-management') {
-      this.modalService.openFilter(ModalDiaLogComponent, UserForm, 'Add user', {
-        action: 'create',
-        dataSelected: null,
-        dataList: this.item.dataList,
-        message: '',
-        from: '',
-      });
+      this.modalService
+        .openModal(ModalDiaLogComponent, UserForm, 'Add user', {
+          action: ACTION.CREAT,
+          dataSelected: null,
+          dataList: this.item.dataList,
+          message: '',
+          from: '',
+        })
+        .subscribe(() => {
+          this.dialogRef.close({
+            isSubmit: true,
+          });
+        });
     } else if (this.item.from === 'contact') {
-      this.modalService.openFilter(
-        ModalDiaLogComponent,
-        ContactForm,
-        'Add contact',
-        {
-          action: 'create',
+      this.modalService
+        .openModal(ModalDiaLogComponent, ContactForm, 'Add contact', {
+          action: ACTION.CREAT,
           dataSelected: null,
           dataList: this.item.dataList,
           message: '',
           from: 'contact',
-        },
-      );
+        })
+        .subscribe(() => {
+          this.dialogRef.close({
+            isSubmit: true,
+          });
+        });
+    } else if (this.item.from === 'salse-order') {
+      this.modalService
+        .openModal(ModalDiaLogComponent, SalesOrderForm, 'Add sale order', {
+          action: ACTION.CREAT,
+          dataSelected: null,
+          dataList: this.item.dataList,
+          message: '',
+          from: 'salse-order',
+        })
+        .subscribe(() => {
+          this.dialogRef.close({
+            isSubmit: true,
+          });
+        });
     }
-
-    this.dialogRef.close();
   }
 
   private downloadInvalidData(
@@ -100,7 +121,6 @@ export class SelectOptioncomponent {
 
       if (validData.length > 0) {
         if (this.item.from === 'user-management') {
-          console.log('validData::::', validData);
           this.userService.createUsers(validData).subscribe({
             next: (res) => {
               const failed = res.failed;
@@ -138,7 +158,6 @@ export class SelectOptioncomponent {
       key.forEach((header, i) => {
         obj[header] = values[i] ?? '';
       });
-      console.log('obj:::', obj);
       return obj;
     });
 

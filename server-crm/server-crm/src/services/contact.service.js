@@ -28,7 +28,6 @@ export class ContactService {
         await ContactRepo.createContact(contact);
         success.push(contact);
       } catch (err) {
-        console.log("err:::", err);
         if (err.code === 11000) {
           failed.push({
             ...contact,

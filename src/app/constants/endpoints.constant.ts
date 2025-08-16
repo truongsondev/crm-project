@@ -22,6 +22,12 @@ export const getEndpoints = () => {
         delete_contacts: `${environment.baseURL}/delete/multiple-contact`,
       },
     },
+
+    salesOrder: {
+      v1: {
+        salesOrder: `${environment.baseURL}/sales-order`,
+      },
+    },
     auth: {
       v1: {
         signIn: `${environment.baseURL}/auth/sign-in`,

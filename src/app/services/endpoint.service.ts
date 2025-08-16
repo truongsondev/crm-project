@@ -65,7 +65,7 @@ export class EndpointService {
   }
 
   showError(title: string, message: string) {
-    return this.modalService.openFilter(
+    return this.modalService.openModal(
       ModalDiaLogComponent,
       ErrorComponent,
       title,

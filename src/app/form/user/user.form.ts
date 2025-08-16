@@ -35,6 +35,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { ROLES, SALUTATION } from '@app/constants/shared.constant';
 import { MatIconModule } from '@angular/material/icon';
 import { SnackbarService } from '@app/services/snackbar.service';
+import { ACTION } from '@app/constants/shared.constant';
 @Component({
   standalone: true,
   selector: 'user-form',
@@ -132,9 +133,6 @@ export class UserForm {
     this.initForm();
   }
 
-  closeForm() {
-    this.dialogRef.close();
-  }
   handleHiddenPassword() {
     this.isPasswordHidden = !this.isPasswordHidden;
   }
@@ -177,22 +175,26 @@ export class UserForm {
     try {
       const { is_terminate, confirm_password, ...dataReq } =
         this.userFormGroup.value;
-      if (this.user.action === 'create') {
+      if (this.user.action === ACTION.CREAT) {
         const { _id, ...requestBody } = dataReq;
         this.userService.createUser(requestBody).subscribe({
           next: (res) => {
             this.snackbarService.openSnackBar('Create user success');
-            this.dialogRef.close();
+            this.dialogRef.close({
+              isSubmit: true,
+            });
           },
           error: () => {
             this.snackbarService.openSnackBar('Create user fail!');
           },
         });
-      } else if (this.user.action === 'update') {
+      } else if (this.user.action === ACTION.UPDATE) {
         this.userService.updateUser(dataReq._id, dataReq).subscribe({
           next: (res) => {
             this.snackbarService.openSnackBar('update user success');
-            this.dialogRef.close();
+            this.dialogRef.close({
+              isSubmit: true,
+            });
           },
           error: () => {
             this.snackbarService.openSnackBar('Create user fail!');

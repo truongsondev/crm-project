@@ -5,7 +5,7 @@ import { AuthService } from './auth.service';
 @Injectable({
   providedIn: 'root',
 })
-export class CommomService {
+export class CommonService {
   constructor(
     private router: Router,
     private authService: AuthService,
@@ -43,5 +43,20 @@ export class CommomService {
       this.router.navigate(['/auth/sign-in']);
       return '';
     }
+  }
+
+  addCreator(formData: any, id: string) {
+    const newFormData = { ...formData, creator_id: id };
+    return newFormData;
+  }
+
+  parseToJson() {
+    const userJson = localStorage.getItem('user');
+
+    if (!userJson) {
+      return '';
+    }
+    const user = JSON.parse(userJson);
+    return user;
   }
 }

@@ -25,6 +25,7 @@ import { ContactService } from '@app/services/contact.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { UserForm } from '../user/user.form';
 import { SnackbarService } from '@app/services/snackbar.service';
+import { CommonService } from '@app/services/common.service';
 
 enum ROLE_TYPE {
   USER_ADMIN = 'USER_ADMIN',
@@ -64,6 +65,7 @@ export class ContactForm {
     private contactService: ContactService,
     private dialogRef: MatDialogRef<UserForm>,
     private snackbarService: SnackbarService,
+    private commonService: CommonService,
     @Inject('data') public contact: FormContact,
   ) {
     this.getListUser();
@@ -83,7 +85,6 @@ export class ContactForm {
 
   ngOnInit() {
     const contactForm = this.contact.dataSelected;
-    console.log(contactForm);
     this.contactFormGroup = this.fb.group({
       _id: [contactForm?._id || ''],
       contact_name: [contactForm?.contact_name || '', Validators.required],
@@ -133,28 +134,37 @@ export class ContactForm {
     const { value } = event.target as HTMLInputElement;
     this.value.set(value);
   }
-  closeForm() {
-    this.dialogRef.close();
-  }
+
   onSubmit() {
     if (this.contactFormGroup.invalid) {
       this.contactFormGroup.markAllAsTouched();
       this.snackbarService.openSnackBar('Form invalid!');
       return;
     }
+    const user = this.commonService.parseToJson();
+    const id = user._id;
+    let newValueForm = { ...this.contactFormGroup.value };
+    newValueForm = this.commonService.addCreator(
+      this.contactFormGroup.value,
+      id,
+    );
     if (this.contact.action === 'create') {
-      const { _id, ...data } = this.contactFormGroup.value;
+      const { _id, ...data } = newValueForm;
       this.contactService.createContact(data).subscribe((res) => {
         this.snackbarService.openSnackBar('Create contact success');
-        this.dialogRef.close();
+        this.dialogRef.close({
+          isSubmit: true,
+        });
       });
     } else if (this.contact.action === 'update') {
-      const data = this.contactFormGroup.value;
+      const data = newValueForm;
       const _id = data._id;
       this.contactService.updateContact(_id, data).subscribe({
         next: (res) => {
           this.snackbarService.openSnackBar('Update contact success');
-          this.dialogRef.close();
+          this.dialogRef.close({
+            isSubmit: true,
+          });
         },
       });
     }

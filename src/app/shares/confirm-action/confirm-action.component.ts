@@ -3,10 +3,12 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { FormContact } from '@app/custom-types/shared.type';
 import { ContactService } from '@app/services/contact.service';
 import { SnackbarService } from '@app/services/snackbar.service';
+import { ButtonComponent } from '../button/button.component';
 @Component({
   selector: 'comfirm-component',
   templateUrl: 'confirm-action.component.html',
   standalone: true,
+  imports: [ButtonComponent],
 })
 export class ConfirmActionComponent {
   contact_name: string = '';

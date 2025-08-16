@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { CommonService } from '@app/services/common.service';
 @Component({
   standalone: true,
   selector: 'nav-component',
@@ -11,29 +12,30 @@ import { NavigationEnd, Router, RouterModule } from '@angular/router';
 export class NavComponent {
   selectedItem = 'dashboard';
   username = '';
-  roleOfUser: string = this.getRoleUser();
-  constructor(private router: Router) {}
+
+  isExpanded = true;
+
+  selectMenu(menu: string) {
+    this.selectedItem = menu;
+  }
+  roleOfUser: string = '';
+  constructor(
+    private router: Router,
+    private commonService: CommonService,
+  ) {}
   getUserName() {
-    const userJson = localStorage.getItem('user');
-    if (!userJson) {
-      return '';
-    }
-    const user = JSON.parse(userJson);
+    const user = this.commonService.parseToJson();
     return user.first_name + ' ' + user.last_name;
   }
 
   getRoleUser(): string {
-    const userJson = localStorage.getItem('user');
-
-    if (!userJson) {
-      return '';
-    }
-    const user = JSON.parse(userJson);
+    const user = this.commonService.parseToJson();
     return user.role;
   }
 
   ngOnInit() {
     this.username = this.getUserName();
+    this.roleOfUser = this.getRoleUser();
     const segments = this.router.url.split('/');
     const last = segments.pop() || '';
     this.selectedItem = last;
@@ -44,8 +46,5 @@ export class NavComponent {
         this.selectedItem = last;
       }
     });
-  }
-  selectMenu(item: string) {
-    this.selectedItem = item;
   }
 }
