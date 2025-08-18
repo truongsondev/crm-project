@@ -63,7 +63,7 @@
           <ng-template #showCheckbox>
             <mat-checkbox
               [(ngModel)]="allSelected"
-              (change)="selectAllSalesOrder()"
+              (change)="selectAllSalesOrder($event.checked)"
             ></mat-checkbox>
           </ng-template>
         </th>
@@ -90,6 +90,9 @@
             <span *ngSwitchCase="'updated_on'">
               {{ row[col.column] | date: "medium" }}
             </span>
+            <span *ngSwitchCase="'purchase_on'">
+              {{ row[col.column] | date: "medium" }}
+            </span>
             <span *ngSwitchCase="'all'">
               <mat-checkbox
                 [(ngModel)]="row.isChecked"
@@ -97,6 +100,9 @@
               ></mat-checkbox>
             </span>
             <span *ngSwitchCase="'assigned_to'">
+              {{ row[col.column]?.name || "-" }}
+            </span>
+            <span *ngSwitchCase="'contact_id'">
               {{ row[col.column]?.name || "-" }}
             </span>
             <span *ngSwitchDefault>
@@ -119,7 +125,7 @@
     [hidden]="lengthDatasource === 0"
     [pageSizeOptions]="[pageSize]"
     showFirstLastButtons
-    (page)="onPageChange($event)"
+    (page)="onPageChange()"
     class="mt-4"
   ></mat-paginator>
 </div>

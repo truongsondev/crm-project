@@ -10,6 +10,7 @@ import { UserService } from '@app/services/user.service';
 import { ButtonComponent } from '../button/button.component';
 import { ModalDiaLogComponent } from '../modal/modal.component';
 import { ACTION } from '@app/constants/shared.constant';
+import { SalesOrderService } from '@app/services/sales-order.service';
 @Component({
   selector: 'select-component',
   templateUrl: './select-option.component.html',
@@ -24,6 +25,7 @@ export class SelectOptioncomponent {
     private userService: UserService,
     private snackbarService: SnackbarService,
     private contactService: ContactService,
+    private saleOrderService: SalesOrderService,
   ) {}
   addSingleItem() {
     if (this.item.from === 'user-management') {
@@ -54,7 +56,7 @@ export class SelectOptioncomponent {
             isSubmit: true,
           });
         });
-    } else if (this.item.from === 'salse-order') {
+    } else if (this.item.from === 'sales-order') {
       this.modalService
         .openModal(ModalDiaLogComponent, SalesOrderForm, 'Add sale order', {
           action: ACTION.CREAT,
@@ -142,8 +144,21 @@ export class SelectOptioncomponent {
               this.snackbarService.openSnackBar('Create contact fail!');
             },
           });
+        } else if (this.item.from === 'sales-order') {
+          this.saleOrderService.createSalesOrder(data).subscribe({
+            next: (res) => {
+              const failed = res.failed;
+              this.downloadInvalidData(failed, 'conflicted_sales.csv');
+              this.snackbarService.openSnackBar('Create sales order success');
+            },
+            error: () => {
+              this.snackbarService.openSnackBar('Create sales order fail!');
+            },
+          });
         }
-        this.dialogRef.close();
+        this.dialogRef.close({
+          isSubmit: true,
+        });
       }
     };
   }
@@ -190,8 +205,9 @@ export class SelectOptioncomponent {
           /^\+?[0-9]{8,15}$/.test(row.phone || '') &&
           (!row.email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.email)) &&
           row.lead_source?.trim().length > 0;
+      } else {
+        isValid = true;
       }
-
       if (isValid) {
         validData.push(row);
       } else {

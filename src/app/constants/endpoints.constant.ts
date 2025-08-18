@@ -26,6 +26,12 @@ export const getEndpoints = () => {
     salesOrder: {
       v1: {
         salesOrder: `${environment.baseURL}/sales-order`,
+        create_sale_order: `${environment.baseURL}/create-sales-order`,
+        create_sales_order: `${environment.baseURL}/multiple-sales-order`,
+        download_sale_order: `${environment.baseURL}/sale-order/download`,
+        update_sale_order: `${environment.baseURL}/sale-order/:id`,
+        delete_sale_order: `${environment.baseURL}/sale-order/delete/:id`,
+        delete_sales_order: `${environment.baseURL}/delete/multiple-sales-order`,
       },
     },
     auth: {

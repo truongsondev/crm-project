@@ -10,7 +10,6 @@ import {
 import { EndpointService } from './endpoint.service';
 import { CommonService } from './common.service';
 import { Router } from '@angular/router';
-import { EMPTY } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class UserService {
   constructor(

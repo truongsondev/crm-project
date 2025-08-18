@@ -94,8 +94,8 @@ export class UserManagementComponent implements AfterViewInit {
         if (searchKeyword !== '') {
           this.employees = users.filter(
             (u) =>
-              u.username?.includes(searchKeyword) ||
-              u.email.includes(searchKeyword),
+              u.username?.includes(searchKeyword.trim()) ||
+              u.email.includes(searchKeyword.trim()),
           );
         } else {
           this.employees = users;
@@ -144,18 +144,19 @@ export class UserManagementComponent implements AfterViewInit {
   }
 
   openDialog() {
-    this.modalService.openModal(
-      ModalDiaLogComponent,
-      SelectOptioncomponent,
-      'Select option',
-      {
+    this.modalService
+      .openModal(ModalDiaLogComponent, SelectOptioncomponent, 'Select option', {
         action: ACTION.SELECT,
         dataSelected: null,
         dataList: this.employees,
         message: '',
         from: 'user-management',
-      },
-    );
+      })
+      .subscribe((res) => {
+        if (res.isSubmit === true) {
+          this.getListUser();
+        }
+      });
   }
   onRowClick(row: User) {
     this.modalService

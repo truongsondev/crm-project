@@ -29,4 +29,12 @@ export class ContactRepo {
   static async deleteContact(_id) {
     return await Contact.findByIdAndDelete(_id);
   }
+  static async findContactById(_id) {
+    try {
+      return await Contact.findOne({ _id });
+    } catch (err) {
+      console.error("Invalid ObjectId:", err.message);
+      return null;
+    }
+  }
 }

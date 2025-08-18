@@ -47,7 +47,7 @@
   <mat-form-field class="w-full">
     <mat-label>Assigned to</mat-label>
     <mat-select formControlName="assigned_to">
-      <mat-option *ngFor="let item of listAssign" [value]="item._id"
+      <mat-option *ngFor="let item of listAssign$ | async" [value]="item._id"
         >{{ item.first_name }} {{ item.last_name }}
       </mat-option>
     </mat-select>
@@ -56,7 +56,7 @@
   <mat-form-field class="w-full">
     <mat-label>Contact</mat-label>
     <mat-select formControlName="contact_id">
-      <mat-option *ngFor="let item of listContact" [value]="item._id"
+      <mat-option *ngFor="let item of listContact$ | async" [value]="item._id"
         >{{ item?.contact_name }}
       </mat-option>
     </mat-select>
@@ -70,7 +70,7 @@
       placeholder="Enter description"
       (input)="onInput($event)"
     />
-    <mat-error *ngIf="getErrorMsg('') as msg">
+    <mat-error *ngIf="getErrorMsg('description') as msg">
       {{ msg }}
     </mat-error>
   </mat-form-field>

@@ -11,8 +11,18 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormSalesOrder } from '@app/custom-types/shared.type';
-import { Contact } from '@app/interfaces/contact.interface';
 import { User } from '@app/interfaces/user.interface';
+import { ROLE_TYPE } from '@app/enum/shared.enum';
+import { CommonService } from '@app/services/common.service';
+import { UserService } from '@app/services/user.service';
+import { ContactService } from '@app/services/contact.service';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { Contact } from '@app/interfaces/contact.interface';
+import { SalesOrderService } from '@app/services/sales-order.service';
+import { MatDialogRef } from '@angular/material/dialog';
+import { SnackbarService } from '@app/services/snackbar.service';
+import { ACTION } from '@app/constants/shared.constant';
 
 @Component({
   standalone: true,
@@ -29,19 +39,29 @@ import { User } from '@app/interfaces/user.interface';
 })
 export class SalesOrderForm implements OnInit {
   salesOrderFormGroup!: FormGroup;
-  listAssign: User[] = [];
   protected readonly value = signal('');
-  listContact: Contact[] = [];
+
+  listAssign$!: Observable<User[]>;
+  listContact$!: Observable<Contact[]>;
 
   private ORDER_NO_PATTERN = /^[a-zA-Z0-9_-]+$/;
   statusOption = ['Created', 'Approved', 'Delivered', 'Canceled'];
+
   constructor(
     @Inject('data') public salesOrder: FormSalesOrder,
     private fb: FormBuilder,
+    private userService: UserService,
+    private commonService: CommonService,
+    private contactService: ContactService,
+    private salseOrderService: SalesOrderService,
+    private dialogRef: MatDialogRef<SalesOrderForm>,
+    private snackbarService: SnackbarService,
   ) {}
 
   ngOnInit(): void {
     this.initForm();
+    this.getListAssignedTo();
+    this.getListContact();
   }
 
   getErrorMsg(controlName: string): string | null {
@@ -50,12 +70,11 @@ export class SalesOrderForm implements OnInit {
     if (control.errors['required']) {
       return 'This field is required';
     }
-
     return 'Invalid input';
   }
+
   initForm = () => {
     const so = this.salesOrder?.dataSelected;
-
     this.salesOrderFormGroup = this.fb.group({
       _id: [so?._id || ''],
       order_number: [
@@ -84,7 +103,76 @@ export class SalesOrderForm implements OnInit {
       this.salesOrderFormGroup.markAllAsTouched();
       return;
     }
-    const formValue = this.salesOrderFormGroup.getRawValue();
-    console.log('Sales order submit:', formValue);
+    const creator_id = this.commonService.parseToJson()?._id;
+    if (creator_id === '') {
+      return;
+    }
+    const newDataform = {
+      ...this.salesOrderFormGroup.value,
+      creator_id: creator_id,
+    };
+    const { _id, ...dataReq } = newDataform;
+
+    if (this.salesOrder.action === ACTION.CREAT) {
+      this.salseOrderService.createSaleOrder(dataReq).subscribe({
+        next: () => {
+          this.snackbarService.openSnackBar('Create sale order success!');
+          this.dialogRef.close({
+            isSubmit: true,
+          });
+        },
+        error: () => {
+          this.snackbarService.openSnackBar('Create sale order fail!');
+        },
+      });
+    } else if (this.salesOrder.action === ACTION.UPDATE) {
+      this.salseOrderService
+        .updateSalesOrder(newDataform._id, newDataform)
+        .subscribe({
+          next: (res) => {
+            this.snackbarService.openSnackBar('Update success');
+            this.dialogRef.close({
+              isSubmit: true,
+            });
+          },
+          error: () => {
+            this.snackbarService.openSnackBar('Update fail');
+            this.dialogRef.close({
+              isSubmit: false,
+            });
+          },
+        });
+    }
+  }
+
+  getListAssignedTo() {
+    const creator = this.commonService.parseToJson();
+    if (creator === '') return;
+
+    const role = creator.role;
+    this.listAssign$ = this.userService.getListUser().pipe(
+      map((res) => {
+        const { users } = res;
+        if (role === ROLE_TYPE.USER_ADMIN || role === ROLE_TYPE.CONTACT_MGR) {
+          return users.filter((item) =>
+            [
+              ROLE_TYPE.CONTACT_MGR.toString(),
+              ROLE_TYPE.CONTACT_EMP.toString(),
+            ].includes(item.role),
+          );
+        } else if (role === ROLE_TYPE.CONTACT_EMP) {
+          return users.filter((item) =>
+            [ROLE_TYPE.CONTACT_EMP.toString()].includes(item.role),
+          );
+        }
+        return [];
+      }),
+    );
+  }
+
+  getListContact() {
+    this.listContact$ = this.contactService
+      .getListContact()
+      .pipe(map((res) => res.contacts));
   }
 }

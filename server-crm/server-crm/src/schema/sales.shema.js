@@ -18,9 +18,9 @@ const orderSchema = new mongoose.Schema(
 
     total: { type: Number, required: true },
 
-    assigned_to: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    assigned_to: { type: String, default: "" },
 
-    creator_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    creator_id: { type: String, default: "" },
 
     description: { type: String },
 

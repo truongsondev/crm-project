@@ -15,8 +15,14 @@ class SalesOrderRepo {
     });
   }
 
-  static async createSalseOrder(saleOrder) {
+  static async createSaleOrder(saleOrder) {
     return await Order.insertOne(saleOrder);
+  }
+  static async updateSaleOrder(id, data) {
+    return await Order.findByIdAndUpdate(id, data);
+  }
+  static async deleteSaleOrder(id) {
+    return await Order.findByIdAndDelete(id);
   }
 }
 

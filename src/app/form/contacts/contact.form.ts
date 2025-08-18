@@ -26,16 +26,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { UserForm } from '../user/user.form';
 import { SnackbarService } from '@app/services/snackbar.service';
 import { CommonService } from '@app/services/common.service';
-
-enum ROLE_TYPE {
-  USER_ADMIN = 'USER_ADMIN',
-  DIR = 'DIR',
-  SALES_MGR = 'SALES_MGR',
-  SALES_EMP = 'SALES_EMP',
-  CONTACT_MGR = 'CONTACT_MGR',
-  CONTACT_EMP = 'CONTACT_EMP',
-  USER_READ_ONLY = 'USER_READ_ONLY',
-}
+import { ROLE_TYPE } from '@app/enum/shared.enum';
 
 @Component({
   selector: 'contact-form',

@@ -93,9 +93,7 @@ class UserSerivice {
     const formattedData = data.map((item) => {
       return {
         ...item,
-        manager_name: item.manager_name
-          ? item.manager_name?.name
-          : "No Manager",
+        manager_name: item.manager_name ? item.manager_name?.name : "",
 
         created_on: item.created_on
           ? CommonService.formatDate(item.created_on)
@@ -107,7 +105,8 @@ class UserSerivice {
           ? CommonService.formatDate(item.hired_date)
           : "",
         role: DISPLAY_ROLES[item.role],
-        password: "*".repeat(item.password.length),
+        is_active: item.is_active ? "Active" : "Inactive",
+        is_manager: item.is_manager ? "Manager" : "Employee",
       };
     });
 

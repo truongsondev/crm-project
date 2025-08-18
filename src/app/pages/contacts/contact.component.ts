@@ -22,7 +22,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ConfirmActionComponent } from '@app/shares/confirm-action/confirm-action.component';
 import { FilterComponent } from '@app/shares/filter/filter.component';
 import { ModalService } from '@app/services/modal.service';
-import { ITEM_OF_PAGE } from '@app/constants/shared.constant';
+import { ACTION, ITEM_OF_PAGE } from '@app/constants/shared.constant';
 import { SnackbarService } from '@app/services/snackbar.service';
 import { FileService } from '@app/services/fileService.service';
 import { getEndpoints } from '@app/constants/endpoints.constant';
@@ -88,7 +88,7 @@ export class ContactComponent {
 
         if (searchKeyword !== '') {
           this.contacts = contacts.filter((u) =>
-            u.contact_name?.includes(searchKeyword),
+            u.contact_name?.includes(searchKeyword.trim()),
           );
         } else {
           this.contacts = contacts;
@@ -229,22 +229,31 @@ export class ContactComponent {
         message: '',
         from: 'contact',
       })
-      .subscribe(() => {
-        this.ngOnInit();
+      .subscribe((res) => {
+        if (res.isSubmit === true) {
+          this.getListContact();
+        }
       });
   }
 
   onDelete(row: Contact) {
     this.modalService
-      .openModal(ModalDiaLogComponent, ConfirmActionComponent, 'Edit contact', {
-        action: 'Confirm delete',
-        dataSelected: row,
-        dataList: this.contacts,
-        message: '',
-        from: 'contact',
-      })
-      .subscribe(() => {
-        this.ngOnInit();
+      .openModal(
+        ModalDiaLogComponent,
+        ConfirmActionComponent,
+        'Delete contact',
+        {
+          action: ACTION.NON,
+          dataSelected: row,
+          dataList: this.contacts,
+          message: '',
+          from: 'contact',
+        },
+      )
+      .subscribe((res) => {
+        if (res.isSubmit === true) {
+          this.getListContact();
+        }
       });
   }
   exportToFileCSV() {

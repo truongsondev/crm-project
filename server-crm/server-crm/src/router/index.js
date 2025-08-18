@@ -29,6 +29,15 @@ router.post("/multiple-contact", ContactController.createContacts);
 router.post("/delete/multiple-contact", ContactController.deleteContacts);
 
 router.get("/sales-order", SalesOrderController.getListSalesOrder);
+router.post("/create-sales-order", SalesOrderController.createSaleOrder);
+router.post("/multiple-sales-order", SalesOrderController.createSalesOrder);
+router.get("/sale-order/download", SalesOrderController.exportToFileCSV);
+router.put("/sale-order/:id", SalesOrderController.updateSaleOrder);
+router.delete("/sale-order/delete/:id", SalesOrderController.deleteSaleOrder);
+router.post(
+  "/delete/multiple-sales-order",
+  SalesOrderController.deleteSalesOrder
+);
 
 router.post("/reset-token", TokenController.resetToken);
 
