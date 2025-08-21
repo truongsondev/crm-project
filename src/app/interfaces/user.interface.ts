@@ -17,6 +17,6 @@ export interface User {
   hired_date: Date;
   password: string;
   terminated_date: Date;
-  created_time: Date;
-  updated_time: Date;
+  created_on: Date;
+  updated_on: Date;
 }

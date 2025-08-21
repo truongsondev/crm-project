@@ -5,6 +5,7 @@ import { Parser } from "@json2csv/plainjs";
 import { fileURLToPath } from "url";
 import fs from "fs";
 import { CommonService } from "./common.service.js";
+import { NotFoundError } from "../http/error.http.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -123,7 +124,7 @@ export class ContactService {
 
   static exportToFileCSV = async () => {
     const data = await this.getListContact();
-    if (!data) {
+    if (!data || data.length === 0) {
       throw new NotFoundError("No data found");
     }
     const formattedData = data.map((item) => {

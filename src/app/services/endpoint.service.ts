@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpEvent } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ErrorComponent } from '@app/shares/error/error.component';
-import { ModalDiaLogComponent } from '@app/shares/modal/modal.component';
+import { ErrorComponent } from '@app/shared-components/error/error.component';
+import { ModalDiaLogComponent } from '@app/shared-components/modal/modal.component';
 import { catchError, of, throwError } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 import { ModalService } from './modal.service';

@@ -17,4 +17,5 @@ export interface SalesOrder {
   purchase_on: Date;
   updated_on: Date;
   isChecked: Boolean;
+  created_on: Date;
 }

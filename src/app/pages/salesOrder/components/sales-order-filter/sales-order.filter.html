@@ -1,0 +1,75 @@
+<form [formGroup]="filterFormSalesOrder" class="flex flex-col gap-6">
+  <div class="flex flex-col gap-6">
+    <mat-form-field class="block w-full">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option *ngFor="let status of displayStatus" [value]="status">{{
+          status
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="block w-full">
+      <mat-label>Assigned to</mat-label>
+      <mat-select formControlName="assignedTo">
+        <mat-option *ngFor="let item of assignedTo" [value]="item">{{
+          item
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Enter a date range</mat-label>
+      <mat-date-range-input [rangePicker]="picker">
+        <input
+          matStartDate
+          formControlName="createStartDate"
+          placeholder="Start date"
+        />
+        <input
+          matEndDate
+          formControlName="createEndDate"
+          placeholder="End date"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"
+      ></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Updated time</mat-label>
+      <mat-date-range-input [rangePicker]="updatedPicker">
+        <input
+          matStartDate
+          placeholder="Start date"
+          formControlName="updateStartDate"
+        />
+        <input
+          matEndDate
+          placeholder="End date"
+          formControlName="updateEndDate"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="updatedPicker"
+      ></mat-datepicker-toggle>
+      <mat-date-range-picker #updatedPicker></mat-date-range-picker>
+    </mat-form-field>
+    <div class="flex flex-row justify-between items-center">
+      <button-component
+        [textBt]="'Cancel'"
+        [className]="'bg-teal-400 text-white'"
+        (click)="onCancel()"
+      />
+      <button-component
+        [textBt]="'Submit'"
+        [className]="'bg-teal-400 text-white'"
+        (click)="onSubmit()"
+      />
+    </div>
+  </div>
+</form>

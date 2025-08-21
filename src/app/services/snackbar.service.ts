@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { PizzaPartyAnnotatedComponent } from '@app/shares/toast/toast.component';
+import { PizzaPartyAnnotatedComponent } from '@app/shared-components/toast/toast.component';
 
 @Injectable({
   providedIn: 'root',

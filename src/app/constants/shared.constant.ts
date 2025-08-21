@@ -67,9 +67,11 @@ export const ROLES = [
 export const ACTION = {
   SELECT: 'select',
   UPDATE: 'update',
-  CREAT: 'creat',
-  NON: '#',
+  CREATE: 'creat',
+  NONE: '#',
 };
+
+export const STATUSOPTION = ['Created', 'Approved', 'Delivered', 'Canceled'];
 
 export const ERROR_MESSAGES: Record<
   number,
@@ -96,5 +98,3 @@ export const ERROR_MESSAGES: Record<
     message: 'An unexpected error occurred on the server.',
   },
 };
-
-

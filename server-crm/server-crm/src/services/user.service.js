@@ -87,7 +87,7 @@ class UserSerivice {
 
   static exportToFileCSV = async () => {
     const data = await this.getListUser();
-    if (!data) {
+    if (!data || data.length === 0) {
       throw new NotFoundError("No data found");
     }
     const formattedData = data.map((item) => {

@@ -2,7 +2,7 @@ import { Component, ViewChild, AfterViewInit } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { SearchComponent } from '@app/shares/search/search.component';
+import { SearchComponent } from '@app/shared-components/search/search.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import {
   MatPaginator,
@@ -16,8 +16,8 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '@app/services/user.service';
 import { User } from '@app/interfaces/user.interface';
 import { HeaderColumn } from '@app/custom-types/shared.type';
-import { ModalDiaLogComponent } from '@app/shares/modal/modal.component';
-import { UserForm } from '@app/form/user/user.form';
+import { ModalDiaLogComponent } from '@app/shared-components/modal/modal.component';
+import { UserForm } from '@app/pages/user/components/user-form/user.form';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import {
   FormControl,
@@ -32,15 +32,15 @@ import {
   DISPLAY_ROLES,
   ITEM_OF_PAGE,
 } from '@app/constants/shared.constant';
-import { getManagerName as _getManagerName } from '@app/helper/get-manager-name';
 import { SnackbarService } from '@app/services/snackbar.service';
 import { ModalService } from '@app/services/modal.service';
-import { FilterComponent } from '@app/shares/filter/filter.component';
-import { FileService } from '@app/services/fileService.service';
-import { SelectOptioncomponent } from '@app/shares/select-option/select-option.component';
+import { FileService } from '@app/services/file.service';
+import { SelectOptioncomponent } from '@app/shared-components/select-option/select-option.component';
 import { getEndpoints } from '@app/constants/endpoints.constant';
-import { ButtonComponent } from '@app/shares/button/button.component';
+import { ButtonComponent } from '@app/shared-components/button/button.component';
 import { ACTION } from '@app/constants/shared.constant';
+import { OPENDED_FORM_ENUM } from '@app/enums/shared.enum';
+import { UserFilterComponent } from './components/user-filter/user-filter.filter';
 @Component({
   standalone: true,
   selector: 'user-management',
@@ -65,12 +65,12 @@ import { ACTION } from '@app/constants/shared.constant';
   ],
 })
 export class UserManagementComponent implements AfterViewInit {
-  employees: User[] = [];
+  users: User[] = [];
   mySearch: string = 'user/email';
   pageSize = ITEM_OF_PAGE;
   pageIndex = 0;
   Math = Math;
-  getManagerName = _getManagerName;
+
   onPageChange(event: PageEvent) {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
@@ -92,15 +92,15 @@ export class UserManagementComponent implements AfterViewInit {
       next: (data) => {
         const { users } = data;
         if (searchKeyword !== '') {
-          this.employees = users.filter(
+          this.users = users.filter(
             (u) =>
               u.username?.includes(searchKeyword.trim()) ||
               u.email.includes(searchKeyword.trim()),
           );
         } else {
-          this.employees = users;
+          this.users = users;
         }
-        this.dataSource.data = this.employees;
+        this.dataSource.data = this.users;
       },
       error: (err) => {
         this.snackbarservice.openSnackBar('Search failed: ' + err.message);
@@ -113,7 +113,7 @@ export class UserManagementComponent implements AfterViewInit {
     private modalService: ModalService,
     private fileService: FileService,
   ) {
-    this.dataSource = new MatTableDataSource(this.employees);
+    this.dataSource = new MatTableDataSource(this.users);
   }
 
   ngAfterViewInit() {
@@ -138,7 +138,7 @@ export class UserManagementComponent implements AfterViewInit {
   getListUser() {
     this.userService.getListUser().subscribe((data) => {
       const { users } = data;
-      this.employees = users;
+      this.users = users;
       this.dataSource.data = users;
     });
   }
@@ -148,9 +148,9 @@ export class UserManagementComponent implements AfterViewInit {
       .openModal(ModalDiaLogComponent, SelectOptioncomponent, 'Select option', {
         action: ACTION.SELECT,
         dataSelected: null,
-        dataList: this.employees,
+        dataList: this.users,
         message: '',
-        from: 'user-management',
+        from: OPENDED_FORM_ENUM.USER_MANAGEMENT,
       })
       .subscribe((res) => {
         if (res.isSubmit === true) {
@@ -163,9 +163,9 @@ export class UserManagementComponent implements AfterViewInit {
       .openModal(ModalDiaLogComponent, UserForm, 'Edit user', {
         action: ACTION.UPDATE,
         dataSelected: row,
-        dataList: this.employees,
+        dataList: this.users,
         message: '',
-        from: 'user-management',
+        from: OPENDED_FORM_ENUM.USER_MANAGEMENT,
       })
       .subscribe((res) => {
         console.log(res.isSubmit);
@@ -177,17 +177,17 @@ export class UserManagementComponent implements AfterViewInit {
 
   openFilter() {
     this.modalService
-      .openModal(ModalDiaLogComponent, FilterComponent, 'Filter by', {
-        action: ACTION.NON,
+      .openModal(ModalDiaLogComponent, UserFilterComponent, 'Filter by', {
+        action: ACTION.NONE,
         dataSelected: null,
         dataList: [],
         message: '',
-        from: 'user-management',
+        from: OPENDED_FORM_ENUM.USER_MANAGEMENT,
       })
       .subscribe((result) => {
         if (result) {
-          this.employees = result.employees;
-          this.dataSource.data = result.employees;
+          this.users = result.users;
+          this.dataSource.data = result.users;
         }
       });
   }

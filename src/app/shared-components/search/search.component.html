@@ -1,0 +1,11 @@
+<div
+  class="w-[336px] h-[44px] rounded-xl flex items-center px-3 bg-white border border-gray-200 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-200 transition"
+>
+  <input
+    type="search"
+    placeholder="Search by {{ titleSearch }}"
+    class="w-full placeholder-gray-400 bg-transparent focus:outline-none text-gray-700"
+    [(ngModel)]="searchText"
+    (input)="valueChange()"
+  />
+</div>

@@ -13,8 +13,8 @@ app.use((req, res, next) => {
   next();
 });
 app.use((err, req, res, next) => {
-  const statusCode = 500;
-  const message = "An unexpected error occurred on the server.";
+  const statusCode = err.status || 500;
+  const message = err.message || "An unexpected error occurred on the server.";
 
   res.status(statusCode).json({
     success: false,

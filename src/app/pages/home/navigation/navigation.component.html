@@ -1,0 +1,107 @@
+<nav>
+  <div
+    class="w-full bg-cyan-400 h-screen max-xxl:animate-wiggle flex flex-col justify-between"
+  >
+    <div class="flex flex-col gap-8 px-[12px] mt-[50px]">
+      <a
+        *ngIf="hasAccess('dashboard')"
+        class="flex gap-1 cursor-pointer p-2 rounded"
+        (click)="selectMenu('dashboard')"
+        [ngClass]="{
+          'bg-white text-primary': selectedItem === 'dashboard',
+          'text-white': selectedItem !== 'dashboard',
+        }"
+        [routerLink]="'/dashboard'"
+      >
+        <mat-icon
+          [ngClass]="{
+            'text-primary': selectedItem === 'dashboard',
+            'text-white': selectedItem !== 'dashboard',
+          }"
+        >
+          dashboard
+        </mat-icon>
+        <span class="hidden xxl:block">Dashboard</span>
+      </a>
+
+      <a
+        *ngIf="hasAccess('contacts')"
+        class="flex gap-1 cursor-pointer p-2 rounded"
+        (click)="selectMenu('contacts')"
+        [ngClass]="{
+          'bg-white text-primary': selectedItem === 'contacts',
+          'text-white': selectedItem !== 'contacts',
+        }"
+        [routerLink]="'/contacts'"
+      >
+        <mat-icon
+          [ngClass]="{
+            'text-primary': selectedItem === 'contacts',
+            'text-white': selectedItem !== 'contacts',
+          }"
+        >
+          article
+        </mat-icon>
+        <span class="hidden xxl:block">Contacts</span>
+      </a>
+
+      <a
+        *ngIf="hasAccess('sales-orders')"
+        class="flex gap-1 cursor-pointer p-2 rounded"
+        (click)="selectMenu('sales-orders')"
+        [ngClass]="{
+          'bg-white text-primary': selectedItem === 'sales-orders',
+          'text-white': selectedItem !== 'sales-orders',
+        }"
+        [routerLink]="'/sales-orders'"
+      >
+        <mat-icon
+          [ngClass]="{
+            'text-primary': selectedItem === 'sales-orders',
+            'text-white': selectedItem !== 'sales-orders',
+          }"
+        >
+          receipt_long
+        </mat-icon>
+        <span class="hidden xxl:block">Sales Orders</span>
+      </a>
+
+      <a
+        *ngIf="hasAccess('user-management')"
+        class="flex gap-1 cursor-pointer p-2 rounded"
+        (click)="selectMenu('user-management')"
+        [ngClass]="{
+          'bg-white text-primary': selectedItem === 'user-management',
+          'text-white': selectedItem !== 'user-management',
+        }"
+        [routerLink]="'/user-management'"
+      >
+        <mat-icon
+          [ngClass]="{
+            'text-primary': selectedItem === 'users',
+            'text-white': selectedItem !== 'users',
+          }"
+        >
+          person
+        </mat-icon>
+        <span class="hidden xxl:block">User Management</span>
+      </a>
+    </div>
+    <div class="flex flex-col gap-2 px-[12px] mt-[50px] flex-1">
+      <a
+        class="flex gap-2 items-center cursor-pointer p-2 rounded transition hover:bg-white hover:text-primary text-white mt-auto"
+        (click)="logout()"
+      >
+        <mat-icon>logout</mat-icon>
+        <span class="hidden xxl:block">Logout</span>
+      </a>
+    </div>
+
+    <div class="p-4 flex items-center gap-3 border-t border-white/20">
+      <div class="rounded-full bg-white w-8 h-8 overflow-hidden">
+        <img src="avt.png" alt="avt" class="object-cover w-full h-full" />
+      </div>
+      <span class="text-white">{{ username }}</span>
+    </div>
+  </div>
+</nav>

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { User } from '@app/interfaces/user.interface';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -59,4 +60,12 @@ export class CommonService {
     const user = JSON.parse(userJson);
     return user;
   }
+
+  // getManagerName(id: string | undefined, employees: User[] | null) {
+  //   const manager = employees?.find((u) => u._id == id);
+  //   if (!manager) {
+  //     return null;
+  //   }
+  //   return manager.first_name + ' ' + manager?.last_name;
+  // }
 }
