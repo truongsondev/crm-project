@@ -12,9 +12,9 @@ const createTokenPair = (payload, publicKey, privateKey) => {
   return { accessToken, refreshToken };
 };
 
-const verifyToken = (accessToken, publicKey) => {
+const verifyToken = (token, publicKey) => {
   try {
-    const decoded = jwt.verify(accessToken, publicKey);
+    const decoded = jwt.verify(token, publicKey);
     return decoded;
   } catch (err) {
     console.log("err:::", err);

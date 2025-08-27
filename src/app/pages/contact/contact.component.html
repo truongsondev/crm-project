@@ -52,7 +52,7 @@
     </div>
   </div>
 
-  <h1 *ngIf="contacts.length > 0" class="mt-4 opacity-90 text-lg sm:text-sm">
+  <h1 *ngIf="contactList.length > 0" class="mt-4 opacity-90 text-lg sm:text-sm">
     Showing
     {{ pageIndex * pageSize + 1 }}
     -
@@ -83,16 +83,18 @@
               class="text-primary cursor-pointer flex gap-2"
               *ngSwitchCase="'action'"
             >
-              <span
+              <button
                 (click)="onRowClick(row)"
-                class="px-2 rounded-full border text-sm font-medium border-fuchsia-500 text-fuchsia-500 bg-fuchsia-50"
-                >Edit</span
+                class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition cursor-pointer"
               >
-              <span
-                (click)="onDelete(row)"
-                class="px-2 rounded-full border text-sm font-medium border-indigo-500 text-indigo-500 bg-indigo-50"
-                >Delete</span
+                <i class="material-icons text-lg">edit</i>
+              </button>
+              <button
+                (click)="onRowClick(row)"
+                class="w-8 h-8 flex items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-blue-200 transition cursor-pointer"
               >
+                <i class="material-icons text-sm">delete</i>
+              </button>
             </span>
             <span *ngSwitchCase="'created_on'">
               {{ row[col.column] | date: "medium" }}

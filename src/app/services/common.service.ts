@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from '@app/interfaces/user.interface';
+import { catchError, map, Observable, of } from 'rxjs';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -21,29 +22,33 @@ export class CommonService {
     return rt ? rt : '';
   }
 
-  handleToken() {
-    try {
-      const at = this.getAccessToken();
-      const rt = this.getRefreshToken();
+  handleToken(): Observable<string> {
+    const at = this.getAccessToken();
+    const rt = this.getRefreshToken();
 
-      if (at === '' && rt === '') {
+    if (!at && rt) {
+      const user = this.parseToJson();
+      if (!user) {
         this.router.navigate(['/auth/sign-in']);
-        return '';
+        return of('');
       }
 
-      if (at === '' && rt !== '') {
-        this.authService.resetToken(rt).subscribe((res) => {
-          const { accessToken, refreshToken } = res;
+      return this.authService.resetToken(rt, user._id).pipe(
+        map((res) => {
+          const { accessToken, refreshToken } = res.data.token;
           localStorage.setItem('at', accessToken);
           localStorage.setItem('rt', refreshToken);
+          localStorage.setItem('user', JSON.stringify(res.data.user));
           return accessToken;
-        });
-      }
-      return at;
-    } catch (err) {
-      this.router.navigate(['/auth/sign-in']);
-      return '';
+        }),
+        catchError(() => {
+          this.router.navigate(['/auth/sign-in']);
+          return of('');
+        }),
+      );
     }
+
+    return of(at || '');
   }
 
   addCreator(formData: any, id: string) {
@@ -60,12 +65,4 @@ export class CommonService {
     const user = JSON.parse(userJson);
     return user;
   }
-
-  // getManagerName(id: string | undefined, employees: User[] | null) {
-  //   const manager = employees?.find((u) => u._id == id);
-  //   if (!manager) {
-  //     return null;
-  //   }
-  //   return manager.first_name + ' ' + manager?.last_name;
-  // }
 }

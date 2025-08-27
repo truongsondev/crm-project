@@ -41,8 +41,7 @@ const userSchema = new mongoose.Schema(
 
     hired_date: { type: Date },
     terminated_date: { type: Date },
-    access_token: { type: String },
-    refresh_token: { type: String },
+
     public_key: { type: String },
     created_on: { type: Date, default: Date.now },
     updated_on: { type: Date, default: Date.now },

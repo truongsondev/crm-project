@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { getEndpoints } from '@app/constants/endpoints.constant';
-import {
-  DataResponse,
-  SaleOrderResponse,
-  SalesOrderResponse,
-} from '@app/interfaces/response.interface';
+import { DataResponse } from '@app/interfaces/response.interface';
+import { SalesOrder } from '@app/interfaces/sales-order.interface';
 import { EndpointService } from './endpoint.service';
 @Injectable({
   providedIn: 'root',
@@ -13,15 +10,12 @@ export class SalesOrderService {
   constructor(private endpointService: EndpointService) {}
   getListSalesOrder() {
     const endpoint = getEndpoints().salesOrder.v1.salesOrder;
-    return this.endpointService.fetchEndpoint<SalesOrderResponse>(endpoint);
+    return this.endpointService.fetchEndpoint<SalesOrder[]>(endpoint);
   }
 
   createSaleOrder(data: any) {
     const endpoint = getEndpoints().salesOrder.v1.create_sale_order;
-    return this.endpointService.postEndpoint<SalesOrderResponse>(
-      endpoint,
-      data,
-    );
+    return this.endpointService.postEndpoint(endpoint, data);
   }
 
   createSalesOrder(data: any) {
@@ -33,7 +27,7 @@ export class SalesOrderService {
       ':id',
       id,
     );
-    return this.endpointService.putEndpoint<SaleOrderResponse>(endpoint, data);
+    return this.endpointService.putEndpoint(endpoint, data);
   }
 
   deleteSaleOrder(id: string) {
@@ -41,11 +35,11 @@ export class SalesOrderService {
       ':id',
       id,
     );
-    return this.endpointService.deleteEndpoint<SaleOrderResponse>(endpoint);
+    return this.endpointService.deleteEndpoint(endpoint);
   }
 
   deleteSalesOrder(id: string[]) {
     const endpoint = getEndpoints().salesOrder.v1.delete_sales_order;
-    return this.endpointService.postEndpoint<SaleOrderResponse>(endpoint, id);
+    return this.endpointService.postEndpoint(endpoint, id);
   }
 }

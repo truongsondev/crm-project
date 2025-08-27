@@ -1,11 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { getEndpoints } from '@app/constants/endpoints.constant';
 import { Contact } from '@app/interfaces/contact.interface';
 import {
-  ContactReponse,
-  ContactsReponse,
   DataResponse,
+  LeadSourceStatResponse,
 } from '@app/interfaces/response.interface';
 import { EndpointService } from './endpoint.service';
 
@@ -15,13 +13,13 @@ export class ContactService {
   private readonly endpoints = getEndpoints().contact.v1;
   getListContact() {
     const endpoint = this.endpoints.contacts;
-    return this.endpointService.fetchEndpoint<ContactsReponse>(endpoint);
+    return this.endpointService.fetchEndpoint<Contact[]>(endpoint);
   }
 
   createContact(data: any) {
     const endpoint = this.endpoints.contacts;
 
-    return this.endpointService.postEndpoint<ContactReponse>(endpoint, data);
+    return this.endpointService.postEndpoint(endpoint, data);
   }
 
   createContacts(data: any) {
@@ -32,15 +30,22 @@ export class ContactService {
 
   updateContact(id: string, data: Contact) {
     const endpoint = `${this.endpoints.update_contact.replace(':id', id)}`;
-    return this.endpointService.putEndpoint<ContactReponse>(endpoint, data);
+    return this.endpointService.putEndpoint(endpoint, data);
   }
 
   deleteContact(id: string) {
     const endpoint = `${this.endpoints.delete_contact.replace(':id', id)}`;
-    return this.endpointService.deleteEndpoint<ContactReponse>(endpoint);
+    return this.endpointService.deleteEndpoint(endpoint);
   }
   deleteContacts(id: string[]) {
     const endpoint = this.endpoints.delete_contacts;
-    return this.endpointService.postEndpoint<ContactReponse>(endpoint, id);
+    return this.endpointService.postEndpoint(endpoint, id);
+  }
+
+  countContactByLeadSource() {
+    const endpoint = this.endpoints.chart_contacts;
+    return this.endpointService.fetchEndpoint<LeadSourceStatResponse[]>(
+      endpoint,
+    );
   }
 }

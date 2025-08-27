@@ -20,6 +20,7 @@ export const getEndpoints = () => {
         download_contact: `${environment.baseURL}/contacts/download`,
         create_contacts: `${environment.baseURL}/multiple-contact`,
         delete_contacts: `${environment.baseURL}/delete/multiple-contact`,
+        chart_contacts: `${environment.baseURL}/chart`,
       },
     },
 
@@ -38,7 +39,7 @@ export const getEndpoints = () => {
       v1: {
         signIn: `${environment.baseURL}/auth/sign-in`,
 
-        resetToken: `${environment.baseURL}/reset-token`,
+        resetToken: `${environment.baseURL}/auth/reset-token`,
       },
     },
   } as const;

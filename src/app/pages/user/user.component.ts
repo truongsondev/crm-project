@@ -17,7 +17,7 @@ import { UserService } from '@app/services/user.service';
 import { User } from '@app/interfaces/user.interface';
 import { HeaderColumn } from '@app/custom-types/shared.type';
 import { ModalDiaLogComponent } from '@app/shared-components/modal/modal.component';
-import { UserForm } from '@app/pages/user/components/user-form/user.form';
+import { UserForm } from './components/user-form/user.component';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import {
   FormControl,
@@ -40,7 +40,9 @@ import { getEndpoints } from '@app/constants/endpoints.constant';
 import { ButtonComponent } from '@app/shared-components/button/button.component';
 import { ACTION } from '@app/constants/shared.constant';
 import { OPENDED_FORM_ENUM } from '@app/enums/shared.enum';
-import { UserFilterComponent } from './components/user-filter/user-filter.filter';
+import { UserFilterComponent } from './components/user-filter/user-filter.component';
+import { BehaviorSubject, map, Observable } from 'rxjs';
+import { combineLatestWith } from 'rxjs/operators';
 @Component({
   standalone: true,
   selector: 'user-management',
@@ -51,7 +53,6 @@ import { UserFilterComponent } from './components/user-filter/user-filter.filter
     FormsModule,
     ReactiveFormsModule,
     SearchComponent,
-
     MatMenuModule,
     MatButtonModule,
     MatDialogModule,
@@ -65,7 +66,7 @@ import { UserFilterComponent } from './components/user-filter/user-filter.filter
   ],
 })
 export class UserManagementComponent implements AfterViewInit {
-  users: User[] = [];
+  userList: User[] = [];
   mySearch: string = 'user/email';
   pageSize = ITEM_OF_PAGE;
   pageIndex = 0;
@@ -76,10 +77,6 @@ export class UserManagementComponent implements AfterViewInit {
     this.pageSize = event.pageSize;
   }
 
-  readonly range = new FormGroup({
-    start: new FormControl<Date | null>(null),
-    end: new FormControl<Date | null>(null),
-  });
   displayedColumns: string[] = DISPLAY_COLUMN_ROLE;
   columnDefs: HeaderColumn[] = COLUMN_DEFS;
   displayRole = DISPLAY_ROLES;
@@ -87,33 +84,41 @@ export class UserManagementComponent implements AfterViewInit {
   dataSource!: MatTableDataSource<User>;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+
   onSearch(searchKeyword: string) {
+    // const searchSubject: BehaviorSubject<{ searchKeyword: string }> =
+    //   new BehaviorSubject<{ searchKeyword: string }>({
+    //     searchKeyword: searchKeyword,
+    //   });
+    // this.getListUser(searchSubject);
+    // this.getListUser();
     this.userService.getListUser().subscribe({
       next: (data) => {
-        const { users } = data;
+        const users = data;
         if (searchKeyword !== '') {
-          this.users = users.filter(
-            (u) =>
+          this.userList = users.filter(
+            (u: any) =>
               u.username?.includes(searchKeyword.trim()) ||
               u.email.includes(searchKeyword.trim()),
           );
         } else {
-          this.users = users;
+          this.userList = users;
         }
-        this.dataSource.data = this.users;
+        this.dataSource.data = this.userList;
       },
       error: (err) => {
         this.snackbarservice.openSnackBar('Search failed: ' + err.message);
       },
     });
   }
+
   constructor(
     private userService: UserService,
     private snackbarservice: SnackbarService,
     private modalService: ModalService,
     private fileService: FileService,
   ) {
-    this.dataSource = new MatTableDataSource(this.users);
+    this.dataSource = new MatTableDataSource(this.userList);
   }
 
   ngAfterViewInit() {
@@ -121,25 +126,65 @@ export class UserManagementComponent implements AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
-  applyFilter(event: Event) {
-    const { value } = event.target as HTMLInputElement;
-    const filterValue = value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-  }
-
   ngOnInit() {
     this.getListUser();
   }
 
-  getListUser() {
-    this.userService.getListUser().subscribe((data) => {
-      const { users } = data;
-      this.users = users;
-      this.dataSource.data = users;
+  getListUser(filterVal?: BehaviorSubject<any>) {
+    const user$ = this.userService.getListUser();
+    let result$: Observable<User[]> = user$;
+    if (filterVal) {
+      result$ = filterVal.pipe(
+        combineLatestWith(user$),
+        map(
+          ([
+            {
+              role,
+              createdDateFrom,
+              createdDateTo,
+              updatedDateFrom,
+              updatedDateTo,
+              // searchKeyword,
+            },
+            userData,
+          ]) => {
+            const sourceData = userData.filter((user: User) => {
+              return (
+                (role ? user.role === role : true) &&
+                (createdDateFrom
+                  ? new Date(user.created_on) >= createdDateFrom
+                  : true) &&
+                (createdDateTo
+                  ? new Date(user.created_on) <= createdDateTo
+                  : true) &&
+                (updatedDateFrom
+                  ? new Date(user.updated_on) >= updatedDateFrom
+                  : true) &&
+                (updatedDateTo
+                  ? new Date(user.updated_on) <= updatedDateTo
+                  : true)
+                //   &&
+                // (!searchKeyword ||
+                //   user.username
+                //     ?.toLowerCase()
+                //     .includes(searchKeyword.trim().toLowerCase()) ||
+                //   user.email
+                //     .toLowerCase()
+                //     .includes(searchKeyword.trim().toLowerCase()))
+              );
+            });
+            return sourceData;
+          },
+        ),
+      );
+    }
+
+    result$.subscribe((data: User[]) => {
+      if (data) {
+        const users = data;
+        this.userList = users;
+        this.dataSource.data = users;
+      }
     });
   }
 
@@ -148,34 +193,34 @@ export class UserManagementComponent implements AfterViewInit {
       .openModal(ModalDiaLogComponent, SelectOptioncomponent, 'Select option', {
         action: ACTION.SELECT,
         dataSelected: null,
-        dataList: this.users,
+        dataList: this.userList,
         message: '',
         from: OPENDED_FORM_ENUM.USER_MANAGEMENT,
       })
       .subscribe((res) => {
-        if (res.isSubmit === true) {
-          this.getListUser();
-        }
-      });
-  }
-  onRowClick(row: User) {
-    this.modalService
-      .openModal(ModalDiaLogComponent, UserForm, 'Edit user', {
-        action: ACTION.UPDATE,
-        dataSelected: row,
-        dataList: this.users,
-        message: '',
-        from: OPENDED_FORM_ENUM.USER_MANAGEMENT,
-      })
-      .subscribe((res) => {
-        console.log(res.isSubmit);
-        if (res.isSubmit === true) {
+        if (res && res.isSubmit === true) {
           this.getListUser();
         }
       });
   }
 
-  openFilter() {
+  onRowClick(row: User) {
+    this.modalService
+      .openModal(ModalDiaLogComponent, UserForm, 'Edit user', {
+        action: ACTION.UPDATE,
+        dataSelected: row,
+        dataList: this.userList,
+        message: '',
+        from: OPENDED_FORM_ENUM.USER_MANAGEMENT,
+      })
+      .subscribe((res) => {
+        if (res && res.isSubmit === true) {
+          this.getListUser();
+        }
+      });
+  }
+
+  openFilterModal() {
     this.modalService
       .openModal(ModalDiaLogComponent, UserFilterComponent, 'Filter by', {
         action: ACTION.NONE,
@@ -186,8 +231,7 @@ export class UserManagementComponent implements AfterViewInit {
       })
       .subscribe((result) => {
         if (result) {
-          this.users = result.users;
-          this.dataSource.data = result.users;
+          this.getListUser(result.filterSubject);
         }
       });
   }

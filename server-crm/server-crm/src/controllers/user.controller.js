@@ -6,10 +6,7 @@ class UserController {
   static getListUser = async (req, res, next) => {
     try {
       const users = await UserSerivice.getListUser();
-      res.status(200).json({
-        code: 200000,
-        users: users,
-      });
+      res.status(200).json(users);
     } catch (err) {
       next(err);
     }
@@ -52,16 +49,6 @@ class UserController {
       });
     } catch (e) {
       console.log(e);
-    }
-  };
-
-  static signIn = async (req, res, next) => {
-    try {
-      const { user_name, password } = req.body;
-      const response = await AuthService.signIn({ user_name, password });
-      return new OKE({ data: response }).send(res);
-    } catch (e) {
-      next(e);
     }
   };
 

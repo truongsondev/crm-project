@@ -13,9 +13,9 @@ import {
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
 import { FormData } from '@app/interfaces/user-form-data.interface';
-import { ContactFilterComponent } from '@app/pages/contact/components/contact-filter/contact.filter';
-import { SalesOrderFilterComponent } from '@app/pages/salesOrder/components/sales-order-filter/sales-order.filter';
-import { UserFilterComponent } from '@app/pages/user/components/user-filter/user-filter.filter';
+import { ContactFilterComponent } from '@app/pages/contact/components/contact-filter/contact.component';
+import { SalesOrderFilterComponent } from '@app/pages/salesOrder/components/sales-order-filter/sales-order.component';
+import { UserFilterComponent } from '@app/pages/user/components/user-filter/user-filter.component';
 import { ButtonComponent } from '../button/button.component';
 import { ConfirmActionComponent } from '../confirm-action/confirm-action.component';
 import { ErrorComponent } from '../error/error.component';

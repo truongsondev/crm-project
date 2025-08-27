@@ -1,6 +1,6 @@
 import UserRepo from "../repositories/user.repo.js";
 import { generateKeyPairSync } from "crypto";
-import { createTokenPair } from "../jwt/token.js";
+import { createTokenPair, verifyToken } from "../jwt/token.js";
 import { AuthorizedError, NotFoundError } from "../http/error.http.js";
 
 // const mockUsers = [
@@ -137,12 +137,12 @@ class AuthService {
     const user = await UserRepo.findUser({ user_name });
     console.log(user);
     if (!user) {
-      throw new NotFoundError((message = "User not found"));
+      throw new NotFoundError("User not found");
     }
     const matchPassword = password === user.password;
 
     if (!matchPassword) {
-      throw new AuthorizedError({ message: "Incorrect password" });
+      throw new AuthorizedError("Incorrect password");
     }
 
     const { publicKey, privateKey } = generateKeyPairSync("rsa", {
@@ -160,8 +160,6 @@ class AuthService {
     );
     const saveUser = await UserRepo.updateUser({
       _id: user._id,
-      accessToken,
-      refreshToken,
       publicKeyString,
     });
     if (!saveUser) {
@@ -175,10 +173,46 @@ class AuthService {
       },
     };
   }
-  static async signUp(user_name = "user", password = "Lson123456@") {
-    // const users = await UserRepo.createUsers(mockUsers);
-    // const user = await UserRepo.createUser({ user_name, password });
-    // console.log("user::::", users);
+  static async resetToken(refreshTokenOfuser, _id) {
+    console.log("refreshTokenOfuser:::", refreshTokenOfuser);
+    const token = refreshTokenOfuser.split(" ")[1];
+    const user = await UserRepo.findUserbyId(_id);
+    if (!user) {
+      throw new AuthorizedError("Invalid user. Please log in again");
+    }
+    const publicKeyOfUser = user.public_key;
+    const isValid = verifyToken(token, publicKeyOfUser);
+    console.log(isValid);
+    if (!isValid) {
+      {
+        throw new AuthorizedError("Invalid token. Please log in again");
+      }
+    }
+
+    const { publicKey, privateKey } = generateKeyPairSync("rsa", {
+      modulusLength: 2048,
+    });
+    const publicKeyString = publicKey
+      .export({ type: "pkcs1", format: "pem" })
+      .toString();
+    const { accessToken, refreshToken } = createTokenPair(
+      {
+        _id: user._id,
+      },
+      publicKeyString,
+      privateKey
+    );
+    await UserRepo.updateUser({
+      _id: user._id,
+      publicKeyString,
+    });
+    return {
+      user: user,
+      token: {
+        accessToken,
+        refreshToken,
+      },
+    };
   }
 }
 

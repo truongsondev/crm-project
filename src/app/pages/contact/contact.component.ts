@@ -15,7 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ModalDiaLogComponent } from '@app/shared-components/modal/modal.component';
-import { ContactForm } from '@app/pages/contact/components/contact-form/contact.form';
+import { ContactForm } from '@app/pages/contact/components/contact-form/contact.component';
 import { User } from '@app/interfaces/user.interface';
 import { UserService } from '@app/services/user.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -29,7 +29,8 @@ import { SelectOptioncomponent } from '@app/shared-components/select-option/sele
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@app/shared-components/button/button.component';
 import { OPENDED_FORM_ENUM } from '@app/enums/shared.enum';
-import { ContactFilterComponent } from './components/contact-filter/contact.filter';
+import { ContactFilterComponent } from './components/contact-filter/contact.component';
+import { combineLatestWith, map, Observable } from 'rxjs';
 
 @Component({
   selector: 'contact-component',
@@ -50,7 +51,7 @@ import { ContactFilterComponent } from './components/contact-filter/contact.filt
   providers: [DatePipe],
 })
 export class ContactComponent {
-  contacts: Contact[] = [];
+  contactList: Contact[] = [];
   mySearch: string = 'contact name';
   users: User[] = [];
   pageSize = ITEM_OF_PAGE;
@@ -59,7 +60,7 @@ export class ContactComponent {
   Math = Math;
   listDelete: string[] = [];
   allSelected = false;
-  dataSource!: MatTableDataSource<Contact>;
+  dataSource = new MatTableDataSource<Contact>();
   displayedColumns: string[] = [
     'all',
     'contact_name',
@@ -85,16 +86,16 @@ export class ContactComponent {
   onSearch(searchKeyword: string) {
     this.contactService.getListContact().subscribe({
       next: (data) => {
-        const { contacts } = data;
+        const contacts = data;
 
         if (searchKeyword !== '') {
-          this.contacts = contacts.filter((u) =>
+          this.contactList = contacts.filter((u) =>
             u.contact_name?.includes(searchKeyword.trim()),
           );
         } else {
-          this.contacts = contacts;
+          this.contactList = contacts;
         }
-        this.dataSource.data = this.contacts;
+        this.dataSource.data = this.contactList;
       },
       error: (err) => {
         this.snackbarservice.openSnackBar('Search failed: ' + err.message);
@@ -112,24 +113,59 @@ export class ContactComponent {
   ngOnInit() {
     this.getListContact();
     this.userService.getListUser().subscribe((res) => {
-      const { users } = res;
+      const users = res;
       this.users = users;
     });
   }
 
-  getListContact() {
-    this.contactService.getListContact().subscribe((res) => {
-      const contactsRes = res.contacts;
-      this.contacts = contactsRes.map((contact) => {
-        return {
-          ...contact,
-          isChecked: false,
-        };
-      });
-      this.dataSource = new MatTableDataSource(this.contacts);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-      this.lengthDatasource = this.dataSource?.data?.length ?? 0;
+  getListContact(filterVal?: Observable<any>) {
+    const contacts$ = this.contactService.getListContact();
+    let result$: Observable<Contact[]> = contacts$;
+    if (filterVal) {
+      result$ = filterVal.pipe(
+        combineLatestWith(contacts$),
+        map(
+          ([
+            {
+              assignedTo,
+              leadSource,
+              createdDateFrom,
+              createdDateTo,
+              updatedDateFrom,
+              updatedDateTo,
+            },
+            contactData,
+          ]) => {
+            const source = contactData.filter((contact: Contact) => {
+              return (
+                (assignedTo ? contact.assigned_to === assignedTo : true) &&
+                (leadSource ? contact.lead_source === leadSource : true) &&
+                (createdDateFrom
+                  ? new Date(contact.created_on) >= createdDateFrom
+                  : true) &&
+                (createdDateTo
+                  ? new Date(contact.created_on) <= createdDateTo
+                  : true) &&
+                (updatedDateFrom
+                  ? new Date(contact.updated_on) >= updatedDateFrom
+                  : true) &&
+                (updatedDateTo
+                  ? new Date(contact.updated_on) <= updatedDateTo
+                  : true)
+              );
+            });
+            return source;
+          },
+        ),
+      );
+    }
+    result$.subscribe((data: Contact[]) => {
+      if (data) {
+        const contacts = data;
+
+        this.contactList = contacts;
+        this.dataSource.data = contacts;
+      }
     });
   }
 
@@ -154,16 +190,16 @@ export class ContactComponent {
   }
 
   onRowChange() {
-    this.allSelected = this.contacts.every((c) => c.isChecked);
-    this.listDelete = this.contacts
+    this.allSelected = this.contactList.every((c) => c.isChecked);
+    this.listDelete = this.contactList
       .filter((c) => c.isChecked)
       .map((c) => c._id);
   }
   selectAllContacts(checked: boolean) {
-    this.contacts.forEach((contact) => (contact.isChecked = checked));
+    this.contactList.forEach((contact) => (contact.isChecked = checked));
 
     if (checked) {
-      this.listDelete = this.contacts.map((contact) => contact._id);
+      this.listDelete = this.contactList.map((contact) => contact._id);
     } else {
       this.listDelete = [];
     }
@@ -201,8 +237,7 @@ export class ContactComponent {
         from: OPENDED_FORM_ENUM.CONTACT,
       })
       .subscribe((res) => {
-        this.contacts = res.contacts;
-        this.dataSource.data = this.contacts;
+        this.getListContact(res.filterSubject);
       });
   }
   openDialog() {
@@ -210,12 +245,12 @@ export class ContactComponent {
       .openModal(ModalDiaLogComponent, SelectOptioncomponent, 'Select option', {
         action: 'select',
         dataSelected: null,
-        dataList: this.contacts,
+        dataList: this.contactList,
         message: '',
         from: OPENDED_FORM_ENUM.CONTACT,
       })
       .subscribe((res) => {
-        if (res.isSubmit === true) {
+        if (res && res.isSubmit === true) {
           this.getListContact();
         }
       });
@@ -226,12 +261,12 @@ export class ContactComponent {
       .openModal(ModalDiaLogComponent, ContactForm, 'Edit contact', {
         action: 'update',
         dataSelected: row,
-        dataList: this.contacts,
+        dataList: this.contactList,
         message: '',
         from: OPENDED_FORM_ENUM.CONTACT,
       })
       .subscribe((res) => {
-        if (res.isSubmit === true) {
+        if (res && res.isSubmit === true) {
           this.getListContact();
         }
       });
@@ -246,13 +281,13 @@ export class ContactComponent {
         {
           action: ACTION.NONE,
           dataSelected: row,
-          dataList: this.contacts,
+          dataList: this.contactList,
           message: '',
           from: OPENDED_FORM_ENUM.CONTACT,
         },
       )
       .subscribe((res) => {
-        if (res.isSubmit === true) {
+        if (res && res.isSubmit === true) {
           this.getListContact();
         }
       });

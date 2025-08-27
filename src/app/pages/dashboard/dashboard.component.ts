@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { LEAD_SOURCE } from '@app/constants/shared.constant';
 import { Contact } from '@app/interfaces/contact.interface';
 import { SalesOrder } from '@app/interfaces/sales-order.interface';
 import { CommonService } from '@app/services/common.service';
@@ -10,7 +11,7 @@ import { SnackbarService } from '@app/services/snackbar.service';
 
 import { ChartData, ChartOptions, ChartEvent, ActiveElement } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-
+import { LeadSourceStatResponse } from '@app/interfaces/response.interface';
 @Component({
   standalone: true,
   selector: 'dashboard-component',
@@ -23,33 +24,25 @@ export class DashboardComponet {
   totalIncome: number = 0;
   listSalesOrders: SalesOrder[] = [];
   listContacts: Contact[] = [];
+  leadSourceStat: LeadSourceStatResponse[] = [];
 
   currentRole = '';
-  data: { year: number; count: number }[] = [
-    { year: 2010, count: 10 },
-    { year: 2011, count: 20 },
-    { year: 2012, count: 15 },
-    { year: 2013, count: 25 },
-    { year: 2014, count: 22 },
-    { year: 2015, count: 30 },
-    { year: 2016, count: 28 },
-  ];
 
   salesStatusChartData: ChartData<'bar'> = {
-    labels: this.data.map((row) => row.year),
+    labels: this.leadSourceStat.map((item) => item.lead_source),
     datasets: [
       {
         label: '',
-        data: this.data.map((row) => row.count),
+        data: this.leadSourceStat.map((item) => item.count),
       },
     ],
   };
 
   contactSourceChartData: ChartData<'bar'> = {
-    labels: this.data.map((row) => row.year),
+    labels: this.leadSourceStat.map((item) => item.lead_source),
     datasets: [
       {
-        data: this.data.map((row) => row.count),
+        data: this.leadSourceStat.map((item) => item.count),
       },
     ],
   };
@@ -71,9 +64,53 @@ export class DashboardComponet {
   ) {}
 
   ngOnInit() {
+    this.getRole();
+  }
+
+  ngAfterViewInit() {
     this.getListContacts();
     this.getListSalesOrders();
-    this.getRole();
+    this.getStatLeadSource();
+  }
+
+  setDataForContactSource() {
+    return {
+      labels: this.leadSourceStat.map((item) => item.lead_source),
+      datasets: [
+        {
+          data: this.leadSourceStat.map((item) => item.count),
+        },
+      ],
+    };
+  }
+
+  getStatLeadSource() {
+    this.contactService.countContactByLeadSource().subscribe((res) => {
+      console.log(res);
+      const stats = [...res];
+
+      this.leadSourceStat = LEAD_SOURCE.map((source) => {
+        const found = stats.find((x) => x.lead_source === source);
+        return found ? found : { lead_source: source, count: 0 };
+      });
+      this.contactSourceChartData = {
+        labels: this.leadSourceStat.map((item) => item.lead_source),
+        datasets: [
+          {
+            data: this.leadSourceStat.map((item) => item.count),
+            backgroundColor: [
+              '#10b981',
+              '#3b82f6',
+              '#f59e0b',
+              '#ec4899',
+              '#8b5cf6',
+              '#ef4444',
+            ],
+          },
+        ],
+      };
+      console.log(this.leadSourceStat);
+    });
   }
 
   getRole() {
@@ -83,7 +120,7 @@ export class DashboardComponet {
 
   getListSalesOrders() {
     this.salesOrderService.getListSalesOrder().subscribe((res) => {
-      const saleOrder = res?.salesOrder;
+      const saleOrder = res;
       if (!saleOrder) {
         this.snackbarService.openSnackBar('Not found sales order');
         return;
@@ -110,7 +147,7 @@ export class DashboardComponet {
 
   getListContacts() {
     this.contactService.getListContact().subscribe((res) => {
-      const contacts = res?.contacts;
+      const contacts = res;
       if (!contacts) {
         this.snackbarService.openSnackBar('Not found contacts');
         return;

@@ -18,13 +18,14 @@ export class AuthService {
     );
   }
 
-  resetToken(rt: string) {
+  resetToken(rt: string, id: string) {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${rt}`,
     });
+    const body = { id };
     return this.endpointService.postEndpoint<TokenResponse>(
       this.endpoints.resetToken,
-      {},
+      body,
       { headers },
     );
   }

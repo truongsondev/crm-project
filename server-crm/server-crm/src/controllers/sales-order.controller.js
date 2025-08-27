@@ -4,9 +4,7 @@ export class SalesOrderController {
   static getListSalesOrder = async (req, res, next) => {
     try {
       const responseData = await SalesOrderService.getListSalesOrder();
-      res.status(200).json({
-        salesOrder: responseData,
-      });
+      res.status(200).json(responseData);
     } catch (e) {
       next(e);
     }

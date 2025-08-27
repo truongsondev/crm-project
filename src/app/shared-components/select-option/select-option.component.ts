@@ -1,8 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { ContactForm } from '@app/pages/contact/components/contact-form/contact.form';
-import { SalesOrderForm } from '@app/pages/salesOrder/components/salesorder-form/sales-order.form';
-import { UserForm } from '@app/pages/user/components/user-form/user.form';
+import { ContactForm } from '@app/pages/contact/components/contact-form/contact.component';
+import { SalesOrderForm } from '@app/pages/salesOrder/components/salesorder-form/sales-order.component';
+import { UserForm } from '@app/pages/user/components/user-form/user.component';
 import { ContactService } from '@app/services/contact.service';
 import { ModalService } from '@app/services/modal.service';
 import { SnackbarService } from '@app/services/snackbar.service';

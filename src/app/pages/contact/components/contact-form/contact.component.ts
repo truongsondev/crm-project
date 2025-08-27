@@ -23,14 +23,14 @@ import { LEAD_SOURCE, SALUTATION } from '@app/constants/shared.constant';
 import { ContactService } from '@app/services/contact.service';
 
 import { MatDialogRef } from '@angular/material/dialog';
-import { UserForm } from '../../../user/components/user-form/user.form';
+import { UserForm } from '../../../user/components/user-form/user.component';
 import { SnackbarService } from '@app/services/snackbar.service';
 import { CommonService } from '@app/services/common.service';
 import { ROLE_TYPE } from '@app/enums/shared.enum';
 
 @Component({
   selector: 'contact-form',
-  templateUrl: './contact.form.html',
+  templateUrl: './contact.component.html',
   imports: [
     MatFormFieldModule,
     MatInputModule,
@@ -105,7 +105,7 @@ export class ContactForm {
     const role = this.getRole();
     if (!role) return;
     this.userService.getListUser().subscribe((data) => {
-      const { users } = data;
+      const users = data;
       if (role === ROLE_TYPE.USER_ADMIN || role === ROLE_TYPE.CONTACT_MGR) {
         this.listAssign = users.filter((item) =>
           [

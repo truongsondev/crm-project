@@ -66,10 +66,7 @@ export class ContactService {
           };
         })
       );
-      return {
-        code: 200000,
-        contacts,
-      };
+      return contacts;
     } catch (e) {
       next(e);
     }
@@ -158,4 +155,8 @@ export class ContactService {
       fileName,
     };
   };
+
+  static async countContactByLeadSource() {
+    return await ContactRepo.countContactByLeadSource();
+  }
 }

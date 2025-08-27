@@ -91,4 +91,14 @@ export class ContactController {
       next(e);
     }
   };
+
+  static async countContactByLeadSource(req, res, next) {
+    try {
+      const response = await ContactService.countContactByLeadSource();
+      console.log("response:::", response);
+      res.status(200).json(response);
+    } catch (e) {
+      next(e);
+    }
+  }
 }

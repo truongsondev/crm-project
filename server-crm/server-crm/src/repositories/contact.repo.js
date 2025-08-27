@@ -37,4 +37,22 @@ export class ContactRepo {
       return null;
     }
   }
+
+  static async countContactByLeadSource() {
+    return await Contact.aggregate([
+      {
+        $group: {
+          _id: "$lead_source",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          lead_source: "$_id",
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+  }
 }

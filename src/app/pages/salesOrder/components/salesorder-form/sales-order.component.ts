@@ -27,7 +27,7 @@ import { ACTION, STATUSOPTION } from '@app/constants/shared.constant';
 @Component({
   standalone: true,
   selector: 'sales-order-form',
-  templateUrl: './sales-order.form.html',
+  templateUrl: './sales-order.component.html',
   imports: [
     MatFormFieldModule,
     MatInputModule,
@@ -127,7 +127,7 @@ export class SalesOrderForm implements OnInit {
       this.salseOrderService
         .updateSalesOrder(this.salesOrder.dataSelected?._id || '', newDataform)
         .subscribe({
-          next: (res) => {
+          next: () => {
             this.snackbarService.openSnackBar('Update success');
             this.dialogRef.close({
               isSubmit: true,
@@ -150,7 +150,7 @@ export class SalesOrderForm implements OnInit {
     const role = creator.role;
     this.listAssign$ = this.userService.getListUser().pipe(
       map((res) => {
-        const { users } = res;
+        const users = res;
         if (role === ROLE_TYPE.USER_ADMIN || role === ROLE_TYPE.CONTACT_MGR) {
           return users.filter((item) =>
             [
@@ -171,6 +171,6 @@ export class SalesOrderForm implements OnInit {
   getListContact() {
     this.listContact$ = this.contactService
       .getListContact()
-      .pipe(map((res) => res.contacts));
+      .pipe(map((res) => res));
   }
 }

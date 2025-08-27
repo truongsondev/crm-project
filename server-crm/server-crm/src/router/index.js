@@ -1,4 +1,5 @@
 import express from "express";
+import { AuthController } from "../controllers/auth.controller.js";
 import { ContactController } from "../controllers/contact.controller.js";
 import { SalesOrderController } from "../controllers/sales-order.controller.js";
 import { TokenController } from "../controllers/token.controller.js";
@@ -18,7 +19,8 @@ router.post("/multiple-user", UserController.createUsers);
 router.put("/users/:id", UserController.updateUser);
 router.get("/users/download", UserController.exportToFileCSV);
 
-router.post("/auth/sign-in", UserController.signIn);
+router.post("/auth/sign-in", AuthController.signIn);
+router.post("/auth/reset-token", AuthController.resetToken);
 
 router.get("/contacts", ContactController.getListContacts);
 router.post("/contacts", ContactController.createContact);
@@ -27,6 +29,7 @@ router.delete("/contacts/delete/:id", ContactController.deleteContact);
 router.get("/contacts/download", ContactController.exportToFileCSV);
 router.post("/multiple-contact", ContactController.createContacts);
 router.post("/delete/multiple-contact", ContactController.deleteContacts);
+router.get("/chart", ContactController.countContactByLeadSource);
 
 router.get("/sales-order", SalesOrderController.getListSalesOrder);
 router.post("/create-sales-order", SalesOrderController.createSaleOrder);

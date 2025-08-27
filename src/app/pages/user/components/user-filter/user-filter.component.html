@@ -1,4 +1,4 @@
-<form [formGroup]="filterFormUser" class="flex flex-col gap-6">
+<form [formGroup]="userFilterForm" class="flex flex-col gap-6">
   <mat-form-field class="block w-full">
     <mat-label>Role</mat-label>
     <mat-select formControlName="role">
@@ -9,43 +9,47 @@
   </mat-form-field>
 
   <mat-form-field>
-    <mat-label>Created time</mat-label>
-    <mat-date-range-input [rangePicker]="picker">
+    <mat-label>Created date</mat-label>
+    <mat-date-range-input [rangePicker]="createdDatePicker">
       <input
         matStartDate
         placeholder="Start date"
-        formControlName="createStartDate"
+        formControlName="createdStartDate"
       />
       <input
         matEndDate
         placeholder="End date"
-        formControlName="createEndDate"
-      />
-    </mat-date-range-input>
-    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-date-range-picker #picker></mat-date-range-picker>
-  </mat-form-field>
-
-  <mat-form-field>
-    <mat-label>Updated time</mat-label>
-    <mat-date-range-input [rangePicker]="updatedPicker">
-      <input
-        matStartDate
-        placeholder="Start date"
-        formControlName="updateStartDate"
-      />
-      <input
-        matEndDate
-        placeholder="End date"
-        formControlName="updateEndDate"
+        formControlName="createdEndDate"
       />
     </mat-date-range-input>
     <mat-datepicker-toggle
       matIconSuffix
-      [for]="updatedPicker"
+      [for]="createdDatePicker"
     ></mat-datepicker-toggle>
-    <mat-date-range-picker #updatedPicker></mat-date-range-picker>
+    <mat-date-range-picker #createdDatePicker></mat-date-range-picker>
   </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Updated date</mat-label>
+    <mat-date-range-input [rangePicker]="updatedDatePicker">
+      <input
+        matStartDate
+        placeholder="Start date"
+        formControlName="updatedStartDate"
+      />
+      <input
+        matEndDate
+        placeholder="End date"
+        formControlName="updatedEndDate"
+      />
+    </mat-date-range-input>
+    <mat-datepicker-toggle
+      matIconSuffix
+      [for]="updatedDatePicker"
+    ></mat-datepicker-toggle>
+    <mat-date-range-picker #updatedDatePicker></mat-date-range-picker>
+  </mat-form-field>
+
   <div class="flex flex-row justify-between items-center">
     <button-component
       [textBt]="'Cancel'"
@@ -55,7 +59,7 @@
     <button-component
       [textBt]="'Submit'"
       [className]="'bg-teal-400 text-white'"
-      (click)="onSubmit()"
+      (click)="applyFilter()"
     />
   </div>
 </form>

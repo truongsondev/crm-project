@@ -15,7 +15,7 @@ import { getEndpoints } from '@app/constants/endpoints.constant';
 import { ACTION, ITEM_OF_PAGE } from '@app/constants/shared.constant';
 import { HeaderColumn } from '@app/custom-types/shared.type';
 import { OPENDED_FORM_ENUM } from '@app/enums/shared.enum';
-import { SalesOrderForm } from '@app/pages/salesOrder/components/salesorder-form/sales-order.form';
+import { SalesOrderForm } from '@app/pages/salesOrder/components/salesorder-form/sales-order.component';
 import { SalesOrder } from '@app/interfaces/sales-order.interface';
 import { FileService } from '@app/services/file.service';
 import { ModalService } from '@app/services/modal.service';
@@ -26,7 +26,9 @@ import { ConfirmActionComponent } from '@app/shared-components/confirm-action/co
 import { ModalDiaLogComponent } from '@app/shared-components/modal/modal.component';
 import { SearchComponent } from '@app/shared-components/search/search.component';
 import { SelectOptioncomponent } from '@app/shared-components/select-option/select-option.component';
-import { SalesOrderFilterComponent } from './components/sales-order-filter/sales-order.filter';
+import { SalesOrderFilterComponent } from './components/sales-order-filter/sales-order.component';
+import { combineLatestWith, map, Observable } from 'rxjs';
+import { Contact } from '@app/interfaces/contact.interface';
 @Component({
   standalone: true,
   selector: 'sale-order-component',
@@ -50,9 +52,9 @@ import { SalesOrderFilterComponent } from './components/sales-order-filter/sales
   ],
 })
 export class SaleOrderComponet {
+  salesOrderList: SalesOrder[] = [];
   pageSize: number = ITEM_OF_PAGE;
-  salesOrder: SalesOrder[] = [];
-  dataSource!: MatTableDataSource<SalesOrder>;
+  dataSource = new MatTableDataSource<SalesOrder>();
   lengthDatasource: number = 0;
   allSelected: Boolean = false;
   listDelete: string[] = [];
@@ -93,41 +95,77 @@ export class SaleOrderComponet {
     this.getListSalesOrder();
   }
 
-  getListSalesOrder() {
-    this.salesOrderService.getListSalesOrder().subscribe({
-      next: (res) => {
-        if (res && res.salesOrder) {
-          const { salesOrder } = res;
-          this.salesOrder = salesOrder.map((saleOrder) => {
-            return {
-              ...saleOrder,
-              isChecked: false,
-            };
-          });
-          console.log(salesOrder);
-          this.dataSource = new MatTableDataSource(this.salesOrder);
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
-          this.lengthDatasource = this.dataSource?.data?.length ?? 0;
-        }
-      },
+  getListSalesOrder(filterVal?: Observable<any>) {
+    const salesOrders$ = this.salesOrderService.getListSalesOrder();
+    let result$: Observable<SalesOrder[]> = salesOrders$;
+    console.log('filterVal:::', filterVal);
+
+    if (filterVal) {
+      result$ = filterVal.pipe(
+        combineLatestWith(salesOrders$),
+        map(
+          ([
+            {
+              assignedTo,
+              status,
+              createdDateFrom,
+              createdDateTo,
+              updatedDateFrom,
+              updatedDateTo,
+            },
+            salesOrdersData,
+          ]) => {
+            const sourceData = salesOrdersData.filter(
+              (salesOrder: SalesOrder) => {
+                return (
+                  (assignedTo ? salesOrder.assigned_to === assignedTo : true) &&
+                  (status ? salesOrder.status === status : true) &&
+                  (createdDateFrom
+                    ? new Date(salesOrder.created_on) >= createdDateFrom
+                    : true) &&
+                  (createdDateTo
+                    ? new Date(salesOrder.created_on) <= createdDateTo
+                    : true) &&
+                  (updatedDateFrom
+                    ? new Date(salesOrder.updated_on) >= updatedDateFrom
+                    : true) &&
+                  (updatedDateTo
+                    ? new Date(salesOrder.updated_on) <= updatedDateTo
+                    : true)
+                );
+              },
+            );
+
+            return sourceData;
+          },
+        ),
+      );
+    }
+
+    result$.subscribe((data: SalesOrder[]) => {
+      if (data) {
+        const salesOrders = data;
+
+        this.salesOrderList = salesOrders;
+        this.dataSource.data = salesOrders;
+      }
     });
   }
 
   onSearch(searchKeyword: string) {
     this.salesOrderService.getListSalesOrder().subscribe({
       next: (data) => {
-        const { salesOrder } = data;
+        const salesOrder = data;
         if (searchKeyword !== '') {
-          this.salesOrder = salesOrder.filter(
-            (u) =>
+          this.salesOrderList = salesOrder.filter(
+            (u: SalesOrder) =>
               u.subject?.includes(searchKeyword.trim()) ||
               u.order_number.includes(searchKeyword.trim()),
           );
         } else {
-          this.salesOrder = salesOrder;
+          this.salesOrderList = salesOrder;
         }
-        this.dataSource.data = this.salesOrder;
+        this.dataSource.data = this.salesOrderList;
       },
       error: (err) => {
         this.snackbarservice.openSnackBar('Search failed: ' + err.message);
@@ -140,12 +178,12 @@ export class SaleOrderComponet {
       .openModal(ModalDiaLogComponent, SelectOptioncomponent, 'Select option', {
         action: ACTION.SELECT,
         dataSelected: null,
-        dataList: this.salesOrder,
+        dataList: this.salesOrderList,
         message: '',
         from: OPENDED_FORM_ENUM.SALE_ORDER,
       })
       .subscribe((res) => {
-        if (res.isSubmit === true) {
+        if (res && res.isSubmit === true) {
           this.getListSalesOrder();
         }
       });
@@ -172,8 +210,7 @@ export class SaleOrderComponet {
         from: OPENDED_FORM_ENUM.SALE_ORDER,
       })
       .subscribe((res) => {
-        this.salesOrder = res.salesOrder;
-        this.dataSource.data = this.salesOrder;
+        this.getListSalesOrder(res.filterSubject);
       });
   }
 
@@ -194,7 +231,7 @@ export class SaleOrderComponet {
       .openModal(ModalDiaLogComponent, SalesOrderForm, 'Edit Sale Order', {
         action: ACTION.UPDATE,
         dataSelected: row,
-        dataList: this.salesOrder,
+        dataList: this.salesOrderList,
         message: '',
         from: OPENDED_FORM_ENUM.SALE_ORDER,
       })
@@ -214,13 +251,13 @@ export class SaleOrderComponet {
         {
           action: ACTION.NONE,
           dataSelected: row,
-          dataList: this.salesOrder,
+          dataList: this.salesOrderList,
           message: '',
           from: OPENDED_FORM_ENUM.SALE_ORDER,
         },
       )
       .subscribe((res) => {
-        if (res.isSubmit === true) {
+        if (res && res.isSubmit === true) {
           this.getListSalesOrder();
         }
       });
@@ -238,17 +275,17 @@ export class SaleOrderComponet {
   }
 
   onPageChange() {
-    this.allSelected = this.salesOrder.every((c) => c.isChecked);
-    this.listDelete = this.salesOrder
+    this.allSelected = this.salesOrderList.every((c) => c.isChecked);
+    this.listDelete = this.salesOrderList
       .filter((c) => c.isChecked)
       .map((c) => c._id);
   }
 
   selectAllSalesOrder(checked: boolean) {
-    this.salesOrder.forEach((saleOrder) => (saleOrder.isChecked = checked));
+    this.salesOrderList.forEach((saleOrder) => (saleOrder.isChecked = checked));
 
     if (checked) {
-      this.listDelete = this.salesOrder.map((contact) => contact._id);
+      this.listDelete = this.salesOrderList.map((contact) => contact._id);
     } else {
       this.listDelete = [];
     }

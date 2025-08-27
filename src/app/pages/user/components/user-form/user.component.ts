@@ -3,8 +3,6 @@ import {
   Component,
   signal,
   Inject,
-  EventEmitter,
-  Output,
 } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -36,7 +34,7 @@ import { UserValidator } from '@app/validators/user.validator';
 @Component({
   standalone: true,
   selector: 'user-form',
-  templateUrl: './user.form.html',
+  templateUrl: './user.component.html',
   imports: [
     MatFormFieldModule,
     MatInputModule,
@@ -50,10 +48,6 @@ import { UserValidator } from '@app/validators/user.validator';
     MatNativeDateModule,
     MatCheckboxModule,
     CommonModule,
-    MatFormFieldModule,
-    FormsModule,
-    MatInputModule,
-    MatButtonModule,
     MatIconModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -65,7 +59,6 @@ export class UserForm {
   isPasswordHidden = true;
   roles: SelectOption[] = ROLES;
   isChecked = true;
-  @Output() formSubmit = new EventEmitter<any>();
 
   isCheckedDate = true;
 
@@ -176,7 +169,7 @@ export class UserForm {
         this.userFormGroup.value;
       if (this.user.action === ACTION.CREATE) {
         this.userService.createUser(dataReq).subscribe({
-          next: (res) => {
+          next: () => {
             this.snackbarService.openSnackBar('Create user success');
             this.dialogRef.close({
               isSubmit: true,
@@ -190,7 +183,7 @@ export class UserForm {
         this.userService
           .updateUser(this.user.dataSelected?._id || '', dataReq)
           .subscribe({
-            next: (res) => {
+            next: () => {
               this.snackbarService.openSnackBar('update user success');
               this.dialogRef.close({
                 isSubmit: true,
