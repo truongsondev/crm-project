@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { LEAD_SOURCE } from '@app/constants/shared.constant';
+import { LEAD_SOURCE, STATUS_OPTION } from '@app/constants/shared.constant';
 import { Contact } from '@app/interfaces/contact.interface';
 import { SalesOrder } from '@app/interfaces/sales-order.interface';
 import { CommonService } from '@app/services/common.service';
@@ -11,7 +11,10 @@ import { SnackbarService } from '@app/services/snackbar.service';
 
 import { ChartData, ChartOptions, ChartEvent, ActiveElement } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { LeadSourceStatResponse } from '@app/interfaces/response.interface';
+import {
+  LeadSourceStatResponse,
+  StatusStatResponse,
+} from '@app/interfaces/response.interface';
 @Component({
   standalone: true,
   selector: 'dashboard-component',
@@ -25,27 +28,12 @@ export class DashboardComponet {
   listSalesOrders: SalesOrder[] = [];
   listContacts: Contact[] = [];
   leadSourceStat: LeadSourceStatResponse[] = [];
-
+  statusStat: StatusStatResponse[] = [];
   currentRole = '';
 
-  salesStatusChartData: ChartData<'bar'> = {
-    labels: this.leadSourceStat.map((item) => item.lead_source),
-    datasets: [
-      {
-        label: '',
-        data: this.leadSourceStat.map((item) => item.count),
-      },
-    ],
-  };
+  salesStatusChartData: ChartData<'bar'> = { labels: [], datasets: [] };
 
-  contactSourceChartData: ChartData<'bar'> = {
-    labels: this.leadSourceStat.map((item) => item.lead_source),
-    datasets: [
-      {
-        data: this.leadSourceStat.map((item) => item.count),
-      },
-    ],
-  };
+  contactSourceChartData: ChartData<'bar'> = { labels: [], datasets: [] };
   chartOptions: ChartOptions<'bar'> = {
     responsive: true,
     plugins: {
@@ -61,43 +49,33 @@ export class DashboardComponet {
     private snackbarService: SnackbarService,
     private router: Router,
     private commonService: CommonService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
     this.getRole();
-  }
-
-  ngAfterViewInit() {
     this.getListContacts();
     this.getListSalesOrders();
     this.getStatLeadSource();
-  }
-
-  setDataForContactSource() {
-    return {
-      labels: this.leadSourceStat.map((item) => item.lead_source),
-      datasets: [
-        {
-          data: this.leadSourceStat.map((item) => item.count),
-        },
-      ],
-    };
+    this.getStatStatus();
   }
 
   getStatLeadSource() {
     this.contactService.countContactByLeadSource().subscribe((res) => {
-      console.log(res);
-      const stats = [...res];
+      const statsContacts = [...res];
 
       this.leadSourceStat = LEAD_SOURCE.map((source) => {
-        const found = stats.find((x) => x.lead_source === source);
-        return found ? found : { lead_source: source, count: 0 };
+        const found = statsContacts.find(
+          (contact) => contact.lead_source === source,
+        );
+        return found ? found : { count: 0, lead_source: source };
       });
       this.contactSourceChartData = {
-        labels: this.leadSourceStat.map((item) => item.lead_source),
+        labels: this.leadSourceStat.map((contact) => contact.lead_source),
         datasets: [
           {
-            data: this.leadSourceStat.map((item) => item.count),
+            label: 'contact',
+            data: this.leadSourceStat.map((contact) => contact.count),
             backgroundColor: [
               '#10b981',
               '#3b82f6',
@@ -109,12 +87,40 @@ export class DashboardComponet {
           },
         ],
       };
-      console.log(this.leadSourceStat);
+    });
+  }
+
+  getStatStatus() {
+    this.salesOrderService.countSalesOrdersByLeadSource().subscribe((res) => {
+      const statsSalesOrders = [...res];
+      this.statusStat = STATUS_OPTION.map((source) => {
+        const found = statsSalesOrders.find(
+          (saleOrder) => saleOrder.status === source,
+        );
+        return found ? found : { count: 0, status: source };
+      });
+      this.salesStatusChartData = {
+        labels: this.statusStat.map((saleOrder) => saleOrder.status),
+        datasets: [
+          {
+            label: 'Sales Status',
+            data: this.statusStat.map((saleOrder) => saleOrder.count),
+            backgroundColor: [
+              '#10b981',
+              '#3b82f6',
+              '#f59e0b',
+              '#ec4899',
+              '#8b5cf6',
+              '#ef4444',
+            ],
+          },
+        ],
+      };
     });
   }
 
   getRole() {
-    const user = this.commonService.parseToJson();
+    const user = this.commonService.parseStringToJson('user');
     this.currentRole = user?.role;
   }
 
@@ -125,23 +131,19 @@ export class DashboardComponet {
         this.snackbarService.openSnackBar('Not found sales order');
         return;
       }
-      this.listSalesOrders = saleOrder;
+      this.listSalesOrders = saleOrder.sort((a, b) => {
+        return (
+          new Date(b.created_on).getTime() - new Date(a.created_on).getTime()
+        );
+      });
       this.totalSalesOrders = this.listSalesOrders.length;
       this.totalIncome = this.listSalesOrders.reduce(
         (sum, so) => sum + (so.total || 0),
         0,
       );
 
-      const grouped = this.groupBy(this.listSalesOrders, 'status');
-      this.salesStatusChartData = {
-        labels: Object.keys(grouped),
-        datasets: [
-          {
-            data: Object.values(grouped).map((arr: any) => arr.length),
-            backgroundColor: ['#6366f1', '#22c55e', '#f97316', '#ef4444'],
-          },
-        ],
-      };
+      //Change Detection không chạy lại sau khi dữ liệu async trả về.
+      this.cdr.detectChanges();
     });
   }
 
@@ -152,32 +154,14 @@ export class DashboardComponet {
         this.snackbarService.openSnackBar('Not found contacts');
         return;
       }
-      this.listContacts = contacts;
+      this.listContacts = contacts.sort((a, b) => {
+        return (
+          new Date(b.created_on).getTime() - new Date(a.created_on).getTime()
+        );
+      });
       this.totalContacts = this.listContacts.length;
-
-      const grouped = this.groupBy(this.listContacts, 'leadSource');
-      this.contactSourceChartData = {
-        labels: Object.keys(grouped),
-        datasets: [
-          {
-            data: Object.values(grouped).map((arr: any) => arr.length),
-            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ec4899'],
-          },
-        ],
-      };
+      this.cdr.detectChanges();
     });
-  }
-
-  private groupBy(arr: any[], key: string) {
-    return arr.reduce(
-      (acc, cur) => {
-        const val = cur[key] || 'Unknown';
-        if (!acc[val]) acc[val] = [];
-        acc[val].push(cur);
-        return acc;
-      },
-      {} as Record<string, any[]>,
-    );
   }
 
   onContactSourceClick(event: { event?: ChartEvent; active?: {}[] }) {

@@ -6,11 +6,13 @@ import { catchError, of, throwError } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 import { ModalService } from './modal.service';
 import { ERROR_MESSAGES } from '@app/constants/shared.constant';
+import { Router } from '@angular/router';
 @Injectable({ providedIn: 'root' })
 export class EndpointService {
   constructor(
     private http: HttpClient,
     private modalService: ModalService,
+    private router: Router,
   ) {}
   fetchEndpoint<T = any>(endpoint: string, options?: any): Observable<T> {
     return this.http
@@ -53,6 +55,21 @@ export class EndpointService {
       .pipe(catchError((err) => this.handleError<T>(err)));
   }
 
+  pactchEndpoint<T = any>(
+    endpoint: string,
+    reqBody: any,
+    options?: any,
+  ): Observable<T> {
+    return this.http
+      .patch<T>(endpoint, reqBody, {
+        observe: 'body',
+        ...options,
+      } as {
+        observe: 'body';
+      })
+      .pipe(catchError((err) => this.handleError<T>(err)));
+  }
+
   deleteEndpoint<T = any>(endpoint: string, options?: any): Observable<T> {
     return this.http
       .delete<T>(endpoint, {
@@ -72,7 +89,7 @@ export class EndpointService {
       {
         action: '',
         dataList: [],
-        dataSelected: null,
+        selectedRow: null,
         message: message,
         from: '',
       },
@@ -82,7 +99,12 @@ export class EndpointService {
   handleError<T>(error: HttpErrorResponse): Observable<T> {
     const httpStatus = error.status;
     const message = error.error.message;
-    console.log(error);
+
+    if (httpStatus === 406) {
+      console.log(httpStatus);
+      localStorage.clear();
+      this.router.navigate(['/auth/sign-in']);
+    }
     return this.showError(
       ERROR_MESSAGES[httpStatus].title || 'Invalid Error',
       message ||

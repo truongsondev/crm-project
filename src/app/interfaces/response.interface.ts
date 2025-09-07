@@ -1,6 +1,6 @@
 import { User } from './user.interface';
 
-export interface DataLoginResponse {
+export interface LoginResponse {
   message: string;
   data: {
     user: User;
@@ -11,7 +11,7 @@ export interface DataLoginResponse {
   };
 }
 
-export interface DataResponse {
+export interface FileImportResponse {
   failed: any[];
   success: any[];
 }
@@ -29,4 +29,9 @@ export interface TokenResponse {
 export interface LeadSourceStatResponse {
   count: number;
   lead_source: string;
+}
+
+export interface StatusStatResponse {
+  count: number;
+  status: string;
 }

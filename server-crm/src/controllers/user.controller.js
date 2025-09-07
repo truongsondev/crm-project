@@ -1,7 +1,5 @@
-import AuthService from "../services/auth.service.js";
 import UserSerivice from "../services/user.service.js";
 import fs from "fs";
-import { OKE, SuccessResponse } from "../http/success.http.js";
 class UserController {
   static getListUser = async (req, res, next) => {
     try {
@@ -15,7 +13,6 @@ class UserController {
   static createUser = async (req, res, next) => {
     try {
       const user = req.body;
-      console.log(user);
       const users = await UserSerivice.createUser(user);
       res.status(200).json({
         code: 200000,
@@ -44,7 +41,6 @@ class UserController {
       const user = req.body;
       const data = await UserSerivice.updateUser(id, user);
       res.status(200).json({
-        code: 200000,
         users: data,
       });
     } catch (e) {

@@ -4,4 +4,9 @@
     border-radius: 6px;
     background-color: #0099ff;
   }
+
+  .mat-mdc-snackbar-surface {
+    padding-right: 0;
+    background-color: white;
+  }
 }

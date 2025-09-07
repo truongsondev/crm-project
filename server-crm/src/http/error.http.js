@@ -3,12 +3,16 @@ const STATUS_CODE = {
   NOT_FOUND: 404,
   AUTHORIZED: 401,
   CONFLIC: 409,
+  NOT_FOUND_USER: 406,
+  BAD_REQUEST: 400,
 };
 const REASON_CODE = {
   FORBIDDEN: "Bad request",
   NOT_FOUND: "Data not found",
   AUTHORIZED: "Permission denied",
   CONFLIC: "Data conflict detected",
+  NOT_FOUND_USER: "User current doesn't exit",
+  BAD_REQUEST: "Request invalid",
 };
 export class ErrorResponse extends Error {
   constructor(message, status) {
@@ -40,6 +44,24 @@ export class AuthorizedError extends ErrorResponse {
 
 export class ConflicError extends ErrorResponse {
   constructor(message = REASON_CODE.CONFLIC, status = STATUS_CODE.CONFLIC) {
+    super(message, status);
+  }
+}
+
+export class NotFoundUser extends ErrorResponse {
+  constructor(
+    message = REASON_CODE.NOT_FOUND_USER,
+    status = STATUS_CODE.NOT_FOUND_USER
+  ) {
+    super(message, status);
+  }
+}
+
+export class BadRequestError extends ErrorResponse {
+  constructor(
+    message = REASON_CODE.BAD_REQUEST,
+    status = STATUS_CODE.BAD_REQUEST
+  ) {
     super(message, status);
   }
 }

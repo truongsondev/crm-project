@@ -21,29 +21,38 @@ const DISPLAY_ROLES = {
 class UserSerivice {
   static async getListUser() {
     const users = await UserRepo.getListUser();
-    if (!users) {
+    if (!users || users.length === 0) {
       throw new NotFoundError("No data found");
     }
-    const newlists = [];
 
-    let name_manager = "";
-    for (const user of users) {
-      if (user.manager_name && user.manager_name !== "") {
-        name_manager = await UserRepo.findUserbyId(user?.manager_name);
-      }
-      newlists.push({
-        ...(user.toObject?.() || user),
-        manager_name: name_manager
-          ? {
-              _id: name_manager._id,
-              name: `${name_manager.first_name} ${name_manager.last_name}`,
-            }
-          : null,
-      });
-      name_manager = "";
-    }
-    const newList = newlists.filter((item) => !item.terminated_date);
-    return newList;
+    const enrichedUsers = await Promise.all(
+      users.map(async (user) => {
+        let manager = null;
+
+        if (user.manager_name) {
+          const managerData = await UserRepo.findUserbyId(user.manager_name);
+          if (managerData) {
+            manager = {
+              _id: managerData._id,
+              name: `${managerData.first_name} ${managerData.last_name}`,
+            };
+          }
+        }
+
+        return {
+          ...(user.toObject?.() || user),
+          manager_name: manager,
+        };
+      })
+    );
+
+    const activeUsers = enrichedUsers.filter((u) => !u.terminated_date);
+
+    const sanitizedUsers = activeUsers.map(
+      ({ password, public_key, ...rest }) => rest
+    );
+
+    return sanitizedUsers;
   }
 
   static createUser = async (user) => {
@@ -59,7 +68,6 @@ class UserSerivice {
         await UserRepo.createUser(user);
         success.push(user);
       } catch (err) {
-        console.log(err);
         if (err.code === 11000) {
           failed.push({
             ...user,
@@ -81,7 +89,6 @@ class UserSerivice {
   }
 
   static updateUser = async (id, data) => {
-    console.log(id, data);
     return await UserRepo.updateFilterUser(id, data);
   };
 

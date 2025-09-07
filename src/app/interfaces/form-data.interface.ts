@@ -1,6 +1,6 @@
 export interface FormData {
   action: 'create' | 'update';
-  dataSelected: any | null;
+  selectedRow: any | null;
   dataList: any[];
   message: string;
   from: string;

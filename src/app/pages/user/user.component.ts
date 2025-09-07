@@ -19,30 +19,22 @@ import { HeaderColumn } from '@app/custom-types/shared.type';
 import { ModalDiaLogComponent } from '@app/shared-components/modal/modal.component';
 import { UserForm } from './components/user-form/user.component';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import {
-  COLUMN_DEFS,
-  DISPLAY_COLUMN_ROLE,
-  DISPLAY_ROLES,
-  ITEM_OF_PAGE,
-} from '@app/constants/shared.constant';
+import { DISPLAY_ROLES, ITEM_OF_PAGE } from '@app/constants/shared.constant';
 import { SnackbarService } from '@app/services/snackbar.service';
 import { ModalService } from '@app/services/modal.service';
 import { FileService } from '@app/services/file.service';
-import { SelectOptioncomponent } from '@app/shared-components/select-option/select-option.component';
+import { SelectOptionComponent } from '@app/shared-components/select-option/select-option.component';
 import { getEndpoints } from '@app/constants/endpoints.constant';
 import { ButtonComponent } from '@app/shared-components/button/button.component';
 import { ACTION } from '@app/constants/shared.constant';
-import { OPENDED_FORM_ENUM } from '@app/enums/shared.enum';
+import { OPENDED_FROM_ENUM } from '@app/enums/shared.enum';
 import { UserFilterComponent } from './components/user-filter/user-filter.component';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { combineLatestWith } from 'rxjs/operators';
+import { TranslatePipe } from '@ngx-translate/core';
+
 @Component({
   standalone: true,
   selector: 'user-management',
@@ -63,6 +55,7 @@ import { combineLatestWith } from 'rxjs/operators';
     MatPaginatorModule,
     CommonModule,
     ButtonComponent,
+    TranslatePipe,
   ],
 })
 export class UserManagementComponent implements AfterViewInit {
@@ -77,8 +70,28 @@ export class UserManagementComponent implements AfterViewInit {
     this.pageSize = event.pageSize;
   }
 
-  displayedColumns: string[] = DISPLAY_COLUMN_ROLE;
-  columnDefs: HeaderColumn[] = COLUMN_DEFS;
+  displayedColumns: string[] = [
+    'employee',
+    'username',
+    'email',
+    'salutation',
+    'role',
+    'job_title',
+    'manager_name',
+    'is_active',
+    'action',
+  ];
+  columnDefs: HeaderColumn[] = [
+    { column: 'employee', label: 'Employee' },
+    { column: 'username', label: 'Username' },
+    { column: 'email', label: 'Email' },
+    { column: 'salutation', label: 'Salutation' },
+    { column: 'role', label: 'Role' },
+    { column: 'job_title', label: 'Job Title' },
+    { column: 'manager_name', label: 'Manager' },
+    { column: 'is_active', label: 'Active' },
+    { column: 'action', label: 'Action' },
+  ];
   displayRole = DISPLAY_ROLES;
 
   dataSource!: MatTableDataSource<User>;
@@ -97,9 +110,9 @@ export class UserManagementComponent implements AfterViewInit {
         const users = data;
         if (searchKeyword !== '') {
           this.userList = users.filter(
-            (u: any) =>
-              u.username?.includes(searchKeyword.trim()) ||
-              u.email.includes(searchKeyword.trim()),
+            (user: any) =>
+              user.username?.includes(searchKeyword.trim()) ||
+              user.email.includes(searchKeyword.trim()),
           );
         } else {
           this.userList = users;
@@ -190,12 +203,12 @@ export class UserManagementComponent implements AfterViewInit {
 
   openDialog() {
     this.modalService
-      .openModal(ModalDiaLogComponent, SelectOptioncomponent, 'Select option', {
+      .openModal(ModalDiaLogComponent, SelectOptionComponent, 'Select option', {
         action: ACTION.SELECT,
-        dataSelected: null,
+        selectedRow: null,
         dataList: this.userList,
         message: '',
-        from: OPENDED_FORM_ENUM.USER_MANAGEMENT,
+        from: OPENDED_FROM_ENUM.USER_MANAGEMENT,
       })
       .subscribe((res) => {
         if (res && res.isSubmit === true) {
@@ -208,10 +221,10 @@ export class UserManagementComponent implements AfterViewInit {
     this.modalService
       .openModal(ModalDiaLogComponent, UserForm, 'Edit user', {
         action: ACTION.UPDATE,
-        dataSelected: row,
+        selectedRow: row,
         dataList: this.userList,
         message: '',
-        from: OPENDED_FORM_ENUM.USER_MANAGEMENT,
+        from: OPENDED_FROM_ENUM.USER_MANAGEMENT,
       })
       .subscribe((res) => {
         if (res && res.isSubmit === true) {
@@ -224,10 +237,10 @@ export class UserManagementComponent implements AfterViewInit {
     this.modalService
       .openModal(ModalDiaLogComponent, UserFilterComponent, 'Filter by', {
         action: ACTION.NONE,
-        dataSelected: null,
+        selectedRow: null,
         dataList: [],
         message: '',
-        from: OPENDED_FORM_ENUM.USER_MANAGEMENT,
+        from: OPENDED_FROM_ENUM.USER_MANAGEMENT,
       })
       .subscribe((result) => {
         if (result) {
@@ -242,7 +255,7 @@ export class UserManagementComponent implements AfterViewInit {
   }
 
   exportToFileCSV() {
-    const endpoint = getEndpoints().user.v1.download_user;
+    const endpoint = getEndpoints().user.v1.downloadUser;
     this.fileService.downloadFile(endpoint).subscribe((res) => {
       const url = window.URL.createObjectURL(res);
       const a = document.createElement('a');

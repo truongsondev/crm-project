@@ -13,7 +13,7 @@ export class ModalService {
     title: string,
     options: {
       action: string;
-      dataSelected: any | null;
+      selectedRow: any | null;
       dataList: any[];
       message: string;
       from: string;

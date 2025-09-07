@@ -8,13 +8,17 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import {
+  MatPaginator,
+  MatPaginatorModule,
+  PageEvent,
+} from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { getEndpoints } from '@app/constants/endpoints.constant';
 import { ACTION, ITEM_OF_PAGE } from '@app/constants/shared.constant';
 import { HeaderColumn } from '@app/custom-types/shared.type';
-import { OPENDED_FORM_ENUM } from '@app/enums/shared.enum';
+import { OPENDED_FROM_ENUM } from '@app/enums/shared.enum';
 import { SalesOrderForm } from '@app/pages/salesOrder/components/salesorder-form/sales-order.component';
 import { SalesOrder } from '@app/interfaces/sales-order.interface';
 import { FileService } from '@app/services/file.service';
@@ -25,10 +29,11 @@ import { ButtonComponent } from '@app/shared-components/button/button.component'
 import { ConfirmActionComponent } from '@app/shared-components/confirm-action/confirm-action.component';
 import { ModalDiaLogComponent } from '@app/shared-components/modal/modal.component';
 import { SearchComponent } from '@app/shared-components/search/search.component';
-import { SelectOptioncomponent } from '@app/shared-components/select-option/select-option.component';
+import { SelectOptionComponent } from '@app/shared-components/select-option/select-option.component';
 import { SalesOrderFilterComponent } from './components/sales-order-filter/sales-order.component';
-import { combineLatestWith, map, Observable } from 'rxjs';
-import { Contact } from '@app/interfaces/contact.interface';
+import { BehaviorSubject, combineLatestWith, map, Observable } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   standalone: true,
   selector: 'sale-order-component',
@@ -49,6 +54,7 @@ import { Contact } from '@app/interfaces/contact.interface';
     CommonModule,
     ButtonComponent,
     MatCheckboxModule,
+    TranslatePipe,
   ],
 })
 export class SaleOrderComponet {
@@ -57,7 +63,10 @@ export class SaleOrderComponet {
   dataSource = new MatTableDataSource<SalesOrder>();
   lengthDatasource: number = 0;
   allSelected: Boolean = false;
-  listDelete: string[] = [];
+  salesOrdersToDelete: string[] = [];
+  pageIndex = 0;
+  Math = Math;
+
   mySearch: string = 'No order/subject';
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -90,15 +99,28 @@ export class SaleOrderComponet {
     private modalService: ModalService,
     private fileService: FileService,
     private snackbarservice: SnackbarService,
+    private router: ActivatedRoute,
   ) {}
   ngOnInit() {
-    this.getListSalesOrder();
+    const queryParam = this.router.snapshot.queryParamMap.get('status');
+    if (queryParam) {
+      const queryParamSubject: BehaviorSubject<{ status: string }> =
+        new BehaviorSubject<{ status: string }>({
+          status: queryParam,
+        });
+      this.getSalesOrderList(queryParamSubject);
+    } else {
+      this.getSalesOrderList();
+    }
+  }
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
-  getListSalesOrder(filterVal?: Observable<any>) {
+  getSalesOrderList(filterVal?: Observable<any>) {
     const salesOrders$ = this.salesOrderService.getListSalesOrder();
     let result$: Observable<SalesOrder[]> = salesOrders$;
-    console.log('filterVal:::', filterVal);
 
     if (filterVal) {
       result$ = filterVal.pipe(
@@ -148,6 +170,7 @@ export class SaleOrderComponet {
 
         this.salesOrderList = salesOrders;
         this.dataSource.data = salesOrders;
+        this.lengthDatasource = this.salesOrderList.length;
       }
     });
   }
@@ -175,47 +198,49 @@ export class SaleOrderComponet {
 
   openDialog() {
     this.modalService
-      .openModal(ModalDiaLogComponent, SelectOptioncomponent, 'Select option', {
+      .openModal(ModalDiaLogComponent, SelectOptionComponent, 'Select option', {
         action: ACTION.SELECT,
-        dataSelected: null,
+        selectedRow: null,
         dataList: this.salesOrderList,
         message: '',
-        from: OPENDED_FORM_ENUM.SALE_ORDER,
+        from: OPENDED_FROM_ENUM.SALE_ORDER,
       })
       .subscribe((res) => {
         if (res && res.isSubmit === true) {
-          this.getListSalesOrder();
+          this.getSalesOrderList();
         }
       });
   }
-  deleteMany() {
-    if (this.listDelete.length > 0) {
-      this.salesOrderService.deleteSalesOrder(this.listDelete).subscribe(() => {
-        this.snackbarservice.openSnackBar('Delete success');
-        this.getListSalesOrder();
-        this.allSelected = false;
-      });
+  deleteSelectedContacts() {
+    if (this.salesOrdersToDelete.length > 0) {
+      this.salesOrderService
+        .deleteSalesOrder(this.salesOrdersToDelete)
+        .subscribe(() => {
+          this.snackbarservice.openSnackBar('Delete success');
+          this.getSalesOrderList();
+          this.allSelected = false;
+        });
     } else {
-      this.snackbarservice.openSnackBar('You not select contact');
+      this.snackbarservice.openSnackBar('You not select sales order');
     }
   }
 
   openFilter() {
     this.modalService
       .openModal(ModalDiaLogComponent, SalesOrderFilterComponent, 'Filter by', {
-        action: '#',
-        dataSelected: null,
+        action: ACTION.NONE,
+        selectedRow: null,
         dataList: [],
         message: '',
-        from: OPENDED_FORM_ENUM.SALE_ORDER,
+        from: OPENDED_FROM_ENUM.SALE_ORDER,
       })
       .subscribe((res) => {
-        this.getListSalesOrder(res.filterSubject);
+        this.getSalesOrderList(res.filterSubject);
       });
   }
 
   exportToFileCSV() {
-    const endpoint = getEndpoints().salesOrder.v1.download_sale_order;
+    const endpoint = getEndpoints().salesOrder.v1.downloadSalesOrders;
     this.fileService.downloadFile(endpoint).subscribe((res) => {
       const url = window.URL.createObjectURL(res);
       const a = document.createElement('a');
@@ -230,14 +255,14 @@ export class SaleOrderComponet {
     this.modalService
       .openModal(ModalDiaLogComponent, SalesOrderForm, 'Edit Sale Order', {
         action: ACTION.UPDATE,
-        dataSelected: row,
+        selectedRow: row,
         dataList: this.salesOrderList,
         message: '',
-        from: OPENDED_FORM_ENUM.SALE_ORDER,
+        from: OPENDED_FROM_ENUM.SALE_ORDER,
       })
       .subscribe((res) => {
         if (res.isSubmit === true) {
-          this.getListSalesOrder();
+          this.getSalesOrderList();
         }
       });
   }
@@ -250,45 +275,54 @@ export class SaleOrderComponet {
         'Delete Sales Order',
         {
           action: ACTION.NONE,
-          dataSelected: row,
+          selectedRow: row,
           dataList: this.salesOrderList,
           message: '',
-          from: OPENDED_FORM_ENUM.SALE_ORDER,
+          from: OPENDED_FROM_ENUM.SALE_ORDER,
         },
       )
       .subscribe((res) => {
         if (res && res.isSubmit === true) {
-          this.getListSalesOrder();
+          this.getSalesOrderList();
         }
       });
   }
 
-  insertListDelete(saleOrder: SalesOrder) {
+  markSalesOrderForDeletion(saleOrder: SalesOrder) {
     if (saleOrder.isChecked) {
-      if (!this.listDelete.includes(saleOrder._id)) {
-        this.listDelete.push(saleOrder._id);
+      if (!this.salesOrdersToDelete.includes(saleOrder._id)) {
+        this.salesOrdersToDelete.push(saleOrder._id);
       }
     } else {
-      this.listDelete = this.listDelete.filter((id) => id !== saleOrder._id);
+      this.salesOrdersToDelete = this.salesOrdersToDelete.filter(
+        (salesOrder_id) => salesOrder_id !== saleOrder._id,
+      );
     }
-    console.log(this.listDelete);
   }
 
-  onPageChange() {
-    this.allSelected = this.salesOrderList.every((c) => c.isChecked);
-    this.listDelete = this.salesOrderList
-      .filter((c) => c.isChecked)
-      .map((c) => c._id);
+  onPageChange(event: PageEvent) {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+  }
+
+  onRowChange() {
+    this.allSelected = this.salesOrderList.every(
+      (salesOrder) => salesOrder.isChecked,
+    );
+    this.salesOrdersToDelete = this.salesOrderList
+      .filter((salesOrder) => salesOrder.isChecked)
+      .map((salesOrder) => salesOrder._id);
   }
 
   selectAllSalesOrder(checked: boolean) {
     this.salesOrderList.forEach((saleOrder) => (saleOrder.isChecked = checked));
 
     if (checked) {
-      this.listDelete = this.salesOrderList.map((contact) => contact._id);
+      this.salesOrdersToDelete = this.salesOrderList.map(
+        (contact) => contact._id,
+      );
     } else {
-      this.listDelete = [];
+      this.salesOrdersToDelete = [];
     }
-    console.log(this.listDelete);
   }
 }

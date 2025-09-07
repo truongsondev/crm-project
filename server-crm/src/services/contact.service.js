@@ -17,9 +17,7 @@ export class ContactService {
         code: 200000,
         res,
       };
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   };
   static createContacts = async (contacts) => {
     const success = [];
@@ -48,7 +46,6 @@ export class ContactService {
   static getListContacts = async () => {
     try {
       const rawContacts = await ContactRepo.getListContacts();
-      console.log(rawContacts);
       const contacts = await Promise.all(
         rawContacts.map(async (contact) => {
           let assignedToUser = null;
@@ -110,9 +107,7 @@ export class ContactService {
         code: 200000,
         contact,
       };
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   };
 
   static deleteContact = async (_id) => {
@@ -134,7 +129,6 @@ export class ContactService {
 
       return formattedItem;
     });
-    console.log(formattedData);
 
     const opts = {};
     const parser = new Parser(opts);

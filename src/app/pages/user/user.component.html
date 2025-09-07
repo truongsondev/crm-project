@@ -1,15 +1,17 @@
 <div class="mt-6 mx-4 md:mx-10 bg-white p-4 md:p-6 rounded-lg shadow">
   <div class="flex flex-col gap-6">
     <div class="flex flex-col md:flex-row md:items-center gap-4">
-      <h1 class="font-semibold text-2xl md:text-4xl">User Management</h1>
+      <h1 class="font-semibold text-2xl md:text-4xl">
+        {{ "USER.TITLE" | translate }}
+      </h1>
       <button-component
-        [textBt]="'Add User'"
+        [textBt]="'USER.BUTTON.ADD_USER' | translate"
         [textIcon]="'add'"
         [className]="'bg-primary text-white'"
         (click)="openDialog()"
       />
     </div>
-    <h1 class="font-medium text-xl">List of Users</h1>
+    <h1 class="font-medium text-xl">{{ "USER.SUB_TITLE" | translate }}</h1>
     <div
       class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
     >
@@ -20,13 +22,13 @@
 
       <div class="flex flex-row gap-2 items-center">
         <button-component
-          [textBt]="'Filter by'"
+          [textBt]="'BUTTON.FILTER' | translate"
           [textIcon]="'filter_list'"
           [className]="'bg-emerald-400 text-white'"
           (click)="openFilterModal()"
         />
         <button-component
-          [textBt]="'Download'"
+          [textBt]="'BUTTON.DOWNLOAD' | translate"
           [textIcon]="'cloud_download'"
           [className]="'bg-emerald-400 text-white'"
           (click)="exportToFileCSV()"

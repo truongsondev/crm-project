@@ -1,3 +1,4 @@
+import { BadRequestError } from "../http/error.http.js";
 import User from "../schema/user.schema.js";
 
 class UserRepo {
@@ -11,7 +12,6 @@ class UserRepo {
     try {
       return await User.findOne({ _id });
     } catch (err) {
-      console.error("Invalid ObjectId:", err.message);
       return null;
     }
   }
@@ -25,7 +25,6 @@ class UserRepo {
     return await User.insertOne(user);
   }
   static async createUsers(users) {
-    console.log("users:::", users);
     const normalizedUsers = users.map((u) => ({
       ...u,
       is_active: u.is_active === "true",
@@ -50,7 +49,13 @@ class UserRepo {
   }
 
   static async updateFilterUser(id, data) {
-    return await User.findByIdAndUpdate(id, data);
+    const user = await User.findById(id);
+    if (!user) {
+      throw new BadRequestError("User invalid");
+    }
+    Object.assign(user, data);
+
+    return await user.save();
   }
 
   static async getUserById(_id) {

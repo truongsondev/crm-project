@@ -57,7 +57,7 @@
   <mat-form-field class="w-full">
     <mat-label>Lead source</mat-label>
     <mat-select formControlName="lead_source">
-      <mat-option *ngFor="let item of leadSource" [value]="item"
+      <mat-option *ngFor="let item of leadSources" [value]="item"
         >{{ item }}
       </mat-option>
     </mat-select>
@@ -65,7 +65,7 @@
   <mat-form-field class="w-full">
     <mat-label>Assigned to</mat-label>
     <mat-select formControlName="assigned_to">
-      <mat-option *ngFor="let item of listAssign" [value]="item._id"
+      <mat-option *ngFor="let item of assignList" [value]="item._id"
         >{{ item.first_name }} {{ item.last_name }}
       </mat-option>
     </mat-select>

@@ -153,6 +153,10 @@ class SalesOrderService {
       }
     }
   };
+
+  static countSalesOrdersByStatus = async () => {
+    return await SalesOrderRepo.countSalesOrdersByStatus();
+  };
 }
 
 export default SalesOrderService;

@@ -22,11 +22,11 @@ import { MatNativeDateModule } from '@angular/material/core';
 
 import { UserService } from '@app/services/user.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { FormUser, SelectOption } from '@app/custom-types/shared.type';
+import { UserTableState, SelectOption } from '@app/custom-types/shared.type';
 import { CommonModule } from '@angular/common';
 import { User } from '@app/interfaces/user.interface';
 import { MatDialogRef } from '@angular/material/dialog';
-import { ROLES, SALUTATION } from '@app/constants/shared.constant';
+import { ROLES, SALUTATIONS } from '@app/constants/shared.constant';
 import { MatIconModule } from '@angular/material/icon';
 import { SnackbarService } from '@app/services/snackbar.service';
 import { ACTION } from '@app/constants/shared.constant';
@@ -55,7 +55,7 @@ import { UserValidator } from '@app/validators/user.validator';
 export class UserForm {
   userFormGroup!: FormGroup;
   isTerminated = false;
-  salutations: SelectOption[] = SALUTATION;
+  salutations: SelectOption[] = SALUTATIONS;
   isPasswordHidden = true;
   roles: SelectOption[] = ROLES;
   isChecked = true;
@@ -63,22 +63,17 @@ export class UserForm {
   isCheckedDate = true;
 
   listManager: User[] = [];
-  protected readonly value = signal('');
 
-  protected onInput(event: Event) {
-    const { value } = event.target as HTMLInputElement;
-    this.value.set(value);
-  }
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    @Inject('data') public user: FormUser,
+    @Inject('data') public user: UserTableState,
     private snackbarService: SnackbarService,
     private dialogRef: MatDialogRef<UserForm>,
   ) {}
 
   initForm = () => {
-    const userSelected = this.user.dataSelected;
+    const userSelected = this.user.selectedRow;
     this.userFormGroup = this.fb.group({
       first_name: [userSelected?.first_name || '', Validators.required],
       last_name: [userSelected?.last_name || '', Validators.required],
@@ -89,11 +84,15 @@ export class UserForm {
       ],
       password: [
         userSelected?.password || '',
-        [Validators.required, UserValidator.password],
+        this.user.action === ACTION.CREATE
+          ? [Validators.required, UserValidator.password]
+          : [],
       ],
       confirm_password: [
         userSelected?.password || '',
-        [Validators.required, UserValidator.mustMatch('password')],
+        this.user.action === ACTION.CREATE
+          ? [Validators.required, UserValidator.mustMatch('password')]
+          : [],
       ],
       address: [userSelected?.address || ''],
       salutation: [userSelected?.salutation || 'None', Validators.required],
@@ -117,7 +116,6 @@ export class UserForm {
   ngOnInit() {
     this.listManager =
       this.user.dataList?.filter((item) => item.is_manager) || [];
-    console.log(this.listManager);
     this.initForm();
   }
 
@@ -137,7 +135,9 @@ export class UserForm {
   }
   getErrorMsg(controlName: string): string | null {
     const control = this.userFormGroup.get(controlName);
-    if (!control || !control.errors || !control.touched) return null;
+    if (!control || !control.errors || !control.touched) {
+      return null;
+    }
     if (control.errors['required']) {
       return 'This field is required';
     }
@@ -180,8 +180,9 @@ export class UserForm {
           },
         });
       } else if (this.user.action === ACTION.UPDATE) {
+        const { password, ...newDataUpdate } = dataReq;
         this.userService
-          .updateUser(this.user.dataSelected?._id || '', dataReq)
+          .updateUser(this.user.selectedRow?._id || '', newDataUpdate)
           .subscribe({
             next: () => {
               this.snackbarService.openSnackBar('update user success');

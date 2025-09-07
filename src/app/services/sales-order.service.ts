@@ -1,45 +1,77 @@
 import { Injectable } from '@angular/core';
 import { getEndpoints } from '@app/constants/endpoints.constant';
-import { DataResponse } from '@app/interfaces/response.interface';
+import {
+  FileImportResponse,
+  StatusStatResponse,
+} from '@app/interfaces/response.interface';
 import { SalesOrder } from '@app/interfaces/sales-order.interface';
+import { CommonService } from './common.service';
 import { EndpointService } from './endpoint.service';
+
 @Injectable({
   providedIn: 'root',
 })
 export class SalesOrderService {
-  constructor(private endpointService: EndpointService) {}
+  private readonly endpoints = getEndpoints().salesOrder.v1;
+
+  constructor(
+    private endpointService: EndpointService,
+    private commonService: CommonService,
+  ) {}
   getListSalesOrder() {
-    const endpoint = getEndpoints().salesOrder.v1.salesOrder;
-    return this.endpointService.fetchEndpoint<SalesOrder[]>(endpoint);
+    const endpoint = this.endpoints.salesOrder;
+    return this.commonService.withAuth<SalesOrder[]>(endpoint, (url, options) =>
+      this.endpointService.fetchEndpoint<SalesOrder[]>(url, options),
+    );
   }
 
   createSaleOrder(data: any) {
-    const endpoint = getEndpoints().salesOrder.v1.create_sale_order;
-    return this.endpointService.postEndpoint(endpoint, data);
+    const endpoint = this.endpoints.createSalesOrder;
+    return this.commonService.withAuth<SalesOrder>(endpoint, (url, options) =>
+      this.endpointService.postEndpoint<SalesOrder>(url, data, options),
+    );
   }
 
   createSalesOrder(data: any) {
-    const endpoint = getEndpoints().salesOrder.v1.create_sales_order;
-    return this.endpointService.postEndpoint<DataResponse>(endpoint, data);
-  }
-  updateSalesOrder(id: string, data: any) {
-    const endpoint = getEndpoints().salesOrder.v1.update_sale_order.replace(
-      ':id',
-      id,
+    const endpoint = this.endpoints.createSalesOrders;
+    return this.commonService.withAuth<FileImportResponse>(
+      endpoint,
+      (url, options) =>
+        this.endpointService.postEndpoint<FileImportResponse>(
+          url,
+          data,
+          options,
+        ),
     );
-    return this.endpointService.putEndpoint(endpoint, data);
+  }
+
+  updateSalesOrder(id: string, data: any) {
+    const endpoint = `${this.endpoints.updateSaleOrder}/${id}`;
+    return this.commonService.withAuth<SalesOrder>(endpoint, (url, options) =>
+      this.endpointService.putEndpoint<SalesOrder>(url, data, options),
+    );
   }
 
   deleteSaleOrder(id: string) {
-    const endpoint = getEndpoints().salesOrder.v1.delete_sale_order.replace(
-      ':id',
-      id,
+    const endpoint = `${this.endpoints.deleteSalesOrders}/${id}`;
+    return this.commonService.withAuth<void>(endpoint, (url, options) =>
+      this.endpointService.deleteEndpoint<void>(url, options),
     );
-    return this.endpointService.deleteEndpoint(endpoint);
   }
 
-  deleteSalesOrder(id: string[]) {
-    const endpoint = getEndpoints().salesOrder.v1.delete_sales_order;
-    return this.endpointService.postEndpoint(endpoint, id);
+  deleteSalesOrder(ids: string[]) {
+    const endpoint = this.endpoints.deleteSalesOrders;
+    return this.commonService.withAuth<void>(endpoint, (url, options) =>
+      this.endpointService.postEndpoint<void>(url, ids, options),
+    );
+  }
+
+  countSalesOrdersByLeadSource() {
+    const endpoint = this.endpoints.chartSalesOrders;
+    return this.commonService.withAuth<StatusStatResponse[]>(
+      endpoint,
+      (url, options) =>
+        this.endpointService.fetchEndpoint<StatusStatResponse[]>(url, options),
+    );
   }
 }

@@ -25,12 +25,14 @@ import { ACTION, ITEM_OF_PAGE } from '@app/constants/shared.constant';
 import { SnackbarService } from '@app/services/snackbar.service';
 import { FileService } from '@app/services/file.service';
 import { getEndpoints } from '@app/constants/endpoints.constant';
-import { SelectOptioncomponent } from '@app/shared-components/select-option/select-option.component';
+import { SelectOptionComponent } from '@app/shared-components/select-option/select-option.component';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@app/shared-components/button/button.component';
-import { OPENDED_FORM_ENUM } from '@app/enums/shared.enum';
+import { OPENDED_FROM_ENUM } from '@app/enums/shared.enum';
 import { ContactFilterComponent } from './components/contact-filter/contact.component';
-import { combineLatestWith, map, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatestWith, map, Observable } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'contact-component',
@@ -47,6 +49,7 @@ import { combineLatestWith, map, Observable } from 'rxjs';
     MatCheckboxModule,
     FormsModule,
     ButtonComponent,
+    TranslatePipe,
   ],
   providers: [DatePipe],
 })
@@ -56,9 +59,9 @@ export class ContactComponent {
   users: User[] = [];
   pageSize = ITEM_OF_PAGE;
   pageIndex = 0;
-  lengthDatasource = 0;
+  dataSourceLength = 0;
   Math = Math;
-  listDelete: string[] = [];
+  contactsToDelete: string[] = [];
   allSelected = false;
   dataSource = new MatTableDataSource<Contact>();
   displayedColumns: string[] = [
@@ -109,16 +112,27 @@ export class ContactComponent {
     private modalService: ModalService,
     private snackbarservice: SnackbarService,
     private fileService: FileService,
+    private router: ActivatedRoute,
   ) {}
   ngOnInit() {
-    this.getListContact();
+    const queryParam = this.router.snapshot.queryParamMap.get('leadSource');
+    if (queryParam) {
+      const queryParamSubject: BehaviorSubject<{ leadSource: string }> =
+        new BehaviorSubject<{ leadSource: string }>({
+          leadSource: queryParam,
+        });
+      this.getContactList(queryParamSubject);
+    } else {
+      this.getContactList();
+    }
+
     this.userService.getListUser().subscribe((res) => {
       const users = res;
       this.users = users;
     });
   }
 
-  getListContact(filterVal?: Observable<any>) {
+  getContactList(filterVal?: Observable<any>) {
     const contacts$ = this.contactService.getListContact();
     let result$: Observable<Contact[]> = contacts$;
     if (filterVal) {
@@ -136,7 +150,7 @@ export class ContactComponent {
             },
             contactData,
           ]) => {
-            const source = contactData.filter((contact: Contact) => {
+            const sourceData = contactData.filter((contact: Contact) => {
               return (
                 (assignedTo ? contact.assigned_to === assignedTo : true) &&
                 (leadSource ? contact.lead_source === leadSource : true) &&
@@ -154,7 +168,7 @@ export class ContactComponent {
                   : true)
               );
             });
-            return source;
+            return sourceData;
           },
         ),
       );
@@ -165,53 +179,52 @@ export class ContactComponent {
 
         this.contactList = contacts;
         this.dataSource.data = contacts;
+        this.dataSourceLength = this.contactList.length;
       }
     });
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
-  insertListDelete(contact: Contact) {
+  markContactForDeletion(contact: Contact) {
     if (contact.isChecked) {
-      if (!this.listDelete.includes(contact._id)) {
-        this.listDelete.push(contact._id);
+      if (!this.contactsToDelete.includes(contact._id)) {
+        this.contactsToDelete.push(contact._id);
       }
     } else {
-      this.listDelete = this.listDelete.filter((id) => id !== contact._id);
+      this.contactsToDelete = this.contactsToDelete.filter(
+        (contact_id) => contact_id !== contact._id,
+      );
     }
-    console.log(this.listDelete);
   }
 
   onRowChange() {
-    this.allSelected = this.contactList.every((c) => c.isChecked);
-    this.listDelete = this.contactList
-      .filter((c) => c.isChecked)
-      .map((c) => c._id);
+    this.allSelected = this.contactList.every((contact) => contact.isChecked);
+    this.contactsToDelete = this.contactList
+      .filter((contact) => contact.isChecked)
+      .map((contact) => contact._id);
   }
   selectAllContacts(checked: boolean) {
     this.contactList.forEach((contact) => (contact.isChecked = checked));
 
     if (checked) {
-      this.listDelete = this.contactList.map((contact) => contact._id);
+      this.contactsToDelete = this.contactList.map((contact) => contact._id);
     } else {
-      this.listDelete = [];
+      this.contactsToDelete = [];
     }
-    console.log(this.listDelete);
   }
-  deleteMany() {
-    if (this.listDelete.length > 0) {
-      this.contactService.deleteContacts(this.listDelete).subscribe(() => {
-        this.snackbarservice.openSnackBar('Delete success');
-        this.getListContact();
-        this.allSelected = false;
-      });
+  deleteSelectedContacts() {
+    if (this.contactsToDelete.length > 0) {
+      this.contactService
+        .deleteContacts(this.contactsToDelete)
+        .subscribe(() => {
+          this.snackbarservice.openSnackBar('Delete success');
+          this.getContactList();
+          this.allSelected = false;
+        });
     } else {
       this.snackbarservice.openSnackBar('You not select contact');
     }
@@ -230,28 +243,28 @@ export class ContactComponent {
   openFilter() {
     this.modalService
       .openModal(ModalDiaLogComponent, ContactFilterComponent, 'Filter by', {
-        action: '#',
-        dataSelected: null,
+        action: ACTION.NONE,
+        selectedRow: null,
         dataList: [],
         message: '',
-        from: OPENDED_FORM_ENUM.CONTACT,
+        from: OPENDED_FROM_ENUM.CONTACT,
       })
       .subscribe((res) => {
-        this.getListContact(res.filterSubject);
+        this.getContactList(res.filterSubject);
       });
   }
   openDialog() {
     this.modalService
-      .openModal(ModalDiaLogComponent, SelectOptioncomponent, 'Select option', {
-        action: 'select',
-        dataSelected: null,
+      .openModal(ModalDiaLogComponent, SelectOptionComponent, 'Select option', {
+        action: ACTION.SELECT,
+        selectedRow: null,
         dataList: this.contactList,
         message: '',
-        from: OPENDED_FORM_ENUM.CONTACT,
+        from: OPENDED_FROM_ENUM.CONTACT,
       })
       .subscribe((res) => {
         if (res && res.isSubmit === true) {
-          this.getListContact();
+          this.getContactList();
         }
       });
   }
@@ -259,15 +272,15 @@ export class ContactComponent {
   onRowClick(row: Contact) {
     this.modalService
       .openModal(ModalDiaLogComponent, ContactForm, 'Edit contact', {
-        action: 'update',
-        dataSelected: row,
+        action: ACTION.UPDATE,
+        selectedRow: row,
         dataList: this.contactList,
         message: '',
-        from: OPENDED_FORM_ENUM.CONTACT,
+        from: OPENDED_FROM_ENUM.CONTACT,
       })
       .subscribe((res) => {
         if (res && res.isSubmit === true) {
-          this.getListContact();
+          this.getContactList();
         }
       });
   }
@@ -280,20 +293,20 @@ export class ContactComponent {
         'Delete contact',
         {
           action: ACTION.NONE,
-          dataSelected: row,
+          selectedRow: row,
           dataList: this.contactList,
           message: '',
-          from: OPENDED_FORM_ENUM.CONTACT,
+          from: OPENDED_FROM_ENUM.CONTACT,
         },
       )
       .subscribe((res) => {
         if (res && res.isSubmit === true) {
-          this.getListContact();
+          this.getContactList();
         }
       });
   }
   exportToFileCSV() {
-    const endpoint = getEndpoints().contact.v1.download_contact;
+    const endpoint = getEndpoints().contact.v1.downloadContact;
     this.fileService.downloadFile(endpoint).subscribe((res) => {
       const url = window.URL.createObjectURL(res);
       const a = document.createElement('a');

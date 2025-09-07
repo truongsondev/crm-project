@@ -13,8 +13,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
-import { STATUSOPTION } from '@app/constants/shared.constant';
-import { From } from '@app/custom-types/shared.type';
+import { STATUS_OPTION } from '@app/constants/shared.constant';
+import { ModalOrigin } from '@app/custom-types/shared.type';
 import { ButtonComponent } from '@app/shared-components/button/button.component';
 
 import { BehaviorSubject } from 'rxjs';
@@ -51,17 +51,12 @@ export class SalesOrderFilterComponent {
     new BehaviorSubject<FilterCriteria>({});
   salesOrderFilterForm!: FormGroup;
   assignedTo: string[] = [];
-  displayStatus = STATUSOPTION;
-  protected readonly value = signal('');
+  displayStatus = STATUS_OPTION;
 
-  protected onInput(event: Event) {
-    const { value } = event.target as HTMLInputElement;
-    this.value.set(value);
-  }
   constructor(
     private dialogRef: MatDialogRef<SalesOrderFilterComponent>,
     private contactService: ContactService,
-    @Inject('data') public fromData: From,
+    @Inject('data') public fromData: ModalOrigin,
   ) {}
 
   initForm() {

@@ -7,38 +7,32 @@ export type HeaderColumn = {
   label: string;
 };
 
-export type FormUser = {
+export type UserTableState = {
   action: string;
-  dataSelected: User | null;
+  selectedRow: User | null;
   dataList: User[];
-};
-
-export type ListFormUser = {
-  action: string;
-  userList: User[];
 };
 
 export type SelectOption = {
   value: string;
   label: string;
 };
-
-export type FormContact = {
+export type ContactTableState = {
   action: string;
-  dataSelected: Contact | null;
+  selectedRow: Contact | null;
   dataList: Contact[];
 };
 
-export type Error = {
+export type ErrorMessage = {
   message: string;
 };
 
-export type From = {
+export type ModalOrigin = {
   from: string;
 };
 
-export type FormSalesOrder = {
+export type SalesOrderTableState = {
   action: string;
-  dataSelected: SalesOrder | null;
+  selectedRow: SalesOrder | null;
   dataList: SalesOrder[];
 };

@@ -11,60 +11,60 @@ import { ButtonComponent } from '../button/button.component';
 import { ModalDiaLogComponent } from '../modal/modal.component';
 import { ACTION } from '@app/constants/shared.constant';
 import { SalesOrderService } from '@app/services/sales-order.service';
-import { OPENDED_FORM_ENUM } from '@app/enums/shared.enum';
+import { OPENDED_FROM_ENUM } from '@app/enums/shared.enum';
 @Component({
   selector: 'select-component',
   templateUrl: './select-option.component.html',
   standalone: true,
   imports: [ButtonComponent],
 })
-export class SelectOptioncomponent {
+export class SelectOptionComponent {
   constructor(
     private modalService: ModalService,
     @Inject('data') public item: any,
-    private dialogRef: MatDialogRef<SelectOptioncomponent>,
+    private dialogRef: MatDialogRef<SelectOptionComponent>,
     private userService: UserService,
     private snackbarService: SnackbarService,
     private contactService: ContactService,
     private saleOrderService: SalesOrderService,
   ) {}
   addSingleItem() {
-    if (this.item.from === OPENDED_FORM_ENUM.USER_MANAGEMENT) {
+    if (this.item.from === OPENDED_FROM_ENUM.USER_MANAGEMENT) {
       this.modalService
         .openModal(ModalDiaLogComponent, UserForm, 'Add user', {
           action: ACTION.CREATE,
-          dataSelected: null,
+          selectedRow: null,
           dataList: this.item.dataList,
           message: '',
-          from: OPENDED_FORM_ENUM.USER_MANAGEMENT,
+          from: OPENDED_FROM_ENUM.USER_MANAGEMENT,
         })
         .subscribe(() => {
           this.dialogRef.close({
             isSubmit: true,
           });
         });
-    } else if (this.item.from === OPENDED_FORM_ENUM.CONTACT) {
+    } else if (this.item.from === OPENDED_FROM_ENUM.CONTACT) {
       this.modalService
         .openModal(ModalDiaLogComponent, ContactForm, 'Add contact', {
           action: ACTION.CREATE,
-          dataSelected: null,
+          selectedRow: null,
           dataList: this.item.dataList,
           message: '',
-          from: OPENDED_FORM_ENUM.CONTACT,
+          from: OPENDED_FROM_ENUM.CONTACT,
         })
         .subscribe(() => {
           this.dialogRef.close({
             isSubmit: true,
           });
         });
-    } else if (this.item.from === OPENDED_FORM_ENUM.SALE_ORDER) {
+    } else if (this.item.from === OPENDED_FROM_ENUM.SALE_ORDER) {
       this.modalService
         .openModal(ModalDiaLogComponent, SalesOrderForm, 'Add sale order', {
           action: ACTION.CREATE,
-          dataSelected: null,
+          selectedRow: null,
           dataList: this.item.dataList,
           message: '',
-          from: OPENDED_FORM_ENUM.SALE_ORDER,
+          from: OPENDED_FROM_ENUM.SALE_ORDER,
         })
         .subscribe(() => {
           this.dialogRef.close({
@@ -123,7 +123,7 @@ export class SelectOptioncomponent {
       }
 
       if (validData.length > 0) {
-        if (this.item.from === OPENDED_FORM_ENUM.USER_MANAGEMENT) {
+        if (this.item.from === OPENDED_FROM_ENUM.USER_MANAGEMENT) {
           this.userService.createUsers(validData).subscribe({
             next: (res) => {
               const failed = res.failed;
@@ -134,7 +134,7 @@ export class SelectOptioncomponent {
               this.snackbarService.openSnackBar('Create users fail!');
             },
           });
-        } else if (this.item.from === OPENDED_FORM_ENUM.CONTACT) {
+        } else if (this.item.from === OPENDED_FROM_ENUM.CONTACT) {
           this.contactService.createContacts(validData).subscribe({
             next: (res) => {
               const failed = res.failed;
@@ -145,7 +145,7 @@ export class SelectOptioncomponent {
               this.snackbarService.openSnackBar('Create contact fail!');
             },
           });
-        } else if (this.item.from === OPENDED_FORM_ENUM.SALE_ORDER) {
+        } else if (this.item.from === OPENDED_FROM_ENUM.SALE_ORDER) {
           this.saleOrderService.createSalesOrder(data).subscribe({
             next: (res) => {
               const failed = res.failed;
@@ -185,7 +185,7 @@ export class SelectOptioncomponent {
 
     for (const row of data) {
       let isValid = false;
-      if (this.item.from === OPENDED_FORM_ENUM.USER_MANAGEMENT) {
+      if (this.item.from === OPENDED_FROM_ENUM.USER_MANAGEMENT) {
         isValid =
           row.first_name?.trim().length > 0 &&
           row.last_name?.trim().length > 0 &&
@@ -197,7 +197,7 @@ export class SelectOptioncomponent {
           /[!@#$%^&*]/.test(row.password) &&
           /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.email) &&
           row.role?.trim().length > 0;
-      } else if (this.item.from === OPENDED_FORM_ENUM.CONTACT) {
+      } else if (this.item.from === OPENDED_FROM_ENUM.CONTACT) {
         isValid =
           row['contact_name']?.trim().length > 0 &&
           ['None', 'Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Prof.'].includes(

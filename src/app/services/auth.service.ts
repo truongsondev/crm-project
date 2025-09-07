@@ -1,8 +1,8 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { getEndpoints } from '@app/constants/endpoints.constant';
 import {
-  DataLoginResponse,
+  LoginResponse,
   TokenResponse,
 } from '@app/interfaces/response.interface';
 import { EndpointService } from './endpoint.service';
@@ -12,15 +12,15 @@ export class AuthService {
   constructor(private endpointService: EndpointService) {}
   private readonly endpoints = getEndpoints().auth.v1;
   signIn(data: { user_name: string; password: string }) {
-    return this.endpointService.postEndpoint<DataLoginResponse>(
+    return this.endpointService.postEndpoint<LoginResponse>(
       this.endpoints.signIn,
       data,
     );
   }
 
-  resetToken(rt: string, id: string) {
+  resetToken(refreshToken: string, id: string) {
     const headers = new HttpHeaders({
-      Authorization: `Bearer ${rt}`,
+      Authorization: `Bearer ${refreshToken}`,
     });
     const body = { id };
     return this.endpointService.postEndpoint<TokenResponse>(

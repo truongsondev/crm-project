@@ -1,15 +1,15 @@
 <nav>
   <div
-    class="w-full bg-cyan-400 h-screen max-xxl:animate-wiggle flex flex-col justify-between"
+    class="w-20 lg:w-64 bg-cyan-400 h-screen flex flex-col justify-between transition-all duration-300"
   >
-    <div class="flex flex-col gap-8 px-[12px] mt-[50px]">
+    <div class="flex flex-col gap-8 px-3 mt-10">
       <a
         *ngIf="hasAccess('dashboard')"
-        class="flex gap-1 cursor-pointer p-2 rounded"
+        class="flex items-center gap-3 cursor-pointer p-2 rounded transition"
         (click)="selectMenu('dashboard')"
         [ngClass]="{
           'bg-white text-primary': selectedItem === 'dashboard',
-          'text-white': selectedItem !== 'dashboard',
+          'text-white hover:bg-white/20': selectedItem !== 'dashboard',
         }"
         [routerLink]="'/dashboard'"
       >
@@ -21,16 +21,18 @@
         >
           dashboard
         </mat-icon>
-        <span class="hidden xxl:block">Dashboard</span>
+        <span class="hidden lg:inline">{{
+          "NAVIGATION.DASHBOARD" | translate
+        }}</span>
       </a>
 
       <a
         *ngIf="hasAccess('contacts')"
-        class="flex gap-1 cursor-pointer p-2 rounded"
+        class="flex items-center gap-3 cursor-pointer p-2 rounded transition"
         (click)="selectMenu('contacts')"
         [ngClass]="{
           'bg-white text-primary': selectedItem === 'contacts',
-          'text-white': selectedItem !== 'contacts',
+          'text-white hover:bg-white/20': selectedItem !== 'contacts',
         }"
         [routerLink]="'/contacts'"
       >
@@ -42,16 +44,18 @@
         >
           article
         </mat-icon>
-        <span class="hidden xxl:block">Contacts</span>
+        <span class="hidden lg:inline">{{
+          "NAVIGATION.CONTACTS" | translate
+        }}</span>
       </a>
 
       <a
         *ngIf="hasAccess('sales-orders')"
-        class="flex gap-1 cursor-pointer p-2 rounded"
+        class="flex items-center gap-3 cursor-pointer p-2 rounded transition"
         (click)="selectMenu('sales-orders')"
         [ngClass]="{
           'bg-white text-primary': selectedItem === 'sales-orders',
-          'text-white': selectedItem !== 'sales-orders',
+          'text-white hover:bg-white/20': selectedItem !== 'sales-orders',
         }"
         [routerLink]="'/sales-orders'"
       >
@@ -63,37 +67,44 @@
         >
           receipt_long
         </mat-icon>
-        <span class="hidden xxl:block">Sales Orders</span>
+        <span class="hidden lg:inline">{{
+          "NAVIGATION.SALES_ORDER" | translate
+        }}</span>
       </a>
 
       <a
         *ngIf="hasAccess('user-management')"
-        class="flex gap-1 cursor-pointer p-2 rounded"
+        class="flex items-center gap-3 cursor-pointer p-2 rounded transition"
         (click)="selectMenu('user-management')"
         [ngClass]="{
           'bg-white text-primary': selectedItem === 'user-management',
-          'text-white': selectedItem !== 'user-management',
+          'text-white hover:bg-white/20': selectedItem !== 'user-management',
         }"
         [routerLink]="'/user-management'"
       >
         <mat-icon
           [ngClass]="{
-            'text-primary': selectedItem === 'users',
-            'text-white': selectedItem !== 'users',
+            'text-primary': selectedItem === 'user-management',
+            'text-white': selectedItem !== 'user-management',
           }"
         >
           person
         </mat-icon>
-        <span class="hidden xxl:block">User Management</span>
+        <span class="hidden lg:inline">{{
+          "NAVIGATION.USER_MANAGEMENT" | translate
+        }}</span>
       </a>
     </div>
-    <div class="flex flex-col gap-2 px-[12px] mt-[50px] flex-1">
+
+    <div class="flex flex-col gap-2 px-3 mt-6 flex-1">
       <a
-        class="flex gap-2 items-center cursor-pointer p-2 rounded transition hover:bg-white hover:text-primary text-white mt-auto"
+        class="flex items-center gap-3 cursor-pointer p-2 rounded transition text-white hover:bg-white hover:text-primary mt-auto"
         (click)="logout()"
       >
         <mat-icon>logout</mat-icon>
-        <span class="hidden xxl:block">Logout</span>
+        <span class="hidden lg:inline">{{
+          "NAVIGATION.LOGOUT" | translate
+        }}</span>
       </a>
     </div>
 
@@ -101,7 +112,7 @@
       <div class="rounded-full bg-white w-8 h-8 overflow-hidden">
         <img src="avt.png" alt="avt" class="object-cover w-full h-full" />
       </div>
-      <span class="text-white">{{ username }}</span>
+      <span class="hidden lg:inline text-white">{{ username }}</span>
     </div>
   </div>
 </nav>

@@ -1,0 +1,42 @@
+{
+  "SALUTATION": {
+    "MR": "Mr.",
+    "MRS": "Mrs.",
+    "MS": "Ms.",
+    "DR": "Dr.",
+    "PROF": "Prof."
+  },
+  "USER": {
+    "BUTTON": {
+      "ADD_USER": "Add User"
+    },
+    "TITLE": "User Management",
+    "SUB_TITLE": "List Of Users"
+  },
+  "CONTACT": {
+    "BUTTON": {
+      "ADD_CONTACT": "Add Contact"
+    },
+    "TITLE": "Contacts",
+    "SUB_TITLE": "List Of Contacts"
+  },
+  "SALES_ORDER": {
+    "BUTTON": {
+      "ADD_SALES_ORDER": "Add Sales Order"
+    },
+    "TITLE": "Sales Order",
+    "SUB_TITLE": "List Of Sales Orders"
+  },
+  "BUTTON": {
+    "FILTER": "Filter by",
+    "DOWNLOAD": "Download",
+    "DELETE": "Delete"
+  },
+  "NAVIGATION": {
+    "DASHBOARD": "Dashboard",
+    "CONTACTS": "Contacts",
+    "SALES_ORDER": "Sales Order",
+    "USER_MANAGEMENT": "User Management",
+    "LOGOUT": "Logout"
+  }
+}

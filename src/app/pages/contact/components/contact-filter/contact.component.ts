@@ -1,9 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  signal,
-  Inject,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, Inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
@@ -14,7 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { LEAD_SOURCE } from '@app/constants/shared.constant';
-import { From } from '@app/custom-types/shared.type';
+import { ModalOrigin } from '@app/custom-types/shared.type';
 import { ButtonComponent } from '@app/shared-components/button/button.component';
 
 import { BehaviorSubject } from 'rxjs';
@@ -54,15 +49,9 @@ export class ContactFilterComponent {
   leadSource: string[] = LEAD_SOURCE;
   assignedTo: string[] = [];
 
-  protected readonly value = signal('');
-
-  protected onInput(event: Event) {
-    const { value } = event.target as HTMLInputElement;
-    this.value.set(value);
-  }
   constructor(
     private dialogRef: MatDialogRef<ContactFilterComponent>,
-    @Inject('data') public fromData: From,
+    @Inject('data') public fromData: ModalOrigin,
   ) {}
 
   initForm() {

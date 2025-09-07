@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { FormContact } from '@app/custom-types/shared.type';
-import { OPENDED_FORM_ENUM } from '@app/enums/shared.enum';
+import { OPENDED_FROM_ENUM } from '@app/enums/shared.enum';
 import { ContactService } from '@app/services/contact.service';
 import { SalesOrderService } from '@app/services/sales-order.service';
 import { SnackbarService } from '@app/services/snackbar.service';
@@ -22,14 +21,14 @@ export class ConfirmActionComponent {
     private salesOrderService: SalesOrderService,
   ) {
     this.nameDeleted =
-      this.data.from === OPENDED_FORM_ENUM.CONTACT
+      this.data.from === OPENDED_FROM_ENUM.CONTACT
         ? this.data.dataSelected?.contact_name
         : this.data.dataSelected.order_number;
   }
 
   onDelete() {
     const _id = this.data.dataSelected?._id;
-    if (this.data.from === OPENDED_FORM_ENUM.CONTACT) {
+    if (this.data.from === OPENDED_FROM_ENUM.CONTACT) {
       this.contactService.deleteContact(_id).subscribe({
         next: () => {
           this.snackbarService.openSnackBar('Delete success!');
@@ -38,7 +37,7 @@ export class ConfirmActionComponent {
           this.snackbarService.openSnackBar('Delete fail!');
         },
       });
-    } else if (this.data.from === OPENDED_FORM_ENUM.SALE_ORDER) {
+    } else if (this.data.from === OPENDED_FROM_ENUM.SALE_ORDER) {
       this.salesOrderService.deleteSaleOrder(_id).subscribe({
         next: () => {
           this.snackbarService.openSnackBar('Delete success!');

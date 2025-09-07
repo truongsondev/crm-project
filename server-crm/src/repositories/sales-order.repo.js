@@ -24,6 +24,24 @@ class SalesOrderRepo {
   static async deleteSaleOrder(id) {
     return await Order.findByIdAndDelete(id);
   }
+
+  static async countSalesOrdersByStatus() {
+    return await Order.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          status: "$_id",
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+  }
 }
 
 export default SalesOrderRepo;

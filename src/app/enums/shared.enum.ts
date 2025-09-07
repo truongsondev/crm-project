@@ -8,7 +8,7 @@ export enum ROLE_TYPE {
   USER_READ_ONLY = 'USER_READ_ONLY',
 }
 
-export enum OPENDED_FORM_ENUM {
+export enum OPENDED_FROM_ENUM {
   USER_MANAGEMENT = 'user-management',
   CONTACT = 'contact',
   SALE_ORDER = 'sales-orders',

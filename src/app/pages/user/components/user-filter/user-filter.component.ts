@@ -9,7 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 
-import { From } from '@app/custom-types/shared.type';
+import { ModalOrigin } from '@app/custom-types/shared.type';
 
 import { ButtonComponent } from '@app/shared-components/button/button.component';
 import { ROLES } from '@app/constants/shared.constant';
@@ -48,7 +48,7 @@ export class UserFilterComponent {
 
   constructor(
     private dialogRef: MatDialogRef<UserFilterComponent>,
-    @Inject('data') public fromData: From,
+    @Inject('data') public fromData: ModalOrigin,
   ) {}
 
   ngOnInit(): void {

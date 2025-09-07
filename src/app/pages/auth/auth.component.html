@@ -12,7 +12,7 @@
       </div>
       <div class="w-full">
         <form
-          [formGroup]="LoginFormGroup"
+          [formGroup]="loginFormGroup"
           (ngSubmit)="onSubmit()"
           class="flex flex-col gap-4"
         >
@@ -26,8 +26,8 @@
             </div>
             <span
               *ngIf="
-                LoginFormGroup.get('user_name')?.touched &&
-                LoginFormGroup.get('user_name')?.invalid
+                loginFormGroup.get('user_name')?.touched &&
+                loginFormGroup.get('user_name')?.invalid
               "
               class="text-sm text-red-500"
             >
@@ -45,8 +45,8 @@
             </div>
             <span
               *ngIf="
-                LoginFormGroup.get('password')?.touched &&
-                LoginFormGroup.get('password')?.errors?.['required']
+                loginFormGroup.get('password')?.touched &&
+                loginFormGroup.get('password')?.errors?.['required']
               "
               class="text-sm text-red-500"
             >

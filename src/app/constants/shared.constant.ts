@@ -1,18 +1,4 @@
-import { HeaderColumn } from '@app/custom-types/shared.type';
-
 export const ITEM_OF_PAGE = 10;
-
-export const COLUMN_DEFS: HeaderColumn[] = [
-  { column: 'employee', label: 'Employee' },
-  { column: 'username', label: 'Username' },
-  { column: 'email', label: 'Email' },
-  { column: 'salutation', label: 'Salutation' },
-  { column: 'role', label: 'Role' },
-  { column: 'job_title', label: 'Job Title' },
-  { column: 'manager_name', label: 'Manager' },
-  { column: 'is_active', label: 'Active' },
-  { column: 'action', label: 'Action' },
-];
 
 export const DISPLAY_ROLES = {
   USER_ADMIN: 'Admin',
@@ -24,18 +10,6 @@ export const DISPLAY_ROLES = {
   USER_READ_ONLY: 'Guest',
 };
 
-export const DISPLAY_COLUMN_ROLE = [
-  'employee',
-  'username',
-  'email',
-  'salutation',
-  'role',
-  'job_title',
-  'manager_name',
-  'is_active',
-  'action',
-];
-
 export const LEAD_SOURCE = [
   'Existing Customer',
   'Partner',
@@ -45,7 +19,7 @@ export const LEAD_SOURCE = [
   'Other',
 ];
 
-export const SALUTATION = [
+export const SALUTATIONS = [
   { value: 'None', label: 'None' },
   { value: 'Mr.', label: 'Mr.' },
   { value: 'Mrs.', label: 'Mrs.' },
@@ -67,11 +41,11 @@ export const ROLES = [
 export const ACTION = {
   SELECT: 'select',
   UPDATE: 'update',
-  CREATE: 'creat',
+  CREATE: 'create',
   NONE: '#',
 };
 
-export const STATUSOPTION = ['Created', 'Approved', 'Delivered', 'Canceled'];
+export const STATUS_OPTION = ['Created', 'Approved', 'Delivered', 'Canceled'];
 
 export const ERROR_MESSAGES: Record<
   number,

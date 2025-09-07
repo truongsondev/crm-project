@@ -1,7 +1,11 @@
 import UserRepo from "../repositories/user.repo.js";
 import { generateKeyPairSync } from "crypto";
 import { createTokenPair, verifyToken } from "../jwt/token.js";
-import { AuthorizedError, NotFoundError } from "../http/error.http.js";
+import {
+  AuthorizedError,
+  NotFoundError,
+  NotFoundUser,
+} from "../http/error.http.js";
 
 // const mockUsers = [
 //   {
@@ -174,15 +178,13 @@ class AuthService {
     };
   }
   static async resetToken(refreshTokenOfuser, _id) {
-    console.log("refreshTokenOfuser:::", refreshTokenOfuser);
     const token = refreshTokenOfuser.split(" ")[1];
     const user = await UserRepo.findUserbyId(_id);
     if (!user) {
-      throw new AuthorizedError("Invalid user. Please log in again");
+      throw new NotFoundUser("Invalid user. Please login again");
     }
     const publicKeyOfUser = user.public_key;
     const isValid = verifyToken(token, publicKeyOfUser);
-    console.log(isValid);
     if (!isValid) {
       {
         throw new AuthorizedError("Invalid token. Please log in again");

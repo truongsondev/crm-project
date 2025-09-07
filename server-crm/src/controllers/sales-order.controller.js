@@ -88,4 +88,14 @@ export class SalesOrderController {
       next(e);
     }
   };
+
+  static async countSalesOrdersByStatus(req, res, next) {
+    try {
+      const response = await SalesOrderService.countSalesOrdersByStatus();
+      console.log("response:::", response);
+      res.status(200).json(response);
+    } catch (e) {
+      next(e);
+    }
+  }
 }

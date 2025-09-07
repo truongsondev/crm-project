@@ -10,7 +10,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { FormSalesOrder } from '@app/custom-types/shared.type';
+import { SalesOrderTableState } from '@app/custom-types/shared.type';
 import { User } from '@app/interfaces/user.interface';
 import { ROLE_TYPE } from '@app/enums/shared.enum';
 import { CommonService } from '@app/services/common.service';
@@ -22,7 +22,7 @@ import { Contact } from '@app/interfaces/contact.interface';
 import { SalesOrderService } from '@app/services/sales-order.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { SnackbarService } from '@app/services/snackbar.service';
-import { ACTION, STATUSOPTION } from '@app/constants/shared.constant';
+import { ACTION, STATUS_OPTION } from '@app/constants/shared.constant';
 
 @Component({
   standalone: true,
@@ -37,7 +37,7 @@ import { ACTION, STATUSOPTION } from '@app/constants/shared.constant';
     ReactiveFormsModule,
   ],
 })
-export class SalesOrderForm implements OnInit {
+export class SalesOrderForm {
   salesOrderFormGroup!: FormGroup;
   protected readonly value = signal('');
 
@@ -45,15 +45,15 @@ export class SalesOrderForm implements OnInit {
   listContact$!: Observable<Contact[]>;
 
   private ORDER_NO_PATTERN = /^[a-zA-Z0-9_-]+$/;
-  statusOption = STATUSOPTION;
+  statusOption = STATUS_OPTION;
 
   constructor(
-    @Inject('data') public salesOrder: FormSalesOrder,
+    @Inject('data') public salesOrder: SalesOrderTableState,
     private fb: FormBuilder,
     private userService: UserService,
     private commonService: CommonService,
     private contactService: ContactService,
-    private salseOrderService: SalesOrderService,
+    private salesOrderService: SalesOrderService,
     private dialogRef: MatDialogRef<SalesOrderForm>,
     private snackbarService: SnackbarService,
   ) {}
@@ -61,7 +61,7 @@ export class SalesOrderForm implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.getListAssignedTo();
-    this.getListContact();
+    this.getContacList();
   }
 
   getErrorMsg(controlName: string): string | null {
@@ -74,7 +74,7 @@ export class SalesOrderForm implements OnInit {
   }
 
   initForm = () => {
-    const so = this.salesOrder?.dataSelected;
+    const so = this.salesOrder?.selectedRow;
     this.salesOrderFormGroup = this.fb.group({
       order_number: [
         { value: so?.order_number || '', disabled: true },
@@ -102,7 +102,7 @@ export class SalesOrderForm implements OnInit {
       this.salesOrderFormGroup.markAllAsTouched();
       return;
     }
-    const creator_id = this.commonService.parseToJson()?._id;
+    const creator_id = this.commonService.parseStringToJson('user')?._id;
     if (creator_id === '') {
       return;
     }
@@ -112,7 +112,7 @@ export class SalesOrderForm implements OnInit {
     };
 
     if (this.salesOrder.action === ACTION.CREATE) {
-      this.salseOrderService.createSaleOrder(newDataform).subscribe({
+      this.salesOrderService.createSaleOrder(newDataform).subscribe({
         next: () => {
           this.snackbarService.openSnackBar('Create sale order success!');
           this.dialogRef.close({
@@ -124,8 +124,8 @@ export class SalesOrderForm implements OnInit {
         },
       });
     } else if (this.salesOrder.action === ACTION.UPDATE) {
-      this.salseOrderService
-        .updateSalesOrder(this.salesOrder.dataSelected?._id || '', newDataform)
+      this.salesOrderService
+        .updateSalesOrder(this.salesOrder.selectedRow?._id || '', newDataform)
         .subscribe({
           next: () => {
             this.snackbarService.openSnackBar('Update success');
@@ -144,7 +144,7 @@ export class SalesOrderForm implements OnInit {
   }
 
   getListAssignedTo() {
-    const creator = this.commonService.parseToJson();
+    const creator = this.commonService.parseStringToJson('user');
     if (creator === '') return;
 
     const role = creator.role;
@@ -168,7 +168,7 @@ export class SalesOrderForm implements OnInit {
     );
   }
 
-  getListContact() {
+  getContacList() {
     this.listContact$ = this.contactService
       .getListContact()
       .pipe(map((res) => res));

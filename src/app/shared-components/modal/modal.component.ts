@@ -12,19 +12,19 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
-import { FormData } from '@app/interfaces/user-form-data.interface';
+import { FormData } from '@app/interfaces/form-data.interface';
 import { ContactFilterComponent } from '@app/pages/contact/components/contact-filter/contact.component';
 import { SalesOrderFilterComponent } from '@app/pages/salesOrder/components/sales-order-filter/sales-order.component';
 import { UserFilterComponent } from '@app/pages/user/components/user-filter/user-filter.component';
 import { ButtonComponent } from '../button/button.component';
 import { ConfirmActionComponent } from '../confirm-action/confirm-action.component';
 import { ErrorComponent } from '../error/error.component';
-import { SelectOptioncomponent } from '../select-option/select-option.component';
+import { SelectOptionComponent } from '../select-option/select-option.component';
 
 @Component({
   standalone: true,
   imports: [MatDialogModule, CommonModule, ButtonComponent],
-  selector: 'app-modal-dialog',
+  selector: 'app-modal',
   templateUrl: './modal.component.html',
 })
 export class ModalDiaLogComponent {
@@ -52,7 +52,7 @@ export class ModalDiaLogComponent {
           provide: 'data',
           useValue: {
             action: this.data.data?.action,
-            dataSelected: this.data.data?.dataSelected,
+            selectedRow: this.data.data?.selectedRow,
             dataList: this.data.data?.dataList,
             message: this.data.data?.message,
             from: this.data.data?.from,
@@ -64,7 +64,7 @@ export class ModalDiaLogComponent {
   }
   private isHiddenComponent(comp: any): boolean {
     const hiddenComponents = [
-      SelectOptioncomponent,
+      SelectOptionComponent,
       ErrorComponent,
       ConfirmActionComponent,
       UserFilterComponent,

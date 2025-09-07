@@ -4,10 +4,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { ACCESS_PAGE_ENUM } from '@app/enums/shared.enum';
 import { CommonService } from '@app/services/common.service';
+import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   standalone: true,
   selector: 'nav-component',
-  imports: [MatIconModule, CommonModule, RouterModule],
+  imports: [MatIconModule, CommonModule, RouterModule, TranslatePipe],
   templateUrl: './navigation.component.html',
 })
 export class NavComponent {
@@ -18,6 +19,7 @@ export class NavComponent {
 
   selectMenu(menu: string) {
     this.selectedItem = menu;
+    console.log(this.selectedItem);
   }
   roleOfUser: string = '';
   constructor(
@@ -25,18 +27,18 @@ export class NavComponent {
     private commonService: CommonService,
   ) {}
   getUserName() {
-    const user = this.commonService.parseToJson();
+    const user = this.commonService.parseStringToJson('user');
     return user.first_name + ' ' + user.last_name;
   }
 
   getRoleUser(): string {
-    const user = this.commonService.parseToJson();
+    const user = this.commonService.parseStringToJson('user');
     return user.role;
   }
 
   checkUser() {
-    const user = this.commonService.parseToJson();
-    if (user !== '') {
+    const user = this.commonService.parseStringToJson('user');
+    if (user) {
       this.isLogined = true;
     } else {
       this.isLogined = false;
@@ -75,7 +77,7 @@ export class NavComponent {
         if (event instanceof NavigationEnd) {
           const segments = event.urlAfterRedirects.split('/');
           const last = segments.pop() || '';
-          this.selectedItem = last;
+          this.selectedItem = last || 'dashboard';
         }
       });
     } else {

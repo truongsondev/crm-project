@@ -1,0 +1,42 @@
+{
+  "SALUTATION": {
+    "MR": "Ông",
+    "MRS": "Bà",
+    "MS": "Cô",
+    "DR": "Bác sĩ",
+    "PROF": "Giáo sư"
+  },
+  "USER": {
+    "BUTTON": {
+      "ADD_USER": "Thêm người dùng"
+    },
+    "TITLE": "Quản lý người dùng",
+    "SUB_TITLE": "Danh sách người dùng"
+  },
+  "CONTACT": {
+    "BUTTON": {
+      "ADD_CONTACT": "Thêm liên hệ"
+    },
+    "TITLE": "Liên hệ",
+    "SUB_TITLE": "Danh sách liên hệ"
+  },
+  "SALES_ORDER": {
+    "BUTTON": {
+      "ADD_SALES_ORDER": "Thêm bán hàng"
+    },
+    "TITLE": "Bán hàng",
+    "SUB_TITLE": "Danh sách bán hàng"
+  },
+  "BUTTON": {
+    "FILTER": "Lọc theo",
+    "DOWNLOAD": "Tải xuống",
+    "DELETE": "Xóa"
+  },
+  "NAVIGATION": {
+    "DASHBOARD": "Tổng quan",
+    "CONTACTS": "Liên hệ",
+    "SALES_ORDER": "Bán hàng",
+    "USER_MANAGEMENT": "Quản lí người dùng",
+    "LOGOUT": "Đăng xuất"
+  }
+}

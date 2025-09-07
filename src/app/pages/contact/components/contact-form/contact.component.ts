@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { FormContact, SelectOption } from '@app/custom-types/shared.type';
+import { ContactTableState, SelectOption } from '@app/custom-types/shared.type';
 import { CommonModule } from '@angular/common';
 import { UserService } from '@app/services/user.service';
 import { User } from '@app/interfaces/user.interface';
@@ -19,11 +19,14 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { LEAD_SOURCE, SALUTATION } from '@app/constants/shared.constant';
+import {
+  ACTION,
+  LEAD_SOURCE,
+  SALUTATIONS,
+} from '@app/constants/shared.constant';
 import { ContactService } from '@app/services/contact.service';
 
 import { MatDialogRef } from '@angular/material/dialog';
-import { UserForm } from '../../../user/components/user-form/user.component';
 import { SnackbarService } from '@app/services/snackbar.service';
 import { CommonService } from '@app/services/common.service';
 import { ROLE_TYPE } from '@app/enums/shared.enum';
@@ -47,19 +50,19 @@ export class ContactForm {
   protected readonly value = signal('');
 
   contactFormGroup!: FormGroup;
-  salutations: SelectOption[] = SALUTATION;
-  leadSource: string[] = LEAD_SOURCE;
-  listAssign: User[] = [];
+  salutations: SelectOption[] = SALUTATIONS;
+  leadSources: string[] = LEAD_SOURCE;
+  assignList: User[] = [];
   constructor(
     private userService: UserService,
     private fb: FormBuilder,
     private contactService: ContactService,
-    private dialogRef: MatDialogRef<UserForm>,
+    private dialogRef: MatDialogRef<ContactForm>,
     private snackbarService: SnackbarService,
     private commonService: CommonService,
-    @Inject('data') public contact: FormContact,
+    @Inject('data') public contact: ContactTableState,
   ) {
-    this.getListUser();
+    this.getUserList();
   }
   getErrorMsg(controlName: string): string | null {
     const control = this.contactFormGroup.get(controlName);
@@ -75,21 +78,24 @@ export class ContactForm {
   }
 
   ngOnInit() {
-    const contactForm = this.contact.dataSelected;
+    const selectedContact = this.contact.selectedRow;
     this.contactFormGroup = this.fb.group({
-      contact_name: [contactForm?.contact_name || '', Validators.required],
-      salutation: [contactForm?.salutation || 'None', Validators.required],
+      contact_name: [selectedContact?.contact_name || '', Validators.required],
+      salutation: [selectedContact?.salutation || 'None', Validators.required],
       phone: [
-        contactForm?.phone,
+        selectedContact?.phone,
         [Validators.required, Validators.pattern(/^[0-9]{9,15}$/)],
       ],
-      email: [contactForm?.email, Validators.email],
-      organization: [contactForm?.organization],
-      birthday: [contactForm?.birthday || null],
-      lead_source: [contactForm?.lead_source || '', Validators.required],
-      assigned_to: [contactForm?.assigned_to?._id || '', Validators.required],
-      address: [contactForm?.address || ''],
-      description: [contactForm?.description || ''],
+      email: [selectedContact?.email, Validators.email],
+      organization: [selectedContact?.organization],
+      birthday: [selectedContact?.birthday || null],
+      lead_source: [selectedContact?.lead_source || '', Validators.required],
+      assigned_to: [
+        selectedContact?.assigned_to?._id || '',
+        Validators.required,
+      ],
+      address: [selectedContact?.address || ''],
+      description: [selectedContact?.description || ''],
     });
   }
   getRole() {
@@ -101,20 +107,20 @@ export class ContactForm {
     return user.role;
   }
 
-  getListUser() {
+  getUserList() {
     const role = this.getRole();
     if (!role) return;
     this.userService.getListUser().subscribe((data) => {
       const users = data;
       if (role === ROLE_TYPE.USER_ADMIN || role === ROLE_TYPE.CONTACT_MGR) {
-        this.listAssign = users.filter((item) =>
+        this.assignList = users.filter((item) =>
           [
             ROLE_TYPE.CONTACT_MGR.toString(),
             ROLE_TYPE.CONTACT_EMP.toString(),
           ].includes(item.role),
         );
       } else if (role === ROLE_TYPE.CONTACT_EMP) {
-        this.listAssign = users.filter((item) =>
+        this.assignList = users.filter((item) =>
           [ROLE_TYPE.CONTACT_EMP.toString()].includes(item.role),
         );
       }
@@ -131,24 +137,24 @@ export class ContactForm {
       this.snackbarService.openSnackBar('Form invalid!');
       return;
     }
-    const user = this.commonService.parseToJson();
+    const user = this.commonService.parseStringToJson('user');
     const id = user._id;
     let newValueForm = { ...this.contactFormGroup.value };
-    newValueForm = this.commonService.addCreator(
+    newValueForm = this.commonService.addCreatorToForm(
       this.contactFormGroup.value,
       id,
     );
-    if (this.contact.action === 'create') {
-      this.contactService.createContact(newValueForm).subscribe((res) => {
+    if (this.contact.action === ACTION.CREATE) {
+      this.contactService.createContact(newValueForm).subscribe(() => {
         this.snackbarService.openSnackBar('Create contact success');
         this.dialogRef.close({
           isSubmit: true,
         });
       });
-    } else if (this.contact.action === 'update') {
-      const _id = this.contact.dataSelected?._id;
+    } else if (this.contact.action === ACTION.UPDATE) {
+      const _id = this.contact.selectedRow?._id;
       this.contactService.updateContact(_id || '', newValueForm).subscribe({
-        next: (res) => {
+        next: () => {
           this.snackbarService.openSnackBar('Update contact success');
           this.dialogRef.close({
             isSubmit: true,
