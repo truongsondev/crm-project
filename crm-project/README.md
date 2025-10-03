@@ -24,59 +24,19 @@ git clone https://github.com/truongsondev/crm-project.git
 cd crm-project
 ```
 
-3. Build project
-
-a. With docker
+3. Build and start containers
 
 ```bash
 docker-compose up -d
 ```
 
-b. Manual Setup
-
-Install dependencies for the client:
-
-```bash
-cd crm-project
-npm install
-```
-
-Install dependencies for the server:
-
-```bash
-cd server-crm
-npm install
-```
-
-Set up .env file:
-
-PORT = 8080
-
-URL_CONNECT = mongodb://127.0.0.1:27017/crm_db
-
 ## Usage
-
-a. Using Docker
 
 Frontend (Angular): http://localhost:4200
 
 Backend (Node/Express): http://localhost:8080
 
 MongoDB: mongodb://localhost:27017/crm_db
-
-b. Manual Setup
-
-At the crm-project folder
-
-```bash
-npm start
-```
-
-At the server-crm folder
-
-```bash
-npm run dev
-```
 
 ## Login with role admin
 

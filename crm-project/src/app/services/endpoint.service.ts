@@ -55,7 +55,7 @@ export class EndpointService {
       .pipe(catchError((err) => this.handleError<T>(err)));
   }
 
-  pactchEndpoint<T = any>(
+  patchEndpoint<T = any>(
     endpoint: string,
     reqBody: any,
     options?: any,

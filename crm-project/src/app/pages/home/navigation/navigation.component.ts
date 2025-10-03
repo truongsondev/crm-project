@@ -19,7 +19,6 @@ export class NavComponent {
 
   selectMenu(menu: string) {
     this.selectedItem = menu;
-    console.log(this.selectedItem);
   }
   roleOfUser: string = '';
   constructor(
@@ -80,8 +79,6 @@ export class NavComponent {
           this.selectedItem = last || 'dashboard';
         }
       });
-    } else {
-      this.router.navigate(['/auth/sign-in']);
     }
   }
   logout() {

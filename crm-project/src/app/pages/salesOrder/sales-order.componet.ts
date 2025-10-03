@@ -288,41 +288,36 @@ export class SaleOrderComponet {
       });
   }
 
-  markSalesOrderForDeletion(saleOrder: SalesOrder) {
-    if (saleOrder.isChecked) {
-      if (!this.salesOrdersToDelete.includes(saleOrder._id)) {
-        this.salesOrdersToDelete.push(saleOrder._id);
-      }
-    } else {
-      this.salesOrdersToDelete = this.salesOrdersToDelete.filter(
-        (salesOrder_id) => salesOrder_id !== saleOrder._id,
-      );
-    }
-  }
-
   onPageChange(event: PageEvent) {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
   }
 
-  onRowChange() {
-    this.allSelected = this.salesOrderList.every(
-      (salesOrder) => salesOrder.isChecked,
+  selectAllSalesOrders(checked: boolean) {
+    this.allSelected = checked;
+    this.salesOrderList.forEach(
+      (SalesOrder) => (SalesOrder.isChecked = checked),
     );
-    this.salesOrdersToDelete = this.salesOrderList
-      .filter((salesOrder) => salesOrder.isChecked)
-      .map((salesOrder) => salesOrder._id);
+    this.salesOrdersToDelete = checked
+      ? this.salesOrderList.map((SalesOrder) => SalesOrder._id)
+      : [];
   }
 
-  selectAllSalesOrder(checked: boolean) {
-    this.salesOrderList.forEach((saleOrder) => (saleOrder.isChecked = checked));
+  toggleSalesOrder(SalesOrder: SalesOrder) {
+    SalesOrder.isChecked = !SalesOrder.isChecked;
+    this.salesOrdersToDelete = this.salesOrderList
+      .filter((SalesOrder) => SalesOrder.isChecked)
+      .map((SalesOrder) => SalesOrder._id);
 
-    if (checked) {
-      this.salesOrdersToDelete = this.salesOrderList.map(
-        (contact) => contact._id,
-      );
-    } else {
-      this.salesOrdersToDelete = [];
-    }
+    this.allSelected = this.salesOrderList.every(
+      (SalesOrder) => SalesOrder.isChecked,
+    );
+  }
+
+  isIndeterminate(): boolean {
+    const selected = this.salesOrderList.filter(
+      (SalesOrder) => SalesOrder.isChecked,
+    ).length;
+    return selected > 0 && selected < this.salesOrderList.length;
   }
 }

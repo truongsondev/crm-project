@@ -15,6 +15,7 @@ import {
   LeadSourceStatResponse,
   StatusStatResponse,
 } from '@app/interfaces/response.interface';
+import { ChartService } from '@app/services/chart.service';
 @Component({
   standalone: true,
   selector: 'dashboard-component',
@@ -30,10 +31,18 @@ export class DashboardComponet {
   leadSourceStat: LeadSourceStatResponse[] = [];
   statusStat: StatusStatResponse[] = [];
   currentRole = '';
+  constructor(
+    private contactService: ContactService,
+    private salesOrderService: SalesOrderService,
+    private snackbarService: SnackbarService,
+    private router: Router,
+    private commonService: CommonService,
+    private cdr: ChangeDetectorRef,
+    private chartService: ChartService,
+  ) {}
+  salesStatusChartData!: ChartData<'bar'>;
 
-  salesStatusChartData: ChartData<'bar'> = { labels: [], datasets: [] };
-
-  contactSourceChartData: ChartData<'bar'> = { labels: [], datasets: [] };
+  contactSourceChartData!: ChartData<'bar'>;
   chartOptions: ChartOptions<'bar'> = {
     responsive: true,
     plugins: {
@@ -43,16 +52,19 @@ export class DashboardComponet {
     },
   };
 
-  constructor(
-    private contactService: ContactService,
-    private salesOrderService: SalesOrderService,
-    private snackbarService: SnackbarService,
-    private router: Router,
-    private commonService: CommonService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  initChart() {
+    this.salesStatusChartData = this.chartService.initChart(
+      'Sales Orders ',
+      '#ef4444',
+    );
+    this.contactSourceChartData = this.chartService.initChart(
+      'Contacts',
+      '#10b981',
+    );
+  }
 
   ngOnInit() {
+    this.initChart();
     this.getRole();
     this.getListContacts();
     this.getListSalesOrders();
@@ -76,14 +88,7 @@ export class DashboardComponet {
           {
             label: 'contact',
             data: this.leadSourceStat.map((contact) => contact.count),
-            backgroundColor: [
-              '#10b981',
-              '#3b82f6',
-              '#f59e0b',
-              '#ec4899',
-              '#8b5cf6',
-              '#ef4444',
-            ],
+            backgroundColor: ['#10b981'],
           },
         ],
       };
@@ -105,14 +110,7 @@ export class DashboardComponet {
           {
             label: 'Sales Status',
             data: this.statusStat.map((saleOrder) => saleOrder.count),
-            backgroundColor: [
-              '#10b981',
-              '#3b82f6',
-              '#f59e0b',
-              '#ec4899',
-              '#8b5cf6',
-              '#ef4444',
-            ],
+            backgroundColor: ['#ef4444'],
           },
         ],
       };

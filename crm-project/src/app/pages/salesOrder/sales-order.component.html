@@ -1,10 +1,10 @@
 <div class="mt-4 mx-2 md:mx-6 lg:mx-10 bg-white p-4 md:p-6 rounded-lg shadow">
   <div class="flex flex-col gap-4 md:flex-row md:items-center">
     <h1 class="font-medium text-2xl sm:text-3xl">
-      {{ "CONTACT.TITLE" | translate }}
+      {{ "SALES_ORDER.TITLE" | translate }}
     </h1>
     <button-component
-      [textBt]="'CONTACT.BUTTON.ADD_CONTACT' | translate"
+      [textBt]="'SALES_ORDER.BUTTON.ADD_SALES_ORDER' | translate"
       [textIcon]="'add'"
       [className]="'bg-primary text-white '"
       (click)="openDialog()"
@@ -15,7 +15,7 @@
     class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
   >
     <h1 class="font-medium text-lg sm:text-xl">
-      {{ "CONTACT.SUB_TITLE" | translate }}
+      {{ "SALES_ORDER.SUB_TITLE" | translate }}
     </h1>
   </div>
 
@@ -55,32 +55,39 @@
       />
     </div>
   </div>
-
-  <h1 *ngIf="contactList.length > 0" class="mt-4 opacity-90 text-lg sm:text-sm">
+  <h1
+    *ngIf="salesOrderList.length > 0"
+    class="mt-4 opacity-90 text-lg sm:text-sm"
+  >
     Showing
     {{ pageIndex * pageSize + 1 }}
     -
-    {{ Math.min((pageIndex + 1) * pageSize, dataSourceLength) }}
+    {{ Math.min((pageIndex + 1) * pageSize, salesOrderList.length) }}
     of
-    {{ dataSourceLength }}
+    {{ salesOrderList.length }}
     records
   </h1>
 
   <div class="mat-elevation-z8 overflow-x-auto mt-4">
     <table mat-table [dataSource]="dataSource" matSort class="min-w-full">
       <ng-container *ngFor="let col of columnDefs" [matColumnDef]="col.column">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          <ng-container *ngIf="col.label !== 'All'; else showCheckbox">
+        <ng-container *ngIf="col.label !== 'All'; else showCheckbox">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
             {{ col.label }}
-          </ng-container>
+          </th>
+        </ng-container>
 
-          <ng-template #showCheckbox>
+        <ng-template #showCheckbox>
+          <th mat-header-cell *matHeaderCellDef>
             <mat-checkbox
-              [(ngModel)]="allSelected"
-              (change)="selectAllContacts($event.checked)"
-            ></mat-checkbox>
-          </ng-template>
-        </th>
+              [checked]="allSelected"
+              [indeterminate]="isIndeterminate()"
+              (change)="selectAllSalesOrders($event.checked)"
+            >
+            </mat-checkbox>
+          </th>
+        </ng-template>
+
         <td mat-cell *matCellDef="let row">
           <ng-container [ngSwitch]="col.column">
             <span
@@ -106,13 +113,19 @@
             <span *ngSwitchCase="'updated_on'">
               {{ row[col.column] | date: "medium" }}
             </span>
+            <span *ngSwitchCase="'purchase_on'">
+              {{ row[col.column] | date: "medium" }}
+            </span>
             <span *ngSwitchCase="'all'">
               <mat-checkbox
-                [(ngModel)]="row.isChecked"
-                (change)="markContactForDeletion(row)"
+                [checked]="row.isChecked"
+                (change)="toggleSalesOrder(row)"
               ></mat-checkbox>
             </span>
             <span *ngSwitchCase="'assigned_to'">
+              {{ row[col.column]?.name || "-" }}
+            </span>
+            <span *ngSwitchCase="'contact_id'">
               {{ row[col.column]?.name || "-" }}
             </span>
             <span *ngSwitchDefault>
@@ -132,7 +145,7 @@
   </div>
 
   <mat-paginator
-    [hidden]="dataSourceLength === 0"
+    [hidden]="lengthDatasource === 0"
     [pageSizeOptions]="[pageSize]"
     showFirstLastButtons
     (page)="onPageChange($event)"

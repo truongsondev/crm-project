@@ -99,30 +99,30 @@ export class UserManagementComponent implements AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   onSearch(searchKeyword: string) {
-    // const searchSubject: BehaviorSubject<{ searchKeyword: string }> =
-    //   new BehaviorSubject<{ searchKeyword: string }>({
-    //     searchKeyword: searchKeyword,
-    //   });
-    // this.getListUser(searchSubject);
-    // this.getListUser();
-    this.userService.getListUser().subscribe({
-      next: (data) => {
-        const users = data;
-        if (searchKeyword !== '') {
-          this.userList = users.filter(
-            (user: any) =>
-              user.username?.includes(searchKeyword.trim()) ||
-              user.email.includes(searchKeyword.trim()),
-          );
-        } else {
-          this.userList = users;
-        }
-        this.dataSource.data = this.userList;
-      },
-      error: (err) => {
-        this.snackbarservice.openSnackBar('Search failed: ' + err.message);
-      },
-    });
+    const searchSubject: BehaviorSubject<{ searchKeyword: string }> =
+      new BehaviorSubject<{ searchKeyword: string }>({
+        searchKeyword: searchKeyword,
+      });
+    this.getListUser(searchSubject);
+    //this.getListUser();
+    // this.userService.getListUser().subscribe({
+    //   next: (data) => {
+    //     const users = data;
+    //     if (searchKeyword !== '') {
+    //       this.userList = users.filter(
+    //         (user: any) =>
+    //           user.username?.includes(searchKeyword.trim()) ||
+    //           user.email.includes(searchKeyword.trim()),
+    //       );
+    //     } else {
+    //       this.userList = users;
+    //     }
+    //     this.dataSource.data = this.userList;
+    //   },
+    //   error: (err) => {
+    //     this.snackbarservice.openSnackBar('Search failed: ' + err.message);
+    //   },
+    // });
   }
 
   constructor(
@@ -157,7 +157,7 @@ export class UserManagementComponent implements AfterViewInit {
               createdDateTo,
               updatedDateFrom,
               updatedDateTo,
-              // searchKeyword,
+              searchKeyword,
             },
             userData,
           ]) => {
@@ -175,15 +175,14 @@ export class UserManagementComponent implements AfterViewInit {
                   : true) &&
                 (updatedDateTo
                   ? new Date(user.updated_on) <= updatedDateTo
-                  : true)
-                //   &&
-                // (!searchKeyword ||
-                //   user.username
-                //     ?.toLowerCase()
-                //     .includes(searchKeyword.trim().toLowerCase()) ||
-                //   user.email
-                //     .toLowerCase()
-                //     .includes(searchKeyword.trim().toLowerCase()))
+                  : true) &&
+                (!searchKeyword ||
+                  user.username
+                    ?.toLowerCase()
+                    .includes(searchKeyword.trim().toLowerCase()) ||
+                  user.email
+                    .toLowerCase()
+                    .includes(searchKeyword.trim().toLowerCase()))
               );
             });
             return sourceData;
@@ -203,8 +202,8 @@ export class UserManagementComponent implements AfterViewInit {
 
   openDialog() {
     this.modalService
-      .openModal(ModalDiaLogComponent, SelectOptionComponent, 'Select option', {
-        action: ACTION.SELECT,
+      .openModal(ModalDiaLogComponent, UserForm, 'Add user', {
+        action: ACTION.CREATE,
         selectedRow: null,
         dataList: this.userList,
         message: '',

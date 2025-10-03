@@ -74,6 +74,7 @@ class UserSerivice {
             reason: "Duplicate " + Object.keys(err.keyValue).join(", "),
           });
         } else {
+          console.log(err);
           failed.push({ ...user, reason: "Unknown error" });
         }
       }

@@ -33,6 +33,7 @@ import { ContactFilterComponent } from './components/contact-filter/contact.comp
 import { BehaviorSubject, combineLatestWith, map, Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'contact-component',
@@ -189,33 +190,37 @@ export class ContactComponent {
     this.dataSource.sort = this.sort;
   }
 
-  markContactForDeletion(contact: Contact) {
-    if (contact.isChecked) {
-      if (!this.contactsToDelete.includes(contact._id)) {
-        this.contactsToDelete.push(contact._id);
-      }
-    } else {
-      this.contactsToDelete = this.contactsToDelete.filter(
-        (contact_id) => contact_id !== contact._id,
-      );
-    }
+  partiallyComplete() {
+    return (
+      this.contactList.filter((contact) => contact.isChecked === false).length >
+      0
+    );
   }
 
-  onRowChange() {
-    this.allSelected = this.contactList.every((contact) => contact.isChecked);
+  selectAllContacts(checked: boolean) {
+    this.allSelected = checked;
+    this.contactList.forEach((contact) => (contact.isChecked = checked));
+    this.contactsToDelete = checked
+      ? this.contactList.map((contact) => contact._id)
+      : [];
+  }
+
+  toggleContact(contact: Contact) {
+    contact.isChecked = !contact.isChecked;
     this.contactsToDelete = this.contactList
       .filter((contact) => contact.isChecked)
       .map((contact) => contact._id);
-  }
-  selectAllContacts(checked: boolean) {
-    this.contactList.forEach((contact) => (contact.isChecked = checked));
 
-    if (checked) {
-      this.contactsToDelete = this.contactList.map((contact) => contact._id);
-    } else {
-      this.contactsToDelete = [];
-    }
+    this.allSelected = this.contactList.every((contact) => contact.isChecked);
   }
+
+  isIndeterminate(): boolean {
+    const selected = this.contactList.filter(
+      (contact) => contact.isChecked,
+    ).length;
+    return selected > 0 && selected < this.contactList.length;
+  }
+
   deleteSelectedContacts() {
     if (this.contactsToDelete.length > 0) {
       this.contactService

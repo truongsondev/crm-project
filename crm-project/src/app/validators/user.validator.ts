@@ -9,7 +9,6 @@ export class UserValidator {
 
   static password(control: AbstractControl): ValidationErrors | null {
     const fieldVal = control.value;
-    console.log('fieldVal:::', fieldVal);
     if (!fieldVal) {
       return null;
     } else {

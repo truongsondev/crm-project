@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: mongo_crm
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  server:
+    build: ./server-crm
+    container_name: server_crm
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/crm_db
+    depends_on:
+      - mongo
+
+  client:
+    build: ./crm-project
+    container_name: client_crm
+    restart: always
+    ports:
+      - "4200:4200"
+    command: ["npm", "start", "--", "--host", "0.0.0.0"]
+    volumes:
+      - ./crm-project:/app
+      - /app/node_modules
+    depends_on:
+      - server
+
+volumes:
+  mongo_data:

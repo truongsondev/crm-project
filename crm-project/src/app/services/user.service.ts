@@ -36,7 +36,7 @@ export class UserService {
   updateUser(id: string, data: User) {
     const endpoint = `${this.endpoints.updateUser}/${id}`;
     return this.commonService.withAuth(endpoint, (url, options) =>
-      this.endpointService.pactchEndpoint<User>(url, data, options),
+      this.endpointService.patchEndpoint<User>(url, data, options),
     );
   }
 }

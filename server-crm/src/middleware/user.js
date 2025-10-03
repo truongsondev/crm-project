@@ -12,6 +12,7 @@ export function checkRole(req, res, next) {
 
 export async function checkUserExit(req, res, next) {
   const token = req.headers["authorization"];
+  console.log(token);
   if (!token) {
     throw new AuthorizedError();
   }
